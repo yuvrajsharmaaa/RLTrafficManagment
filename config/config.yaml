@@ -1,0 +1,75 @@
+# Deep Reinforcement Learning for Smart Traffic Signal Optimization
+# Configuration File
+
+# Environment settings
+environment:
+  net_file: "networks/single_intersection.net.xml"
+  route_file: "networks/single_intersection.rou.xml"
+  sumo_cfg: "networks/single_intersection.sumocfg"
+  use_gui: false  # Set to true for visualization
+  num_seconds: 3600  # Simulation duration (1 hour)
+  delta_time: 5  # Seconds per action step
+  yellow_time: 3  # Yellow phase duration
+  min_green: 10  # Minimum green phase duration
+  max_green: 50  # Maximum green phase duration
+  reward_fn: "custom"  # 'custom' or 'diff-waiting-time'
+
+# State representation
+state:
+  include_density: true
+  include_queue: true
+  include_phase: true
+  include_time_on_phase: true
+
+# Action space (4 phases for single intersection)
+actions:
+  num_phases: 4
+  phases:
+    - "NS-green"    # North-South through
+    - "EW-green"    # East-West through
+    - "NS-left"     # North-South left turn
+    - "EW-left"     # East-West left turn
+
+# Reward settings
+reward:
+  waiting_time_weight: -1.0
+  phase_change_penalty: 0.1
+  queue_weight: 0.0
+
+# DQN Agent hyperparameters
+dqn:
+  learning_rate: 0.001
+  gamma: 0.99  # Discount factor
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay: 0.995
+  batch_size: 64
+  buffer_size: 100000
+  target_update_freq: 100  # Steps between target network updates
+  hidden_layers: [256, 256]  # Neural network architecture
+  activation: "relu"
+
+# Training settings
+training:
+  num_episodes: 500
+  max_steps_per_episode: 720  # 3600s / 5s per step
+  save_freq: 50  # Save model every N episodes
+  eval_freq: 25  # Evaluate every N episodes
+  seed: 42
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+
+# Evaluation settings
+evaluation:
+  num_episodes: 10
+  render: false
+  save_metrics: true
+  metrics_dir: "results"
+
+# Baseline settings
+baselines:
+  fixed_time:
+    ns_green_duration: 30  # seconds
+    ew_green_duration: 30  # seconds
+  random:
+    seed: 42
