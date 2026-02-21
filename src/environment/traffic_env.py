@@ -122,7 +122,8 @@ class TrafficEnvironment:
         self.traffic_signal = self.env.traffic_signals[self.ts_id]
         
         # State and action dimensions
-        self.num_phases = len(self.traffic_signal.all_phases)
+        self.num_green_phases = self.traffic_signal.num_green_phases
+        self.num_phases = self.num_green_phases  # only green phases are valid actions
         self.num_lanes = len(self.traffic_signal.lanes)
         
         # State dim: densities + queues + phase one-hot + time on phase
@@ -155,6 +156,9 @@ class TrafficEnvironment:
         
         # Reset SUMO-RL environment
         obs, info = self.env.reset()
+        
+        # Re-acquire traffic signal reference after SUMO restart
+        self.traffic_signal = self.env.traffic_signals[self.ts_id]
         
         # Reset tracking
         self.last_phase = self.traffic_signal.green_phase
@@ -299,7 +303,12 @@ class TrafficEnvironment:
         """Track episode metrics."""
         self.episode_metrics['waiting_times'].append(self._get_total_waiting_time())
         self.episode_metrics['queue_lengths'].append(self._get_total_queue())
-        self.episode_metrics['throughput'] = self.env.vehicles.departed
+        # Use traci to count departed vehicles (compatible with sumo-rl >= 1.4)
+        try:
+            import traci
+            self.episode_metrics['throughput'] = traci.simulation.getArrivedNumber()
+        except Exception:
+            self.episode_metrics['throughput'] = len(self.env.vehicles)
     
     def get_episode_metrics(self) -> Dict:
         """Get metrics for completed episode."""

@@ -98,6 +98,9 @@ def train(args):
     env_config['route_file'] = str(PROJECT_ROOT / env_config['route_file'])
     env_config['seed'] = seed
     
+    # Remove keys not accepted by TrafficEnvironment
+    env_config.pop('sumo_cfg', None)
+    
     # Add reward config
     env_config['waiting_time_weight'] = config['reward']['waiting_time_weight']
     env_config['phase_change_penalty'] = config['reward']['phase_change_penalty']

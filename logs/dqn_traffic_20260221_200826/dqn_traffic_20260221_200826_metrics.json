@@ -1,0 +1,13 @@
+{
+  "experiment_name": "dqn_traffic_20260221_200826",
+  "total_episodes": 0,
+  "total_steps": 0,
+  "episode_rewards": [],
+  "episode_lengths": [],
+  "episode_waiting_times": [],
+  "episode_queue_lengths": [],
+  "episode_throughputs": [],
+  "episode_phase_changes": [],
+  "best_reward": -Infinity,
+  "best_waiting_time": Infinity
+}
