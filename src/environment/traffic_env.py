@@ -72,7 +72,8 @@ class TrafficEnvironment:
         reward_fn: str = "custom",
         waiting_time_weight: float = -1.0,
         phase_change_penalty: float = 0.1,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        additional_file: Optional[str] = None
     ):
         """
         Initialize the traffic environment.
@@ -103,6 +104,12 @@ class TrafficEnvironment:
         self.waiting_time_weight = waiting_time_weight
         self.phase_change_penalty = phase_change_penalty
         self.seed = seed
+        self.additional_file = additional_file
+        
+        # Build additional SUMO command string
+        additional_cmd = None
+        if additional_file:
+            additional_cmd = f"--additional-files {additional_file}"
         
         # Create SUMO-RL environment
         self.env = sumo_rl.SumoEnvironment(
@@ -114,7 +121,8 @@ class TrafficEnvironment:
             yellow_time=yellow_time,
             min_green=min_green,
             max_green=max_green,
-            single_agent=True
+            single_agent=True,
+            additional_sumo_cmd=additional_cmd
         )
         
         # Get traffic signal ID (single intersection)

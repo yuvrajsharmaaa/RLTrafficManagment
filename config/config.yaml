@@ -3,9 +3,10 @@
 
 # Environment settings
 environment:
-  net_file: "networks/single_intersection.net.xml"
-  route_file: "networks/single_intersection.rou.xml"
-  sumo_cfg: "networks/single_intersection.sumocfg"
+  net_file: "networks/delhi/delhi_intersection.net.xml"
+  route_file: "networks/delhi/delhi_intersection.rou.xml"
+  sumo_cfg: "networks/delhi/delhi_intersection.sumocfg"
+  additional_file: "networks/delhi/delhi_vtypes.add.xml"
   use_gui: false  # Set to true for visualization
   num_seconds: 3600  # Simulation duration (1 hour)
   delta_time: 5  # Seconds per action step

@@ -1,0 +1,31 @@
+{
+  "experiment_name": "dqn_traffic_20260223_112019",
+  "total_episodes": 2,
+  "total_steps": 1440,
+  "episode_rewards": [
+    -85.30000000000001,
+    -29.800000000000004
+  ],
+  "episode_lengths": [
+    720,
+    720
+  ],
+  "episode_waiting_times": [
+    15.47638888888889,
+    14.676388888888889
+  ],
+  "episode_queue_lengths": [
+    2.234722222222222,
+    2.313888888888889
+  ],
+  "episode_throughputs": [
+    0,
+    1
+  ],
+  "episode_phase_changes": [
+    293,
+    258
+  ],
+  "best_reward": -29.800000000000004,
+  "best_waiting_time": 14.676388888888889
+}

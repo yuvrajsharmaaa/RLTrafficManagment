@@ -1,0 +1,95 @@
+<additional>
+    <!-- ============================================ -->
+    <!-- Indian Vehicle Types for Delhi Traffic Sim   -->
+    <!-- ============================================ -->
+
+    <!-- Two-Wheeler (Motorcycle / Scooter) -->
+    <!-- Dominant in Delhi: ~40% of traffic -->
+    <vType id="two_wheeler"
+           vClass="motorcycle"
+           length="2.0"
+           width="0.8"
+           height="1.5"
+           minGap="1.0"
+           maxSpeed="16.67"
+           accel="2.0"
+           decel="4.0"
+           sigma="0.8"
+           speedFactor="1.0"
+           speedDev="0.2"
+           emissionClass="HBEFA4/PC_petrol_Euro-4"
+           color="0.2,0.6,1.0"
+           guiShape="motorcycle" />
+
+    <!-- Three-Wheeler (Auto-Rickshaw) -->
+    <!-- Iconic Delhi transport: ~15% of traffic -->
+    <vType id="three_wheeler"
+           vClass="passenger"
+           length="2.8"
+           width="1.4"
+           height="1.8"
+           minGap="1.5"
+           maxSpeed="11.11"
+           accel="1.5"
+           decel="3.0"
+           sigma="0.9"
+           speedFactor="0.7"
+           speedDev="0.2"
+           emissionClass="HBEFA4/PC_petrol_Euro-4"
+           color="0.1,0.8,0.1"
+           guiShape="passenger/sedan" />
+
+    <!-- Car (4-Wheeler) -->
+    <!-- ~30% of Delhi traffic -->
+    <vType id="car"
+           vClass="passenger"
+           length="4.5"
+           width="1.8"
+           height="1.5"
+           minGap="2.5"
+           maxSpeed="16.67"
+           accel="2.6"
+           decel="4.5"
+           sigma="0.5"
+           speedFactor="1.0"
+           speedDev="0.1"
+           emissionClass="HBEFA4/PC_petrol_Euro-4"
+           color="1.0,1.0,0.0"
+           guiShape="passenger" />
+
+    <!-- Bus (DTC / Cluster Bus) -->
+    <!-- Public transport backbone: ~10% of traffic -->
+    <vType id="bus"
+           vClass="bus"
+           length="12.0"
+           width="2.5"
+           height="3.2"
+           minGap="3.0"
+           maxSpeed="13.89"
+           accel="1.2"
+           decel="3.0"
+           sigma="0.4"
+           speedFactor="0.8"
+           speedDev="0.1"
+           emissionClass="HBEFA4/PC_diesel_Euro-4"
+           color="0.8,0.2,0.1"
+           guiShape="bus" />
+
+    <!-- Ambulance / Emergency Vehicle -->
+    <!-- ~1% but highest priority -->
+    <vType id="ambulance"
+           vClass="emergency"
+           length="5.5"
+           width="2.0"
+           height="2.5"
+           minGap="2.5"
+           maxSpeed="22.22"
+           accel="3.0"
+           decel="5.0"
+           sigma="0.3"
+           speedFactor="1.2"
+           speedDev="0.1"
+           emissionClass="HBEFA4/PC_petrol_Euro-4"
+           color="1.0,1.0,1.0"
+           guiShape="emergency" />
+</additional>

@@ -96,6 +96,8 @@ def train(args):
     env_config = config['environment']
     env_config['net_file'] = str(PROJECT_ROOT / env_config['net_file'])
     env_config['route_file'] = str(PROJECT_ROOT / env_config['route_file'])
+    if 'additional_file' in env_config:
+        env_config['additional_file'] = str(PROJECT_ROOT / env_config['additional_file'])
     env_config['seed'] = seed
     
     # Remove keys not accepted by TrafficEnvironment
