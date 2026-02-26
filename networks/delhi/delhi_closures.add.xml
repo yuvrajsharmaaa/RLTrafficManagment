@@ -1,0 +1,31 @@
+<additional>
+    <!-- ============================================ -->
+    <!-- Road Closure: Connaught Lane (partial)       -->
+    <!-- Simulates construction / VIP movement /      -->
+    <!-- metro work blocking a section of CP road     -->
+    <!-- ============================================ -->
+
+    <!-- Close a section of Connaught Lane in both directions -->
+    <!-- This forces traffic to reroute through other roads -->
+    <rerouter id="closure_connaught_lane_1" edges="253307767#1 253307767#2 -253307767#1 -253307767#2 253307767#3 -253307767#3">
+        <interval begin="0" end="3600">
+            <closingReroute id="253307767#1" allow="" />
+            <closingReroute id="253307767#2" allow="" />
+            <closingReroute id="253307767#3" allow="" />
+            <closingReroute id="-253307767#1" allow="" />
+            <closingReroute id="-253307767#2" allow="" />
+            <closingReroute id="-253307767#3" allow="" />
+        </interval>
+    </rerouter>
+
+    <!-- Also close the connecting segment to make it realistic -->
+    <!-- Only emergency vehicles (ambulance) can pass -->
+    <rerouter id="closure_connaught_lane_2" edges="164675827#2 164675827#3 -164675827#2 -164675827#3">
+        <interval begin="0" end="3600">
+            <closingReroute id="164675827#2" allow="emergency" />
+            <closingReroute id="164675827#3" allow="emergency" />
+            <closingReroute id="-164675827#2" allow="emergency" />
+            <closingReroute id="-164675827#3" allow="emergency" />
+        </interval>
+    </rerouter>
+</additional>

@@ -92,4 +92,106 @@
            emissionClass="HBEFA4/PC_petrol_Euro-4"
            color="1.0,1.0,1.0"
            guiShape="emergency" />
+
+    <!-- ============================================ -->
+    <!-- Pedestrian Types - Real Delhi foot traffic   -->
+    <!-- CP area has massive pedestrian volumes       -->
+    <!-- ============================================ -->
+
+    <!-- Regular Pedestrian (office workers, shoppers) -->
+    <vType id="pedestrian"
+           vClass="pedestrian"
+           length="0.5"
+           width="0.5"
+           height="1.7"
+           minGap="0.3"
+           maxSpeed="1.39"
+           accel="1.5"
+           decel="2.0"
+           sigma="0.5"
+           speedFactor="1.0"
+           speedDev="0.3"
+           color="0.4,0.4,0.9"
+           guiShape="pedestrian" />
+
+    <!-- Slow Pedestrian (elderly, loaded, phone-distracted) -->
+    <vType id="pedestrian_slow"
+           vClass="pedestrian"
+           length="0.5"
+           width="0.5"
+           height="1.6"
+           minGap="0.3"
+           maxSpeed="0.83"
+           accel="0.8"
+           decel="1.5"
+           sigma="0.7"
+           speedFactor="0.6"
+           speedDev="0.2"
+           color="0.7,0.5,0.3"
+           guiShape="pedestrian" />
+
+    <!-- Fast Pedestrian (rushing commuters, young) -->
+    <vType id="pedestrian_fast"
+           vClass="pedestrian"
+           length="0.5"
+           width="0.5"
+           height="1.75"
+           minGap="0.3"
+           maxSpeed="2.08"
+           accel="2.0"
+           decel="2.5"
+           sigma="0.4"
+           speedFactor="1.4"
+           speedDev="0.2"
+           color="0.9,0.3,0.3"
+           guiShape="pedestrian" />
+
+    <!-- Cycle-Rickshaw (very common in CP area) -->
+    <vType id="cycle_rickshaw"
+           vClass="bicycle"
+           length="2.5"
+           width="1.2"
+           height="1.8"
+           minGap="1.0"
+           maxSpeed="4.17"
+           accel="0.8"
+           decel="2.0"
+           sigma="0.9"
+           speedFactor="0.5"
+           speedDev="0.3"
+           color="0.6,0.3,0.0"
+           guiShape="bicycle" />
+
+    <!-- E-Rickshaw (very common in Delhi now) -->
+    <vType id="e_rickshaw"
+           vClass="passenger"
+           length="2.8"
+           width="1.3"
+           height="1.8"
+           minGap="1.2"
+           maxSpeed="6.94"
+           accel="1.0"
+           decel="2.5"
+           sigma="0.8"
+           speedFactor="0.5"
+           speedDev="0.2"
+           color="0.0,0.9,0.5"
+           guiShape="passenger/sedan" />
+
+    <!-- Truck / Heavy Vehicle (delivery, construction) -->
+    <vType id="truck"
+           vClass="truck"
+           length="8.0"
+           width="2.5"
+           height="3.5"
+           minGap="3.5"
+           maxSpeed="11.11"
+           accel="0.8"
+           decel="3.0"
+           sigma="0.5"
+           speedFactor="0.6"
+           speedDev="0.1"
+           emissionClass="HBEFA4/PC_diesel_Euro-4"
+           color="0.5,0.5,0.5"
+           guiShape="truck" />
 </additional>

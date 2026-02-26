@@ -7,7 +7,7 @@
     <input>
         <net-file value="delhi_intersection.net.xml"/>
         <route-files value="delhi_intersection.rou.xml"/>
-        <additional-files value="delhi_vtypes.add.xml"/>
+        <additional-files value="delhi_vtypes.add.xml,delhi_closures.add.xml"/>
     </input>
 
     <time>
@@ -20,6 +20,9 @@
         <time-to-teleport value="300"/>
         <collision.action value="warn"/>
         <collision.check-junctions value="true"/>
+        <pedestrian.model value="striping"/>
+        <pedestrian.striping.stripe-width value="0.55"/>
+        <pedestrian.striping.jamtime value="30"/>
     </processing>
 
     <report>
