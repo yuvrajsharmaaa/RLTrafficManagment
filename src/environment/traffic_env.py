@@ -109,7 +109,8 @@ class TrafficEnvironment:
         # Build additional SUMO command string
         additional_cmd = None
         if additional_file:
-            additional_cmd = f"--additional-files {additional_file}"
+            # Quote file list so Windows paths with spaces are parsed correctly.
+            additional_cmd = f'--additional-files "{additional_file}"'
         
         # Create SUMO-RL environment
         self.env = sumo_rl.SumoEnvironment(

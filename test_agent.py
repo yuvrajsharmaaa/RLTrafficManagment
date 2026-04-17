@@ -73,6 +73,15 @@ class RandomPolicy:
         return self.action_space.sample(), None
 
 
+def _first_metric_value(metric):
+    """Return a scalar metric value across SUMO-RL info schema variants."""
+    if isinstance(metric, dict):
+        return next(iter(metric.values())) if metric else None
+    if isinstance(metric, (int, float, np.integer, np.floating)):
+        return float(metric)
+    return None
+
+
 def run_evaluation(policy, env, policy_name, num_episodes=5, use_gui=False):
     """Run evaluation episodes and collect metrics."""
     print(f"\nEvaluating: {policy_name}")
@@ -103,11 +112,14 @@ def run_evaluation(policy, env, policy_name, num_episodes=5, use_gui=False):
             steps += 1
             done = terminated or truncated
             
-            # Track waiting time and queue from info if available
-            if 'agents_total_accumulated_waiting_time' in info:
-                episode_waiting.append(list(info['agents_total_accumulated_waiting_time'].values())[0])
-            if 'agents_total_stopped' in info:
-                episode_queue.append(list(info['agents_total_stopped'].values())[0])
+            # Track waiting time and queue from info if available.
+            waiting_value = _first_metric_value(info.get('agents_total_accumulated_waiting_time'))
+            if waiting_value is not None:
+                episode_waiting.append(waiting_value)
+
+            queue_value = _first_metric_value(info.get('agents_total_stopped'))
+            if queue_value is not None:
+                episode_queue.append(queue_value)
         
         all_rewards.append(episode_reward)
         if episode_waiting:

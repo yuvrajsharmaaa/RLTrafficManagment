@@ -3,7 +3,7 @@
 
 # Core ML/RL
 torch>=2.0.0
-numpy>=1.24.0
+numpy>=1.24.0,<2.0
 gymnasium>=0.29.0
 
 # SUMO integration
@@ -21,8 +21,8 @@ seaborn>=0.12.0
 # Optional: For animations
 imageio>=2.31.0
 
-# Optional: If using Stable-Baselines3 instead of custom DQN
-# stable-baselines3>=2.0.0
+# Required by test_agent.py model loading/evaluation flow
+stable-baselines3>=2.0.0
 
 # Development
 tqdm>=4.65.0

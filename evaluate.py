@@ -64,6 +64,28 @@ def load_config(config_path: str) -> dict:
         return yaml.safe_load(f)
 
 
+def build_env_config(config: dict) -> dict:
+    """Build environment kwargs compatible with TrafficEnvironment."""
+    env_config = dict(config['environment'])
+
+    # Resolve project-relative SUMO files.
+    env_config['net_file'] = str(PROJECT_ROOT / env_config['net_file'])
+    env_config['route_file'] = str(PROJECT_ROOT / env_config['route_file'])
+
+    additional_file = env_config.get('additional_file')
+    if additional_file:
+        parts = [p.strip() for p in str(additional_file).split(',') if p.strip()]
+        env_config['additional_file'] = ','.join(str(PROJECT_ROOT / p) for p in parts)
+
+    env_config['waiting_time_weight'] = config['reward']['waiting_time_weight']
+    env_config['phase_change_penalty'] = config['reward']['phase_change_penalty']
+
+    # Drop keys not accepted by TrafficEnvironment.__init__.
+    env_config.pop('sumo_cfg', None)
+
+    return env_config
+
+
 def evaluate_policy(env, policy, num_episodes: int, policy_name: str) -> EvaluationResult:
     """
     Evaluate a single policy for multiple episodes.
@@ -156,12 +178,7 @@ def evaluate(args):
     
     # Create environment
     print("\nInitializing environment...")
-    env_config = config['environment']
-    env_config['net_file'] = str(PROJECT_ROOT / env_config['net_file'])
-    env_config['route_file'] = str(PROJECT_ROOT / env_config['route_file'])
-    env_config['waiting_time_weight'] = config['reward']['waiting_time_weight']
-    env_config['phase_change_penalty'] = config['reward']['phase_change_penalty']
-    
+    env_config = build_env_config(config)
     env = TrafficEnvironment(**env_config)
     
     num_episodes = config['evaluation']['num_episodes']
@@ -293,13 +310,13 @@ def run_quick_test(args):
     config_path = args.config if args.config else PROJECT_ROOT / "config" / "config.yaml"
     config = load_config(config_path)
     
-    env_config = config['environment']
-    env_config['net_file'] = str(PROJECT_ROOT / env_config['net_file'])
-    env_config['route_file'] = str(PROJECT_ROOT / env_config['route_file'])
+    env_config = build_env_config(config)
+    # Use the compact built-in network for setup verification reliability.
+    env_config['net_file'] = str(PROJECT_ROOT / "networks" / "single_intersection.net.xml")
+    env_config['route_file'] = str(PROJECT_ROOT / "networks" / "single_intersection.rou.xml")
+    env_config['additional_file'] = None
     env_config['num_seconds'] = 300  # Short simulation
-    env_config['waiting_time_weight'] = config['reward']['waiting_time_weight']
-    env_config['phase_change_penalty'] = config['reward']['phase_change_penalty']
-    
+
     print("Creating environment...")
     env = TrafficEnvironment(**env_config)
     
