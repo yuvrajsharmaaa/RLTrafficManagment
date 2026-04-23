@@ -75,7 +75,9 @@ def build_env_config(config: dict) -> dict:
     additional_file = env_config.get('additional_file')
     if additional_file:
         parts = [p.strip() for p in str(additional_file).split(',') if p.strip()]
-        env_config['additional_file'] = ','.join(str(PROJECT_ROOT / p) for p in parts)
+        # Keep additional files as repo-relative paths to avoid Windows
+        # absolute-path parsing issues when the workspace path contains spaces.
+        env_config['additional_file'] = ','.join(parts)
 
     env_config['waiting_time_weight'] = config['reward']['waiting_time_weight']
     env_config['phase_change_penalty'] = config['reward']['phase_change_penalty']
@@ -280,7 +282,12 @@ def evaluate(args):
     # Save results
     results_file = results_dir / "evaluation_results.json"
     with open(results_file, 'w') as f:
-        json.dump(all_results, f, indent=2)
+        json.dump(
+            all_results,
+            f,
+            indent=2,
+            default=lambda o: o.item() if isinstance(o, np.generic) else o,
+        )
     print(f"\nResults saved to: {results_file}")
     
     # Create visualizations

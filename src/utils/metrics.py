@@ -266,10 +266,12 @@ def compare_policies(
             if baseline['avg_queue_length'] > 0 else 0
         )
         
+        baseline_throughput = baseline.get('throughput', baseline.get('avg_throughput', 0))
+        metrics_throughput = metrics.get('throughput', metrics.get('avg_throughput', 0))
         throughput_improvement = (
-            (metrics['throughput'] - baseline['throughput']) /
-            baseline['throughput'] * 100
-            if baseline['throughput'] > 0 else 0
+            (metrics_throughput - baseline_throughput) /
+            baseline_throughput * 100
+            if baseline_throughput > 0 else 0
         )
         
         comparison[name] = {

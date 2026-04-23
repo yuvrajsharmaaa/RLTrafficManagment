@@ -1,0 +1,10 @@
+{
+  "Random": {
+    "policy": "Random",
+    "num_episodes": 3,
+    "avg_reward": -18.299999999999994,
+    "std_reward": 1.4165686240584079,
+    "avg_waiting_time": 0.38611111111111107,
+    "std_waiting_time": 0.3189246979507278,
+    "avg_queue_length": 0.03796296296296296,
+    "max_queue_length": 
