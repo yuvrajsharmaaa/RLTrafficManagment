@@ -34,6 +34,7 @@
 12. [Running the Project — Step by Step](#12-running-the-project--step-by-step)
 13. [Understanding the Results](#13-understanding-the-results)
 14. [Performance Dashboard](#14-performance-dashboard)
+- [Latest Updates (April 2026)](#latest-updates-april-2026)
 15. [Troubleshooting](#15-troubleshooting)
 16. [**Stage 2.1 — Real-World Delhi Intersection with Indian Vehicle Types**](#stage-21--real-world-delhi-intersection-with-indian-vehicle-types)
     - [2.1.1 — Why Delhi? Why Real Roads?](#211--why-delhi-why-real-roads)
@@ -319,6 +320,10 @@ The `requirements.txt` file includes:
 | `matplotlib` | Charts and performance plots |
 | `pyyaml` | Reading the config file |
 | `pandas` | Metric aggregation and CSV export |
+
+Important compatibility note:
+- `numpy` is pinned to `<2.0` to avoid native-extension compatibility issues seen on some Windows environments.
+- `stable-baselines3` is now required (not optional) because `test_agent.py` imports SB3's `DQN` class.
 
 ---
 
@@ -984,7 +989,15 @@ python evaluate.py --model checkpoints/best_model.pt --episodes 20
 
 # Watch the evaluation live in the SUMO graphical window
 python evaluate.py --model checkpoints/best_model.pt --gui --episodes 5
+
+# Windows reliability config for saved custom DQN .pt checkpoints
+python evaluate.py --config config/eval_model_windows.yaml --model checkpoints/dqn_traffic_TIMESTAMP/best_model.pt
 ```
+
+Important model-format note:
+- `evaluate.py` loads the custom project `DQNAgent` checkpoint format (`.pt`).
+- `test_agent.py --model ...` loads **Stable-Baselines3** model format (typically `.zip`).
+- Passing a custom `.pt` checkpoint to `test_agent.py --model` will fail with an SB3 load assertion. In that case, use `--baselines-only` or evaluate via `evaluate.py`.
 
 **What `evaluate_policy()` does:**
 
@@ -1241,6 +1254,30 @@ python train_dqn_sb3.py --timesteps 50000
 python evaluate.py --model checkpoints/dqn_sb3_TIMESTAMP/dqn_traffic_final.zip
 ```
 
+### One-Click Windows Runner (New)
+
+If you are on Windows, this project now includes a PowerShell launcher that:
+- sets `SUMO_HOME`
+- prepends SUMO `bin` to `PATH`
+- runs full evaluation
+- runs policy comparison
+- falls back to `test_agent.py --baselines-only` if SB3 model loading fails
+
+```powershell
+# From project root
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\scripts\run_eval_and_compare.ps1
+
+# Optional custom model/config
+.\scripts\run_eval_and_compare.ps1 \
+    -ModelPath "checkpoints/dqn_traffic_TIMESTAMP/best_model.pt" \
+    -EvalConfig "config/eval_model_windows.yaml" \
+    -CompareEpisodes 1
+```
+
+Launcher script location:
+- `scripts/run_eval_and_compare.ps1`
+
 ### Full Research Run
 
 ```bash
@@ -1352,6 +1389,116 @@ plot_training_curves("logs/dqn_traffic_TIMESTAMP/metrics.json",
 plot_comparison("results/TIMESTAMP/evaluation_results.json",
                 save_path="results/comparison_chart.png")
 ```
+
+---
+
+## Latest Updates (April 2026)
+
+This section summarizes reliability and workflow updates added after the original documentation.
+
+### 1) New evaluation configs for Windows runs
+
+- `config/eval_windows.yaml`
+    - Uses the compact single-intersection network for fast smoke tests.
+    - Useful when validating installation and end-to-end wiring quickly.
+- `config/eval_model_windows.yaml`
+    - Intended for model-based evaluation workflows on Windows.
+    - Provides a stable baseline configuration for running `evaluate.py` with custom `.pt` checkpoints.
+
+### 2) Evaluation pipeline hardening
+
+`evaluate.py` was updated to improve compatibility and reliability:
+- Added a normalized environment-config builder so unsupported keys like `sumo_cfg` are dropped before `TrafficEnvironment` initialization.
+- Quick test path now uses the compact single-intersection setup for more consistent startup validation.
+- JSON result export now handles NumPy scalar types safely, preventing serialization failures at the end of long runs.
+
+### 3) SUMO additional-files argument handling
+
+`src/environment/traffic_env.py` now formats additional SUMO files using key-value style (`--additional-files=...`) to reduce command-line parsing issues.
+
+### 4) Policy-comparison schema compatibility
+
+`test_agent.py` now accepts both dictionary-based and scalar info-metric schemas from SUMO-RL when reading:
+- accumulated waiting time
+- stopped vehicle count
+
+This prevents crashes when SUMO-RL returns a float in environments where older code expected a dict.
+
+### 5) Metrics comparison key consistency
+
+`src/utils/metrics.py` comparison logic now supports either `throughput` or `avg_throughput` keys, preventing post-evaluation crashes in policy-comparison charts.
+
+### 6) Dependency updates
+
+`requirements.txt` was updated to reflect runtime reality:
+- `numpy>=1.24.0,<2.0`
+- `stable-baselines3>=2.0.0` enabled as a required dependency
+
+### 7) Practical model-format guidance
+
+Current project supports two model families:
+- Custom DQN checkpoint (`.pt`) used by `evaluate.py`
+- SB3 checkpoint (typically `.zip`) used by `test_agent.py --model`
+
+If you only have custom `.pt` models and want policy comparison without SB3 checkpoints, run:
+
+```bash
+python test_agent.py --baselines-only --episodes 1
+```
+
+### 8) Migration Checklist (Old Setup -> Current Setup)
+
+Use this checklist if you were using an older project state and want to move to the current stable workflow.
+
+1. Refresh dependencies in your active virtual environment:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Confirm SUMO is discoverable in your current terminal session:
+
+```bash
+sumo --version
+```
+
+3. If SUMO is installed but not found, set these for the current shell (Windows PowerShell):
+
+```powershell
+$env:SUMO_HOME = "C:\Program Files (x86)\Eclipse\Sumo"
+$env:Path = "$env:SUMO_HOME\\bin;$env:Path"
+```
+
+4. For full model evaluation with custom project checkpoints (`.pt`), use:
+
+```bash
+python evaluate.py --config config/eval_model_windows.yaml --model checkpoints/dqn_traffic_TIMESTAMP/best_model.pt
+```
+
+5. Use quick setup validation when needed:
+
+```bash
+python evaluate.py --quick-test
+```
+
+6. If `test_agent.py --model ...` fails with SB3 loading errors, this is expected for custom `.pt` checkpoints. Use either:
+    - `evaluate.py` for custom checkpoint evaluation, or
+    - baselines-only comparison:
+
+```bash
+python test_agent.py --baselines-only --episodes 1
+```
+
+7. For one-command Windows execution, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\scripts\run_eval_and_compare.ps1
+```
+
+8. Verify artifacts after runs:
+    - Evaluation JSON and plots in `results/<timestamp>/`
+    - Baseline comparison CSV from `test_agent.py` in `results/`
 
 ---
 
