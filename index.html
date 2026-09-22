@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>QPSO Ambulance Route Optimizer — Delhi Mission Control</title>
   <meta name="description" content="Real-time interactive Leaflet visualization and side-by-side comparison of Volatility-Adaptive QPSO emergency ambulance dispatch on Delhi road network.">
 
@@ -65,27 +65,80 @@
 
     /* Comparison Split Screen View */
     #comparison-view {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      height: calc(100vh - 140px);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 74px);
       margin-top: 70px;
-      gap: 3px;
-      background: #1e293b;
+      background: #070c16;
       z-index: 50;
       position: relative;
+    }
+
+    .comparison-headline-bar {
+      background: rgba(13, 19, 33, 0.96);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.22);
+      padding: 11px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+      z-index: 60;
+    }
+
+    .headline-tag {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .comparison-headline-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin: 2px 0;
+    }
+
+    .comparison-headline-title strong {
+      color: #38bdf8;
+    }
+
+    .comparison-headline-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      gap: 3px;
+      background: #1e293b;
+      position: relative;
+      overflow: hidden;
     }
 
     .comparison-card {
       display: flex;
       flex-direction: column;
-      background: #0b1324;
+      background: #080d1a;
       position: relative;
       overflow: hidden;
+      transition: box-shadow 0.3s ease;
     }
 
     .comparison-header {
-      padding: 12px 18px;
-      background: rgba(15, 23, 42, 0.95);
+      padding: 10px 18px;
+      background: rgba(13, 20, 36, 0.96);
       border-bottom: 1px solid var(--panel-border);
       display: flex;
       justify-content: space-between;
@@ -93,19 +146,61 @@
       z-index: 10;
     }
 
-    .comparison-title {
-      font-size: 14px;
-      font-weight: 700;
+    .comparison-title-wrap {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
+    .comparison-pill {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .comparison-pill.adaptive {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .comparison-pill.fixed {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .comparison-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .comparison-eta-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .eta-mini-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
     .comparison-clock {
       font-family: var(--font-mono);
       font-size: 13px;
+      font-weight: 700;
       color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
+      background: rgba(56, 189, 248, 0.09);
+      border: 1px solid rgba(56, 189, 248, 0.2);
       padding: 3px 8px;
       border-radius: 6px;
     }
@@ -119,19 +214,21 @@
 
     .comparison-banner {
       position: absolute;
-      top: 60px;
+      top: 18px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      padding: 8px 16px;
-      background: rgba(16, 185, 129, 0.9);
+      padding: 8px 18px;
+      background: rgba(16, 185, 129, 0.94);
       color: #fff;
       font-weight: 700;
       font-size: 13px;
+      letter-spacing: 0.01em;
       border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.55);
       display: none;
       white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .comparison-card.winner {
@@ -227,14 +324,113 @@
     }
 
     button.compare-btn {
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
-      border-color: #a78bfa;
+      background: rgba(14, 165, 233, 0.14);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #e0f2fe;
       font-weight: 600;
     }
 
     button.compare-btn:hover {
-      background: linear-gradient(135deg, #4338ca, #6d28d9);
-      box-shadow: 0 0 14px rgba(167, 139, 250, 0.4);
+      background: rgba(14, 165, 233, 0.24);
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+    }
+
+    /* Hero Card: ETA to Hospital (Single Largest Number On Screen) */
+    .eta-hero-card {
+      background: linear-gradient(180deg, rgba(14, 165, 233, 0.12) 0%, rgba(2, 132, 199, 0.03) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+    }
+
+    .eta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .eta-badge {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .eta-status {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .eta-status.in-transit {
+      color: #38bdf8;
+    }
+
+    .eta-status.arrived {
+      color: #10b981;
+    }
+
+    .eta-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 2px 0;
+    }
+
+    .eta-value-large {
+      font-family: var(--font-mono);
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+    }
+
+    .eta-unit {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .eta-dest-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding-top: 6px;
+      margin-top: 2px;
+    }
+
+    .eta-dest-icon {
+      font-size: 13px;
+    }
+
+    .eta-dest-name {
+      color: #f1f5f9;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Floating Stats Card (Left Side) */
@@ -487,45 +683,139 @@
       filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.28) brightness(0.72);
     }
 
-    /* Custom Leaflet Pin Markers */
-    .stop-marker-pin {
+    /* Dedicated Medical Emergency Pins */
+    .patient-pickup-pin {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 26px;
-      height: 26px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: #0f172a;
-      border: 2px solid var(--accent);
-      color: #fff;
-      font-weight: 700;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+      background: #7f1d1d;
+      border: 2px solid #ef4444;
+      color: #ffffff;
+      font-size: 16px;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.7);
+      cursor: pointer;
     }
 
-    .vehicle-courier-marker {
+    .patient-pickup-pin::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 2px solid rgba(239, 68, 68, 0.55);
+      animation: pickup-beacon 2s infinite ease-out;
+    }
+
+    @keyframes pickup-beacon {
+      0% { transform: scale(0.95); opacity: 0.95; }
+      100% { transform: scale(1.48); opacity: 0; }
+    }
+
+    .patient-pickup-pin.mini {
+      width: 26px;
+      height: 26px;
+      font-size: 12px;
+    }
+
+    .hospital-dest-pin {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #0369a1;
+      border: 2px solid #38bdf8;
+      color: #ffffff;
+      font-size: 18px;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+      cursor: pointer;
+    }
+
+    .hospital-dest-pin.mini {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+    }
+
+    .hospital-candidate-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #475569;
+      color: #94a3b8;
+      font-size: 12px;
+      opacity: 0.75;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .hospital-candidate-pin:hover {
+      opacity: 1;
+      border-color: #38bdf8;
+      transform: scale(1.1);
+    }
+
+    .hospital-candidate-pin.mini {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+
+    .pin-label-callout {
+      position: absolute;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13, 20, 36, 0.96);
+      color: #f1f5f9;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      letter-spacing: 0.02em;
+    }
+
+    .pin-label-callout.hospital {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+    }
+
+    .ambulance-marker {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--tier-calm);
+      background: #0f172a;
+      border: 2px solid var(--tier-calm);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 20px var(--tier-calm);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      color: #000;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+      transition: all 0.3s ease;
+      color: #fff;
       font-size: 16px;
     }
 
-    .vehicle-courier-marker.moderate {
-      background: var(--tier-moderate);
-      box-shadow: 0 0 20px var(--tier-moderate);
+    .ambulance-marker.moderate {
+      border-color: var(--tier-moderate);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
     }
 
-    .vehicle-courier-marker.turbulent {
-      background: var(--tier-turbulent);
-      box-shadow: 0 0 20px var(--tier-turbulent);
+    .ambulance-marker.turbulent {
+      border-color: var(--tier-turbulent);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.55);
     }
 
     /* Onboarding Modal Overlay */
@@ -615,6 +905,561 @@
       background: #334155;
       transform: scale(1.06);
     }
+    /* Info Tooltip Touch & Tap Support */
+    .info-btn {
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+    .info-btn::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+    }
+    .tooltip-content.active,
+    .metric-card.tooltip-open .tooltip-content {
+      display: block !important;
+      animation: tooltip-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes tooltip-fade-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Desktop Playback Layout Defaults */
+    .timeline-row {
+      display: contents;
+    }
+    .controls-row {
+      display: contents;
+    }
+
+    /* Mobile Collapsible Event Feed Drawer */
+    .event-drawer {
+      display: none;
+    }
+
+    /* =============================================================
+       Mobile Responsive Styles (Narrow screens <= 768px, 430px, 390px, 360px)
+       ============================================================= */
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      /* Top Navigation Bar: Mobile Compact Single-Column Header */
+      .top-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0 0 14px 14px;
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .brand-section {
+        width: 100%;
+        justify-content: flex-start;
+        padding-right: 46px;
+      }
+
+      .brand-text h1 {
+        font-size: 13px;
+      }
+
+      .brand-text p {
+        display: none;
+      }
+
+      /* Help button positioned in header top-right on mobile */
+      .btn-help {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        bottom: auto;
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+        z-index: 1200;
+        touch-action: manipulation;
+      }
+
+      .scenario-controls {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      #scenario-selector {
+        width: 100%;
+        min-height: 44px;
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+
+      #btn-toggle-compare {
+        width: 100%;
+        min-height: 44px;
+        font-size: 13px;
+        font-weight: 700;
+        justify-content: center;
+        border-radius: 8px;
+      }
+
+      #btn-reset-view, #btn-toggle-tiles {
+        display: none;
+      }
+
+      /* Single View Map: Map on top taking primary viewport height */
+      #single-view {
+        height: 100dvh;
+        width: 100vw;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+
+      /* Adjust Leaflet zoom controls for ergonomic thumb access near bottom-right */
+      .leaflet-top.leaflet-right {
+        top: auto !important;
+        bottom: 162px !important;
+        right: 10px !important;
+      }
+
+      .leaflet-control-zoom a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+      }
+
+      .leaflet-control-attribution {
+        max-width: 60vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 9px !important;
+        bottom: 2px !important;
+        right: 2px !important;
+      }
+
+      /* Compact Telemetry Readout Strip Overlaid on Map */
+      .hud-panel {
+        position: absolute;
+        top: 152px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+        padding: 8px 10px;
+        border-radius: 12px;
+        gap: 6px;
+        background: rgba(11, 18, 33, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+
+      .panel-header {
+        display: none;
+      }
+
+      .eta-hero-card {
+        padding: 6px 10px;
+        gap: 2px;
+        border-radius: 8px;
+      }
+
+      .eta-value-row {
+        margin: 0;
+      }
+
+      .eta-value-large {
+        font-size: 32px;
+      }
+
+      .eta-unit {
+        font-size: 9px;
+      }
+
+      .eta-dest-row {
+        font-size: 10px;
+        padding-top: 3px;
+        margin-top: 1px;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+      }
+
+      .metric-card {
+        padding: 6px 4px;
+        text-align: center;
+        border-radius: 6px;
+        min-height: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .metric-label-row {
+        justify-content: center;
+        gap: 3px;
+        margin-bottom: 2px;
+      }
+
+      .metric-label {
+        font-size: 8px;
+      }
+
+      .metric-value {
+        font-size: 13px;
+      }
+
+      .tooltip-content {
+        width: 170px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+      }
+
+      /* Hide permanent sidebar event ticker in mobile HUD */
+      .hud-panel .event-ticker {
+        display: none !important;
+      }
+
+      /* Mobile Event Feed Collapsible Drawer (Slides up from bottom) */
+      .event-drawer {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        bottom: 104px;
+        left: 10px;
+        right: 10px;
+        z-index: 1300;
+        background: rgba(13, 22, 38, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(56, 189, 248, 0.28);
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65);
+        overflow: hidden;
+      }
+
+      .drawer-handle {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+
+      .drawer-handle-left {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .drawer-pill-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .drawer-tag {
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.14);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+
+      .drawer-time {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--accent);
+      }
+
+      .drawer-preview {
+        font-size: 11px;
+        color: #f1f5f9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .drawer-toggle-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #38bdf8;
+        font-size: 11px;
+        transition: transform 0.25s ease;
+        flex-shrink: 0;
+      }
+
+      .event-drawer.open .drawer-toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .drawer-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .event-drawer.open .drawer-body {
+        max-height: 40vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .drawer-log-list {
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .drawer-log-item {
+        font-size: 11px;
+        line-height: 1.35;
+        padding: 6px 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        border-left: 3px solid var(--accent);
+        color: #cbd5e1;
+      }
+
+      /* Bottom Playback Dock on Mobile (Thumb-Friendly Touch Targets) */
+      .bottom-bar {
+        position: fixed;
+        bottom: 8px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        width: auto;
+        max-width: none;
+        padding: 8px 10px;
+        border-radius: 14px;
+        z-index: 1400;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+      }
+
+      .playback-row {
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .timeline-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+      }
+
+      #btn-play-pause {
+        flex: 2;
+        min-height: 48px;
+        font-size: 15px;
+        font-weight: 700;
+        justify-content: center;
+        border-radius: 10px;
+      }
+
+      #btn-restart {
+        flex: 1;
+        min-height: 48px;
+        min-width: 48px;
+        font-size: 16px;
+        font-weight: 700;
+        justify-content: center;
+        border-radius: 10px;
+      }
+
+      #speed-selector {
+        flex: 1;
+        min-height: 48px;
+        font-size: 13px;
+        border-radius: 10px;
+        padding: 0 8px;
+        text-align: center;
+      }
+
+      .timeline-slider {
+        height: 10px;
+        border-radius: 5px;
+        touch-action: pan-y;
+      }
+
+      .timeline-slider::-webkit-slider-thumb {
+        width: 26px;
+        height: 26px;
+      }
+
+      .time-display {
+        font-size: 11px;
+        min-width: 72px;
+      }
+
+      /* Floating Help Button */
+      .btn-help {
+        bottom: 88px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+        z-index: 1600;
+      }
+
+      /* Onboarding Modal on Mobile */
+      .modal-card {
+        width: calc(100vw - 24px);
+        max-height: 85vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 18px 14px;
+        border-radius: 14px;
+      }
+
+      .modal-card button {
+        min-height: 48px;
+        font-size: 14px;
+        border-radius: 10px;
+      }
+
+      /* Comparison Dual View on Mobile: Stacked Cards */
+      #comparison-view {
+        height: calc(100dvh - 150px);
+        margin-top: 150px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .comparison-headline-bar {
+        padding: 8px 12px;
+      }
+
+      .comparison-headline-title {
+        font-size: 15px;
+      }
+
+      .comparison-headline-sub {
+        font-size: 10px;
+      }
+
+      .comparison-grid {
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+        flex: none;
+        gap: 6px;
+        padding-bottom: 24px;
+      }
+
+      .comparison-card {
+        min-height: 250px;
+        height: 250px;
+        flex: none;
+        border-radius: 8px;
+      }
+
+      .comparison-header {
+        padding: 8px 12px;
+      }
+
+      .comparison-title {
+        font-size: 12px;
+      }
+
+      .comparison-clock {
+        font-size: 12px;
+        padding: 2px 6px;
+      }
+
+      .comparison-banner {
+        font-size: 11px;
+        padding: 6px 12px;
+        top: 10px;
+      }
+    }
+
+    /* Ultra-narrow devices (<= 380px, e.g. 360px Galaxy S8) */
+    @media (max-width: 380px) {
+      .brand-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+
+      .brand-text h1 {
+        font-size: 12px;
+      }
+
+      .eta-value-large {
+        font-size: 28px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+      }
+
+      .top-bar {
+        padding: 8px 10px;
+      }
+
+      .hud-panel {
+        top: 156px;
+        left: 6px;
+        right: 6px;
+        padding: 6px 8px;
+      }
+
+      .bottom-bar {
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        padding: 6px 8px;
+      }
+
+      .event-drawer {
+        left: 6px;
+        right: 6px;
+        bottom: 102px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -637,7 +1482,7 @@
         <option value="hero_low_va_qpso">Low Volatility (Off-Peak Transfer) — VA-QPSO</option>
         <option value="hero_low_fixed_beta_qpso">Low Volatility (Off-Peak Transfer) — Fixed Beta</option>
       </select>
-      <button id="btn-toggle-compare" class="compare-btn">⚔️ Compare Adaptive vs Fixed</button>
+      <button id="btn-toggle-compare" class="compare-btn">⚖️ Compare Adaptive vs Fixed</button>
       <button id="btn-reset-view">📍 Center Map</button>
       <button id="btn-toggle-tiles">🌓 Map Style</button>
     </div>
@@ -645,6 +1490,25 @@
 
   <!-- Left Stats & Telemetry HUD (Single Mode) -->
   <aside id="telemetry-hud" class="hud-panel">
+    <!-- Hero ETA to Hospital Card: Largest, most prominent number on screen -->
+    <div class="eta-hero-card">
+      <div class="eta-header">
+        <span class="eta-badge">CRITICAL TIMING</span>
+        <div id="eta-status-tag" class="eta-status in-transit">
+          <span class="tier-pulse" style="width:6px;height:6px;"></span>
+          <span id="eta-status-text">IN TRANSIT</span>
+        </div>
+      </div>
+      <div class="eta-value-row">
+        <div id="metric-eta-large" class="eta-value-large">--:--</div>
+        <div class="eta-unit">ETA TO HOSPITAL</div>
+      </div>
+      <div class="eta-dest-row">
+        <span class="eta-dest-icon">🏥</span>
+        <span id="eta-dest-text" class="eta-dest-name">Destination: AIIMS Trauma Center</span>
+      </div>
+    </div>
+
     <div class="panel-header">
       <span class="panel-title">Traffic Telemetry</span>
       <div id="tier-badge" class="tier-badge">
@@ -694,40 +1558,90 @@
     <div id="map"></div>
   </main>
 
+  <!-- Mobile Collapsible Event Feed Drawer (Slides up from bottom on mobile) -->
+  <div id="event-drawer" class="event-drawer">
+    <div id="event-drawer-handle" class="drawer-handle" role="button" aria-expanded="false" aria-label="Toggle Decision Stream Log">
+      <div class="drawer-handle-left">
+        <div class="drawer-pill-row">
+          <span class="drawer-tag">DECISION FEED</span>
+          <span id="drawer-event-time" class="drawer-time">T = 0s [READY]</span>
+        </div>
+        <div id="drawer-preview-text" class="drawer-preview">Dispatching ambulance corridor...</div>
+      </div>
+      <div id="drawer-toggle-icon" class="drawer-toggle-icon">▲</div>
+    </div>
+    <div id="event-drawer-body" class="drawer-body">
+      <div id="drawer-log-list" class="drawer-log-list">
+        <div class="drawer-log-item">
+          <strong style="color:var(--accent);">T = 0s:</strong> Ambulance corridor initialized. Destination: AIIMS Trauma Center.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Split Comparison Dual View -->
   <section id="comparison-view" hidden>
-    <div id="card-adaptive" class="comparison-card">
-      <header class="comparison-header">
-        <span class="comparison-title">⚡ Adaptive VA-QPSO (Reactive Swarm)</span>
-        <span id="clock-adaptive" class="comparison-clock">0.0s / --s</span>
-      </header>
-      <div id="map-adaptive" class="comparison-map-container"></div>
-      <div id="banner-adaptive" class="comparison-banner">🏆 Adaptive Route Reached Hospital Faster!</div>
+    <!-- Prominent Mission Impact Headline Result -->
+    <div id="comparison-headline-bar" class="comparison-headline-bar">
+      <div class="headline-tag">LIFE-CRITICAL IMPACT</div>
+      <h2 id="comparison-headline-text" class="comparison-headline-title">
+        Adaptive routing reached the hospital <strong>2m 14s faster</strong>
+      </h2>
+      <p id="comparison-headline-sub" class="comparison-headline-sub">
+        Real-time quantum swarm bypassed corridor congestion to deliver the patient to emergency care significantly earlier.
+      </p>
     </div>
-    <div id="card-fixed" class="comparison-card">
-      <header class="comparison-header">
-        <span class="comparison-title">⏱️ Fixed-Beta QPSO (Static Baseline)</span>
-        <span id="clock-fixed" class="comparison-clock">0.0s / --s</span>
-      </header>
-      <div id="map-fixed" class="comparison-map-container"></div>
-      <div id="banner-fixed" class="comparison-banner">Reached Hospital</div>
+
+    <div class="comparison-grid">
+      <div id="card-adaptive" class="comparison-card">
+        <header class="comparison-header">
+          <div class="comparison-title-wrap">
+            <span class="comparison-pill adaptive">Adaptive</span>
+            <span class="comparison-title">VA-QPSO (Reactive Swarm)</span>
+          </div>
+          <div class="comparison-eta-badge">
+            <span class="eta-mini-label">ETA TO HOSPITAL</span>
+            <span id="clock-adaptive" class="comparison-clock">--:--</span>
+          </div>
+        </header>
+        <div id="map-adaptive" class="comparison-map-container"></div>
+        <div id="banner-adaptive" class="comparison-banner">Adaptive Route Reached Hospital First</div>
+      </div>
+      <div id="card-fixed" class="comparison-card">
+        <header class="comparison-header">
+          <div class="comparison-title-wrap">
+            <span class="comparison-pill fixed">Baseline</span>
+            <span class="comparison-title">Fixed-Beta QPSO (Static)</span>
+          </div>
+          <div class="comparison-eta-badge">
+            <span class="eta-mini-label">ETA TO HOSPITAL</span>
+            <span id="clock-fixed" class="comparison-clock">--:--</span>
+          </div>
+        </header>
+        <div id="map-fixed" class="comparison-map-container"></div>
+        <div id="banner-fixed" class="comparison-banner">Hospital Reached</div>
+      </div>
     </div>
   </section>
 
   <!-- Bottom Playback Timeline Dock -->
   <footer class="bottom-bar">
     <div class="playback-row">
-      <button id="btn-play-pause" class="primary">▶ Play</button>
-      <button id="btn-restart">↺ Reset</button>
-      <input type="range" id="timeline" class="timeline-slider" min="0" max="100" value="0" step="0.1" aria-label="Timeline Scrubber">
-      <div id="time-display" class="time-display">0.0s / --s</div>
-      <select id="speed-selector" aria-label="Playback Speed">
-        <option value="0.5">0.5x</option>
-        <option value="1.0" selected>1.0x</option>
-        <option value="2.0">2.0x</option>
-        <option value="4.0">4.0x</option>
-        <option value="5.0">5.0x</option>
-      </select>
+      <div class="timeline-row">
+        <input type="range" id="timeline" class="timeline-slider" min="0" max="100" value="0" step="0.1" aria-label="Timeline Scrubber">
+        <div id="time-display" class="time-display">0.0s / --s</div>
+      </div>
+      <div class="controls-row">
+        <button id="btn-play-pause" class="primary">▶ Play</button>
+        <button id="btn-restart" title="Restart Run">↺</button>
+        <select id="speed-selector" aria-label="Playback Speed">
+          <option value="0.5">0.5x</option>
+          <option value="1.0" selected>1.0x</option>
+          <option value="2.0">2.0x</option>
+          <option value="4.0">4.0x</option>
+          <option value="5.0">5.0x</option>
+        </select>
+      </div>
     </div>
   </footer>
 
@@ -738,13 +1652,13 @@
   <div id="intro-modal" class="modal-overlay">
     <div class="modal-card">
       <h2>🚑 Emergency Mission Control Quickstart</h2>
-      <p>Welcome to the <strong>Delhi QPSO Emergency Route Optimizer</strong> simulation demo. Here is what to observe:</p>
+      <p>Welcome to the <strong>Delhi QPSO Emergency Route Optimizer</strong> simulation demo. Key metrics to monitor:</p>
       <ul>
-        <li><strong>Emergency Ambulance Dispatch:</strong> An ambulance is dispatched from a patient incident location in Connaught Place to the optimal trauma center hospital.</li>
-        <li><strong>Traffic Volatility Tracking:</strong> Real-time variance in road traffic conditions dictates when and how hard the quantum swarm searches for hospital bypasses.</li>
-        <li><strong>⚔️ Side-by-Side Comparison:</strong> Click <em>"Compare Adaptive vs Fixed"</em> to watch both algorithms race simultaneously on identical traffic seeds!</li>
+        <li><strong>ETA to Hospital:</strong> The primary emergency metric tracking remaining transit time to trauma center care.</li>
+        <li><strong>Traffic Volatility Tracking:</strong> Real-time variance in road traffic conditions dictates when the quantum swarm dynamically replans bypass routes.</li>
+        <li><strong>Side-by-Side Comparison:</strong> Compare adaptive vs static baseline routing to observe critical time saved for patient survival.</li>
       </ul>
-      <button id="btn-close-intro" class="primary">Got it — Start Demo</button>
+      <button id="btn-close-intro" class="primary">Enter Mission Control</button>
     </div>
   </div>
 
@@ -909,6 +1823,26 @@
     }
 
     // -------------------------------------------------------------
+    // Time & Formatting Utilities (Ambulance Mission Control)
+    // -------------------------------------------------------------
+    function formatETA(seconds) {
+      const rem = Math.max(0, seconds);
+      const m = Math.floor(rem / 60);
+      const s = Math.floor(rem % 60);
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function formatTimeSaved(seconds) {
+      const s = Math.abs(seconds);
+      if (s >= 60) {
+        const m = Math.floor(s / 60);
+        const rem = Math.round(s % 60);
+        return `${m}m ${rem < 10 ? '0' : ''}${rem}s`;
+      }
+      return `${s.toFixed(1)}s`;
+    }
+
+    // -------------------------------------------------------------
     // Render Single Scenario
     // -------------------------------------------------------------
     function renderSingleScenario(data) {
@@ -919,58 +1853,133 @@
       if (routePolyline) map.removeLayer(routePolyline);
       if (vehicleMarker) map.removeLayer(vehicleMarker);
 
-      // 1. Stop Markers (Incident, Corridors, Hospital Destination)
+      // 1. Dedicated Medical Emergency Markers: Patient Pickup & Hospital Destination
       if (data.stops && data.stops.length > 0) {
-        data.stops.forEach((stop, idx) => {
-          let pinHtml = `<div class="stop-marker-pin">${idx + 1}</div>`;
-          if (idx === 0) {
-            pinHtml = `<div class="stop-marker-pin" style="background:#dc2626;border-color:#fca5a5;font-size:13px;" title="Patient Pickup">🚨</div>`;
-          } else if (idx === data.stops.length - 1) {
-            pinHtml = `<div class="stop-marker-pin" style="background:#0284c7;border-color:#38bdf8;font-size:13px;" title="Hospital Destination">🏥</div>`;
-          }
-          const pinIcon = L.divIcon({
+        const pickupStop = data.stops[0];
+        const destStop = data.stops[data.stops.length - 1];
+
+        // Patient Pickup Location Pin (Incident)
+        const pickupHtml = `
+          <div class="patient-pickup-pin" title="Patient Pickup (Incident Location)">
+            <span class="pin-symbol">🚨</span>
+            <div class="pin-label-callout">Patient Pickup</div>
+          </div>
+        `;
+        const pickupIcon = L.divIcon({
+          className: 'custom-pin',
+          html: pickupHtml,
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
+        });
+        const pickupMarker = L.marker([pickupStop.lat, pickupStop.lon], { icon: pickupIcon, zIndexOffset: 900 })
+          .bindPopup(`<b>🚨 Patient Incident & Pickup Location</b><br>Junction: ${pickupStop.id}`)
+          .addTo(map);
+        stopMarkers.push(pickupMarker);
+
+        // Hospital Destination Pin
+        const destName = (data.selected_hospital && data.selected_hospital.name) || destStop.label || 'Destination Hospital';
+        const destLevel = (data.selected_hospital && data.selected_hospital.level) ? data.selected_hospital.level.toUpperCase() : 'TRAUMA CENTER';
+        const hospitalHtml = `
+          <div class="hospital-dest-pin" title="${destName} (${destLevel})">
+            <span class="pin-symbol">🏥</span>
+            <div class="pin-label-callout hospital">${destName.split(',')[0]}</div>
+          </div>
+        `;
+        const hospitalIcon = L.divIcon({
+          className: 'custom-pin',
+          html: hospitalHtml,
+          iconSize: [36, 36],
+          iconAnchor: [18, 18]
+        });
+        const destMarker = L.marker([destStop.lat, destStop.lon], { icon: hospitalIcon, zIndexOffset: 950 })
+          .bindPopup(`<b>🏥 Destination: ${destName}</b><br><span style="color:#38bdf8;font-weight:600;">${destLevel}</span><br>Live Travel Time: ${(data.selected_hospital && data.selected_hospital.live_travel_time_sec) ? data.selected_hospital.live_travel_time_sec.toFixed(1) + 's' : ''}`)
+          .addTo(map);
+        stopMarkers.push(destMarker);
+      }
+
+      // 2. Candidate Hospitals from hospitals.json
+      if (data.hospital_candidates && data.hospital_candidates.length > 0) {
+        data.hospital_candidates.forEach(cand => {
+          if (data.selected_hospital && cand.name === data.selected_hospital.name) return; // already rendered as dest
+          const candHtml = `
+            <div class="hospital-candidate-pin" title="${cand.name} (${cand.level})">
+              <span>🏥</span>
+            </div>
+          `;
+          const candIcon = L.divIcon({
             className: 'custom-pin',
-            html: pinHtml,
-            iconSize: [26, 26],
-            iconAnchor: [13, 13]
+            html: candHtml,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
           });
-          const marker = L.marker([stop.lat, stop.lon], { icon: pinIcon })
-            .bindPopup(`<b>${stop.label || 'Stop ' + (idx + 1)}</b><br>Junction: ${stop.id}`)
+          const candMarker = L.marker([cand.lat, cand.lon], { icon: candIcon, zIndexOffset: 500 })
+            .bindPopup(`<b>🏥 ${cand.name}</b><br><span style="color:#94a3b8;font-size:11px;">Candidate (${cand.level})</span>`)
             .addTo(map);
-          stopMarkers.push(marker);
+          stopMarkers.push(candMarker);
         });
       }
 
-      // 2. Route Polyline
+      // 3. Route Polyline
       if (data.path && data.path.length > 0) {
         const polyCoords = data.path.map(p => [p.lat, p.lon]);
         routePolyline = L.polyline(polyCoords, {
           color: tierColors.calm,
           weight: 4,
-          opacity: 0.82
+          opacity: 0.85
         }).addTo(map);
         map.fitBounds(routePolyline.getBounds(), { padding: [45, 45] });
       }
 
-      // 3. Ambulance Vehicle Marker
+      // 4. Ambulance Vehicle Marker
       const initialTier = (data.metrics_over_time && data.metrics_over_time[0]) ? data.metrics_over_time[0].tier : 'calm';
       const initialPos = data.path && data.path[0] ? [data.path[0].lat, data.path[0].lon] : MAP_CENTER;
 
       const vehicleIcon = L.divIcon({
         className: 'vehicle-marker-div',
-        html: `<div id="vehicle-icon-inner" class="vehicle-courier-marker ${initialTier}">🚑</div>`,
+        html: `<div id="vehicle-icon-inner" class="ambulance-marker ${initialTier}">🚑</div>`,
         iconSize: [32, 32],
         iconAnchor: [16, 16]
       });
 
       vehicleMarker = L.marker(initialPos, { icon: vehicleIcon, zIndexOffset: 1000 }).addTo(map);
 
-      // HUD Stats
+      // Hero Card: ETA to Hospital (Single Largest Number On Screen)
+      const hName = (data.selected_hospital && data.selected_hospital.name) || 'Hospital Trauma Center';
+      const destText = document.getElementById('eta-dest-text');
+      if (destText) {
+        destText.innerText = `Destination: ${hName.split(',')[0]}`;
+        destText.title = hName;
+      }
+      document.getElementById('metric-eta-large').innerText = formatETA(data.completion_time);
+      document.getElementById('eta-status-text').innerText = 'IN TRANSIT';
+      document.getElementById('eta-status-tag').className = 'eta-status in-transit';
+
+      // Telemetry HUD Stats
       document.getElementById('metric-route-time').innerText = `${data.completion_time.toFixed(1)}s`;
       document.getElementById('metric-algorithm').innerText = data.algorithm === 'va_qpso' ? 'VA-QPSO' : 'Fixed Beta';
       document.getElementById('timeline').max = data.completion_time;
       document.getElementById('timeline').value = 0;
       document.getElementById('time-display').innerText = `0.0s / ${data.completion_time.toFixed(1)}s`;
+
+      // Sync Mobile Event Drawer Initial State
+      const drawerTime = document.getElementById('drawer-event-time');
+      const drawerPreview = document.getElementById('drawer-preview-text');
+      if (drawerTime) drawerTime.innerText = 'T = 0s [READY]';
+      if (drawerPreview) drawerPreview.innerText = 'Dispatching ambulance corridor...';
+
+      const drawerList = document.getElementById('drawer-log-list');
+      if (drawerList) {
+        if (data.events && data.events.length > 0) {
+          drawerList.innerHTML = data.events.map(ev => {
+            const icon = ev.type === 'replan' ? '🔄' : '↪️';
+            return `<div class="drawer-log-item ${ev.type}">
+              <span style="color:var(--accent); font-weight:700;">${icon} T = ${ev.t.toFixed(0)}s [${ev.type.toUpperCase()}]:</span> ${ev.detail}
+            </div>`;
+          }).join('');
+        } else {
+          drawerList.innerHTML = '<div class="drawer-log-item">No corridor disruptions detected. Unhindered transit to destination hospital.</div>';
+        }
+      }
 
       playbackTime = 0.0;
       updatePlayback(0.0);
@@ -987,11 +1996,30 @@
 
       if (!currentRunData) return;
 
-      // Move marker
+      // Move ambulance marker
       const pos = getInterpolatedPosition(currentRunData.path, t);
       if (pos && vehicleMarker) vehicleMarker.setLatLng(pos);
 
-      // Update telemetry
+      // Hero: ETA to Hospital countdown (Single largest number on screen)
+      const rem = Math.max(0, currentRunData.completion_time - t);
+      const etaDisplay = document.getElementById('metric-eta-large');
+      const etaStatusTag = document.getElementById('eta-status-tag');
+      const etaStatusText = document.getElementById('eta-status-text');
+
+      if (etaDisplay) {
+        etaDisplay.innerText = formatETA(rem);
+      }
+      if (etaStatusTag && etaStatusText) {
+        if (rem > 0) {
+          etaStatusTag.className = 'eta-status in-transit';
+          etaStatusText.innerText = 'IN TRANSIT';
+        } else {
+          etaStatusTag.className = 'eta-status arrived';
+          etaStatusText.innerText = 'ARRIVED';
+        }
+      }
+
+      // Update telemetry gauges
       const metric = getMetricsAtTime(currentRunData.metrics_over_time, t);
       document.getElementById('metric-volatility').innerText = metric.volatility_index.toFixed(4);
       document.getElementById('metric-beta').innerText = metric.beta.toFixed(4);
@@ -1005,19 +2033,25 @@
       tierText.innerText = tierKey.charAt(0).toUpperCase() + tierKey.slice(1);
 
       if (vehicleInner) {
-        vehicleInner.className = `vehicle-courier-marker ${tierKey}`;
+        vehicleInner.className = `ambulance-marker ${tierKey}`;
       }
 
       if (routePolyline) {
         routePolyline.setStyle({ color: tierColors[tierKey] || tierColors.calm });
       }
 
-      // Event stream
+      // Decision Event stream ticker (Desktop sidebar & Mobile Drawer)
       const activeEvent = getActiveEvent(currentRunData.events, t);
       if (activeEvent) {
         const icon = activeEvent.type === 'replan' ? '🔄' : '↪️';
-        document.getElementById('event-time').innerText = `${icon} T = ${activeEvent.t.toFixed(0)}s [${activeEvent.type.toUpperCase()}]`;
+        const eventTitle = `${icon} T = ${activeEvent.t.toFixed(0)}s [${activeEvent.type.toUpperCase()}]`;
+        document.getElementById('event-time').innerText = eventTitle;
         document.getElementById('event-desc').innerText = activeEvent.detail;
+
+        const drawerTime = document.getElementById('drawer-event-time');
+        const drawerPreview = document.getElementById('drawer-preview-text');
+        if (drawerTime) drawerTime.innerText = eventTitle;
+        if (drawerPreview) drawerPreview.innerText = activeEvent.detail;
       }
 
       document.getElementById('timeline').value = t;
@@ -1043,32 +2077,45 @@
         container.classList.add('dark-tiles');
       }
 
-      if (run.stops) {
-        run.stops.forEach((s, i) => {
-          let pinHtml = `<div class="stop-marker-pin">${i + 1}</div>`;
-          if (i === 0) {
-            pinHtml = `<div class="stop-marker-pin" style="background:#dc2626;border-color:#fca5a5;font-size:11px;" title="Patient Pickup">🚨</div>`;
-          } else if (i === run.stops.length - 1) {
-            pinHtml = `<div class="stop-marker-pin" style="background:#0284c7;border-color:#38bdf8;font-size:11px;" title="Hospital Destination">🏥</div>`;
-          }
-          const pin = L.divIcon({
-            className: 'custom-pin',
-            html: pinHtml,
-            iconSize: [22, 22],
-            iconAnchor: [11, 11]
-          });
-          L.marker([s.lat, s.lon], { icon: pin })
-            .bindPopup(`<b>${s.label || 'Stop ' + (i + 1)}</b>`)
-            .addTo(cmpMap);
+      // Render Patient Pickup & Hospital Destination pins (No delivery pins)
+      if (run.stops && run.stops.length > 0) {
+        const pickupStop = run.stops[0];
+        const destStop = run.stops[run.stops.length - 1];
+
+        const pickupHtml = `
+          <div class="patient-pickup-pin mini" title="Patient Incident & Pickup Location">
+            <span class="pin-symbol">🚨</span>
+          </div>
+        `;
+        const pIcon = L.divIcon({ className: 'custom-pin', html: pickupHtml, iconSize: [26, 26], iconAnchor: [13, 13] });
+        L.marker([pickupStop.lat, pickupStop.lon], { icon: pIcon }).bindPopup('<b>🚨 Patient Incident & Pickup Location</b>').addTo(cmpMap);
+
+        const destName = (run.selected_hospital && run.selected_hospital.name) || destStop.label || 'Destination Hospital';
+        const hospitalHtml = `
+          <div class="hospital-dest-pin mini" title="${destName}">
+            <span class="pin-symbol">🏥</span>
+          </div>
+        `;
+        const hIcon = L.divIcon({ className: 'custom-pin', html: hospitalHtml, iconSize: [28, 28], iconAnchor: [14, 14] });
+        L.marker([destStop.lat, destStop.lon], { icon: hIcon }).bindPopup(`<b>🏥 ${destName}</b>`).addTo(cmpMap);
+      }
+
+      // Candidate Hospitals
+      if (run.hospital_candidates && run.hospital_candidates.length > 0) {
+        run.hospital_candidates.forEach(cand => {
+          if (run.selected_hospital && cand.name === run.selected_hospital.name) return;
+          const candHtml = `<div class="hospital-candidate-pin mini" title="${cand.name}">🏥</div>`;
+          const candIcon = L.divIcon({ className: 'custom-pin', html: candHtml, iconSize: [18, 18], iconAnchor: [9, 9] });
+          L.marker([cand.lat, cand.lon], { icon: candIcon }).bindPopup(`<b>🏥 ${cand.name}</b>`).addTo(cmpMap);
         });
       }
 
       const routeCoords = run.path.map(p => [p.lat, p.lon]);
-      const route = L.polyline(routeCoords, { color: '#38bdf8', weight: 4, opacity: 0.8 }).addTo(cmpMap);
+      const route = L.polyline(routeCoords, { color: '#38bdf8', weight: 4, opacity: 0.85 }).addTo(cmpMap);
 
       const vIcon = L.divIcon({
         className: 'vehicle-marker-div',
-        html: `<div class="vehicle-courier-marker calm" style="width:26px;height:26px;font-size:13px;">🚑</div>`,
+        html: `<div class="ambulance-marker calm" style="width:26px;height:26px;font-size:13px;">🚑</div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 13]
       });
@@ -1091,7 +2138,7 @@
         cmpView.hidden = true;
         singleView.hidden = false;
         hud.style.display = 'flex';
-        toggleBtn.innerText = '⚔️ Compare Adaptive vs Fixed';
+        toggleBtn.innerText = '⚖️ Compare Adaptive vs Fixed';
         toggleBtn.classList.remove('primary');
         map.invalidateSize();
         updatePlayback(playbackTime);
@@ -1137,6 +2184,22 @@
         mapAdaptive.invalidateSize();
         mapFixed.invalidateSize();
 
+        // Update Headline Result: frame the time saved as the primary takeaway
+        const diff = fixedRunData.completion_time - adaptiveRunData.completion_time;
+        const headlineEl = document.getElementById('comparison-headline-text');
+        const headlineSub = document.getElementById('comparison-headline-sub');
+        if (diff > 0) {
+          const savedStr = formatTimeSaved(diff);
+          headlineEl.innerHTML = `Adaptive routing reached the hospital <strong>${savedStr} faster</strong>`;
+          headlineSub.innerText = `Emergency transit completed in ${formatETA(adaptiveRunData.completion_time)} vs ${formatETA(fixedRunData.completion_time)} for static baseline on identical traffic surge.`;
+        } else if (diff < 0) {
+          headlineEl.innerHTML = `Adaptive: ${formatETA(adaptiveRunData.completion_time)} | Baseline: ${formatETA(fixedRunData.completion_time)}`;
+          headlineSub.innerText = `Evaluated across high-density network with alternative corridor routing.`;
+        } else {
+          headlineEl.innerHTML = `Both algorithms reached hospital in identical transit time (${formatETA(adaptiveRunData.completion_time)})`;
+          headlineSub.innerText = `Traffic conditions permitted unhindered corridor transit.`;
+        }
+
         const maxDuration = Math.max(adaptiveRunData.completion_time, fixedRunData.completion_time);
         document.getElementById('timeline').max = maxDuration;
         playbackTime = 0.0;
@@ -1156,25 +2219,44 @@
       document.getElementById('timeline').value = t;
       document.getElementById('time-display').innerText = `${t.toFixed(1)}s / ${maxDuration.toFixed(1)}s`;
 
-      // Adaptive Vehicle
+      // Adaptive Vehicle & Clock
       const tAdaptive = Math.min(t, adaptiveRunData.completion_time);
+      const remAdaptive = Math.max(0, adaptiveRunData.completion_time - t);
       const posAdaptive = getInterpolatedPosition(adaptiveRunData.path, tAdaptive);
       if (posAdaptive && adaptiveVisual) adaptiveVisual.vehicle.setLatLng(posAdaptive);
-      document.getElementById('clock-adaptive').innerText = `${tAdaptive.toFixed(1)}s / ${adaptiveRunData.completion_time.toFixed(1)}s`;
 
-      // Fixed Vehicle
+      const clockAdaptive = document.getElementById('clock-adaptive');
+      if (remAdaptive > 0) {
+        clockAdaptive.innerText = formatETA(remAdaptive);
+        clockAdaptive.style.color = 'var(--accent)';
+      } else {
+        clockAdaptive.innerText = `ARRIVED (${formatETA(adaptiveRunData.completion_time)})`;
+        clockAdaptive.style.color = '#10b981';
+      }
+
+      // Fixed Vehicle & Clock
       const tFixed = Math.min(t, fixedRunData.completion_time);
+      const remFixed = Math.max(0, fixedRunData.completion_time - t);
       const posFixed = getInterpolatedPosition(fixedRunData.path, tFixed);
       if (posFixed && fixedVisual) fixedVisual.vehicle.setLatLng(posFixed);
-      document.getElementById('clock-fixed').innerText = `${tFixed.toFixed(1)}s / ${fixedRunData.completion_time.toFixed(1)}s`;
 
-      // Check Winner Highlights
+      const clockFixed = document.getElementById('clock-fixed');
+      if (remFixed > 0) {
+        clockFixed.innerText = formatETA(remFixed);
+        clockFixed.style.color = '#94a3b8';
+      } else {
+        clockFixed.innerText = `ARRIVED (${formatETA(fixedRunData.completion_time)})`;
+        clockFixed.style.color = '#10b981';
+      }
+
+      // Check Winner Highlights & Headline Result Framing
       const bannerAdaptive = document.getElementById('banner-adaptive');
       const cardAdaptive = document.getElementById('card-adaptive');
+      const diff = fixedRunData.completion_time - adaptiveRunData.completion_time;
 
-      if (t >= adaptiveRunData.completion_time && adaptiveRunData.completion_time < fixedRunData.completion_time) {
-        const diff = (fixedRunData.completion_time - adaptiveRunData.completion_time).toFixed(1);
-        bannerAdaptive.innerText = `🏆 Adaptive Route Reached Hospital ${diff}s Faster!`;
+      if (t >= adaptiveRunData.completion_time && diff > 0) {
+        const savedStr = formatTimeSaved(diff);
+        bannerAdaptive.innerText = `Adaptive routing reached the hospital ${savedStr} faster`;
         bannerAdaptive.style.display = 'block';
         cardAdaptive.classList.add('winner');
       } else {
@@ -1306,6 +2388,69 @@
     });
     document.getElementById('btn-open-intro').addEventListener('click', () => {
       introModal.hidden = false;
+    });
+
+    // -------------------------------------------------------------
+    // Mobile Drawer & Touch Interactive Handlers
+    // -------------------------------------------------------------
+    const eventDrawer = document.getElementById('event-drawer');
+    const drawerHandle = document.getElementById('event-drawer-handle');
+    if (drawerHandle && eventDrawer) {
+      drawerHandle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isOpen = eventDrawer.classList.toggle('open');
+        drawerHandle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    }
+
+    // Touch & Tap Support for Info-Tooltips (Works on tap, not only hover)
+    document.querySelectorAll('.metric-card').forEach(card => {
+      const infoBtn = card.querySelector('.info-btn');
+      const tooltip = card.querySelector('.tooltip-content');
+      if (!tooltip) return;
+
+      const toggleTooltip = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const isActive = tooltip.classList.contains('active');
+        // Close all other tooltips first
+        document.querySelectorAll('.tooltip-content.active').forEach(t => t.classList.remove('active'));
+        if (!isActive) {
+          tooltip.classList.add('active');
+        }
+      };
+
+      if (infoBtn) {
+        infoBtn.addEventListener('click', toggleTooltip);
+      }
+      card.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 && e.target !== infoBtn) {
+          toggleTooltip(e);
+        }
+      });
+    });
+
+    // Dismiss tooltips when tapped anywhere outside
+    const dismissTooltips = (e) => {
+      if (!e.target.closest('.metric-card')) {
+        document.querySelectorAll('.tooltip-content.active').forEach(t => t.classList.remove('active'));
+      }
+    };
+    document.addEventListener('click', dismissTooltips);
+    document.addEventListener('touchend', dismissTooltips);
+
+    // Handle Mobile Orientation and Window Resize
+    window.addEventListener('resize', () => {
+      if (map) map.invalidateSize();
+      if (mapAdaptive) mapAdaptive.invalidateSize();
+      if (mapFixed) mapFixed.invalidateSize();
+    });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+        if (mapAdaptive) mapAdaptive.invalidateSize();
+        if (mapFixed) mapFixed.invalidateSize();
+      }, 300);
     });
 
     // -------------------------------------------------------------
