@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QPSO Delivery Route Optimizer — Delhi Mission Control</title>
-  <meta name="description" content="Real-time interactive Leaflet visualization and side-by-side comparison of Volatility-Adaptive QPSO delivery routing on Delhi road network.">
+  <title>QPSO Ambulance Route Optimizer — Delhi Mission Control</title>
+  <meta name="description" content="Real-time interactive Leaflet visualization and side-by-side comparison of Volatility-Adaptive QPSO emergency ambulance dispatch on Delhi road network.">
 
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- Leaflet CSS (via CDNJS) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="" />
 
   <style>
     :root {
@@ -463,6 +463,29 @@
       min-width: 95px;
       text-align: right;
     }
+    /* Leaflet OpenStreetMap Attribution Styling */
+    .leaflet-control-attribution {
+      background: rgba(13, 22, 38, 0.85) !important;
+      color: var(--text-muted) !important;
+      font-size: 11px !important;
+      font-family: var(--font-main) !important;
+      border-radius: 4px;
+      padding: 2px 7px !important;
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(4px);
+    }
+    .leaflet-control-attribution a {
+      color: var(--accent) !important;
+      text-decoration: none;
+    }
+    .leaflet-control-attribution a:hover {
+      text-decoration: underline;
+    }
+
+    /* OpenStreetMap Dark Mode Tile Styling */
+    .dark-tiles .leaflet-tile-pane {
+      filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.28) brightness(0.72);
+    }
 
     /* Custom Leaflet Pin Markers */
     .stop-marker-pin {
@@ -599,20 +622,20 @@
   <!-- Top Navigation & Controls Bar -->
   <header class="top-bar">
     <div class="brand-section">
-      <div class="brand-icon">🚚</div>
+      <div class="brand-icon">🚑</div>
       <div class="brand-text">
-        <h1>Delhi QPSO Delivery Route Optimizer</h1>
-        <p>Quantum Swarm Navigation over Volatile Indian Road Networks</p>
+        <h1>Delhi QPSO Emergency Route Optimizer</h1>
+        <p>Quantum Swarm Ambulance Navigation over Volatile Indian Road Networks</p>
       </div>
     </div>
     <div class="scenario-controls">
       <select id="scenario-selector" aria-label="Select Scenario">
-        <option value="hero_medium_va_qpso" selected>Medium Volatility (Incident @ 120s) — VA-QPSO</option>
-        <option value="hero_medium_fixed_beta_qpso">Medium Volatility (Incident @ 120s) — Fixed Beta</option>
-        <option value="hero_high_va_qpso">High Volatility (Peak Surge & Closures) — VA-QPSO</option>
-        <option value="hero_high_fixed_beta_qpso">High Volatility (Peak Surge & Closures) — Fixed Beta</option>
-        <option value="hero_low_va_qpso">Low Volatility (Off-Peak) — VA-QPSO</option>
-        <option value="hero_low_fixed_beta_qpso">Low Volatility (Off-Peak) — Fixed Beta</option>
+        <option value="hero_medium_va_qpso" selected>Medium Volatility (Corridor Obstruction @ 120s) — VA-QPSO</option>
+        <option value="hero_medium_fixed_beta_qpso">Medium Volatility (Corridor Obstruction @ 120s) — Fixed Beta</option>
+        <option value="hero_high_va_qpso">High Volatility (Rush Hour Surge) — VA-QPSO</option>
+        <option value="hero_high_fixed_beta_qpso">High Volatility (Rush Hour Surge) — Fixed Beta</option>
+        <option value="hero_low_va_qpso">Low Volatility (Off-Peak Transfer) — VA-QPSO</option>
+        <option value="hero_low_fixed_beta_qpso">Low Volatility (Off-Peak Transfer) — Fixed Beta</option>
       </select>
       <button id="btn-toggle-compare" class="compare-btn">⚔️ Compare Adaptive vs Fixed</button>
       <button id="btn-reset-view">📍 Center Map</button>
@@ -662,7 +685,7 @@
     </div>
     <div class="event-ticker">
       <div id="event-time" class="event-time">T = 0s [Ready]</div>
-      <div id="event-desc" class="event-desc">Loading delivery schedule...</div>
+      <div id="event-desc" class="event-desc">Dispatching ambulance corridor...</div>
     </div>
   </aside>
 
@@ -679,7 +702,7 @@
         <span id="clock-adaptive" class="comparison-clock">0.0s / --s</span>
       </header>
       <div id="map-adaptive" class="comparison-map-container"></div>
-      <div id="banner-adaptive" class="comparison-banner">🏆 Adaptive Route Finished Faster!</div>
+      <div id="banner-adaptive" class="comparison-banner">🏆 Adaptive Route Reached Hospital Faster!</div>
     </div>
     <div id="card-fixed" class="comparison-card">
       <header class="comparison-header">
@@ -687,7 +710,7 @@
         <span id="clock-fixed" class="comparison-clock">0.0s / --s</span>
       </header>
       <div id="map-fixed" class="comparison-map-container"></div>
-      <div id="banner-fixed" class="comparison-banner">Completed</div>
+      <div id="banner-fixed" class="comparison-banner">Reached Hospital</div>
     </div>
   </section>
 
@@ -714,19 +737,19 @@
   <!-- Intro Onboarding Modal -->
   <div id="intro-modal" class="modal-overlay">
     <div class="modal-card">
-      <h2>🚚 Mission Control Quickstart</h2>
-      <p>Welcome to the <strong>Delhi QPSO Delivery Route Optimizer</strong> simulation demo. Here is what to observe:</p>
+      <h2>🚑 Emergency Mission Control Quickstart</h2>
+      <p>Welcome to the <strong>Delhi QPSO Emergency Route Optimizer</strong> simulation demo. Here is what to observe:</p>
       <ul>
-        <li><strong>8 Stop Delivery Tour:</strong> Couriers serve destinations across the Connaught Place network.</li>
-        <li><strong>Traffic Volatility Tracking:</strong> Real-time variance in road traffic conditions dictates when and how hard the quantum swarm searches for detours.</li>
+        <li><strong>Emergency Ambulance Dispatch:</strong> An ambulance is dispatched from a patient incident location in Connaught Place to the optimal trauma center hospital.</li>
+        <li><strong>Traffic Volatility Tracking:</strong> Real-time variance in road traffic conditions dictates when and how hard the quantum swarm searches for hospital bypasses.</li>
         <li><strong>⚔️ Side-by-Side Comparison:</strong> Click <em>"Compare Adaptive vs Fixed"</em> to watch both algorithms race simultaneously on identical traffic seeds!</li>
       </ul>
       <button id="btn-close-intro" class="primary">Got it — Start Demo</button>
     </div>
   </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Leaflet JS (via CDNJS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin=""></script>
 
   <script>
     // -------------------------------------------------------------
@@ -747,10 +770,12 @@
     // -------------------------------------------------------------
     // Map State & Layers
     // -------------------------------------------------------------
+    const OSM_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
+
     let map = null;
-    let darkTiles = null;
-    let osmTiles = null;
-    let currentTileMode = 'dark';
+    let osmTileLayer = null;
+    let isDarkTiles = true;
 
     let stopMarkers = [];
     let routePolyline = null;
@@ -778,19 +803,20 @@
     function initMainMap() {
       map = L.map('map', {
         zoomControl: false,
-        attributionControl: false
+        attributionControl: true
       }).setView(MAP_CENTER, 15);
 
       L.control.zoom({ position: 'topright' }).addTo(map);
 
-      darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      osmTileLayer = L.tileLayer(OSM_TILE_URL, {
         maxZoom: 19,
-        subdomains: 'abcd'
+        attribution: OSM_ATTRIBUTION
       }).addTo(map);
 
-      osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19
-      });
+      const mapContainer = document.getElementById('map');
+      if (isDarkTiles && mapContainer) {
+        mapContainer.classList.add('dark-tiles');
+      }
     }
 
     initMainMap();
@@ -893,12 +919,18 @@
       if (routePolyline) map.removeLayer(routePolyline);
       if (vehicleMarker) map.removeLayer(vehicleMarker);
 
-      // 1. Numbered Stop Markers
+      // 1. Stop Markers (Incident, Corridors, Hospital Destination)
       if (data.stops && data.stops.length > 0) {
         data.stops.forEach((stop, idx) => {
+          let pinHtml = `<div class="stop-marker-pin">${idx + 1}</div>`;
+          if (idx === 0) {
+            pinHtml = `<div class="stop-marker-pin" style="background:#dc2626;border-color:#fca5a5;font-size:13px;" title="Patient Pickup">🚨</div>`;
+          } else if (idx === data.stops.length - 1) {
+            pinHtml = `<div class="stop-marker-pin" style="background:#0284c7;border-color:#38bdf8;font-size:13px;" title="Hospital Destination">🏥</div>`;
+          }
           const pinIcon = L.divIcon({
             className: 'custom-pin',
-            html: `<div class="stop-marker-pin">${idx + 1}</div>`,
+            html: pinHtml,
             iconSize: [26, 26],
             iconAnchor: [13, 13]
           });
@@ -920,13 +952,13 @@
         map.fitBounds(routePolyline.getBounds(), { padding: [45, 45] });
       }
 
-      // 3. Courier Vehicle Marker
+      // 3. Ambulance Vehicle Marker
       const initialTier = (data.metrics_over_time && data.metrics_over_time[0]) ? data.metrics_over_time[0].tier : 'calm';
       const initialPos = data.path && data.path[0] ? [data.path[0].lat, data.path[0].lon] : MAP_CENTER;
 
       const vehicleIcon = L.divIcon({
         className: 'vehicle-marker-div',
-        html: `<div id="vehicle-icon-inner" class="vehicle-courier-marker ${initialTier}">🛵</div>`,
+        html: `<div id="vehicle-icon-inner" class="vehicle-courier-marker ${initialTier}">🚑</div>`,
         iconSize: [32, 32],
         iconAnchor: [16, 16]
       });
@@ -998,23 +1030,36 @@
     function makeComparisonVisual(run, mapContainerId) {
       const cmpMap = L.map(mapContainerId, {
         zoomControl: false,
-        attributionControl: false
+        attributionControl: true
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer(OSM_TILE_URL, {
         maxZoom: 19,
-        subdomains: 'abcd'
+        attribution: OSM_ATTRIBUTION
       }).addTo(cmpMap);
+
+      const container = document.getElementById(mapContainerId);
+      if (container && isDarkTiles) {
+        container.classList.add('dark-tiles');
+      }
 
       if (run.stops) {
         run.stops.forEach((s, i) => {
+          let pinHtml = `<div class="stop-marker-pin">${i + 1}</div>`;
+          if (i === 0) {
+            pinHtml = `<div class="stop-marker-pin" style="background:#dc2626;border-color:#fca5a5;font-size:11px;" title="Patient Pickup">🚨</div>`;
+          } else if (i === run.stops.length - 1) {
+            pinHtml = `<div class="stop-marker-pin" style="background:#0284c7;border-color:#38bdf8;font-size:11px;" title="Hospital Destination">🏥</div>`;
+          }
           const pin = L.divIcon({
             className: 'custom-pin',
-            html: `<div class="stop-marker-pin">${i + 1}</div>`,
+            html: pinHtml,
             iconSize: [22, 22],
             iconAnchor: [11, 11]
           });
-          L.marker([s.lat, s.lon], { icon: pin }).addTo(cmpMap);
+          L.marker([s.lat, s.lon], { icon: pin })
+            .bindPopup(`<b>${s.label || 'Stop ' + (i + 1)}</b>`)
+            .addTo(cmpMap);
         });
       }
 
@@ -1023,7 +1068,7 @@
 
       const vIcon = L.divIcon({
         className: 'vehicle-marker-div',
-        html: `<div class="vehicle-courier-marker calm" style="width:26px;height:26px;font-size:13px;">🛵</div>`,
+        html: `<div class="vehicle-courier-marker calm" style="width:26px;height:26px;font-size:13px;">🚑</div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 13]
       });
@@ -1129,7 +1174,7 @@
 
       if (t >= adaptiveRunData.completion_time && adaptiveRunData.completion_time < fixedRunData.completion_time) {
         const diff = (fixedRunData.completion_time - adaptiveRunData.completion_time).toFixed(1);
-        bannerAdaptive.innerText = `🏆 Adaptive Finished ${diff}s Faster!`;
+        bannerAdaptive.innerText = `🏆 Adaptive Route Reached Hospital ${diff}s Faster!`;
         bannerAdaptive.style.display = 'block';
         cardAdaptive.classList.add('winner');
       } else {
@@ -1227,15 +1272,20 @@
     document.getElementById('btn-toggle-compare').addEventListener('click', toggleComparisonMode);
 
     document.getElementById('btn-toggle-tiles').addEventListener('click', () => {
-      if (currentTileMode === 'dark') {
-        map.removeLayer(darkTiles);
-        osmTiles.addTo(map);
-        currentTileMode = 'osm';
-      } else {
-        map.removeLayer(osmTiles);
-        darkTiles.addTo(map);
-        currentTileMode = 'dark';
-      }
+      isDarkTiles = !isDarkTiles;
+      const containers = [
+        document.getElementById('map'),
+        document.getElementById('map-adaptive'),
+        document.getElementById('map-fixed')
+      ];
+      containers.forEach(el => {
+        if (!el) return;
+        if (isDarkTiles) {
+          el.classList.add('dark-tiles');
+        } else {
+          el.classList.remove('dark-tiles');
+        }
+      });
     });
 
     document.getElementById('btn-reset-view').addEventListener('click', () => {

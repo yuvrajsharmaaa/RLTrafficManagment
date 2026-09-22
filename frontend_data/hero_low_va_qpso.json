@@ -6,526 +6,582 @@
       "id": "10239800518",
       "lat": 28.632587,
       "lon": 77.222985,
-      "label": "Stop 1"
+      "label": "\ud83d\udea8 Patient Pickup (Incident Location)"
     },
     {
       "id": "10239800521",
       "lat": 28.632649,
       "lon": 77.222101,
-      "label": "Stop 2"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 1"
     },
     {
       "id": "10246421063",
       "lat": 28.630897,
       "lon": 77.220743,
-      "label": "Stop 3"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 2"
     },
     {
       "id": "10246421064",
       "lat": 28.630565,
       "lon": 77.220915,
-      "label": "Stop 4"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 3"
     },
     {
       "id": "10248567769",
       "lat": 28.63152,
       "lon": 77.218759,
-      "label": "Stop 5"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 4"
     },
     {
       "id": "10248567772",
       "lat": 28.631328,
       "lon": 77.219493,
-      "label": "Stop 6"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 5"
     },
     {
       "id": "10248567778",
       "lat": 28.631405,
       "lon": 77.219167,
-      "label": "Stop 7"
+      "label": "\ud83d\ude91 Emergency Corridor Checkpoint 6"
     },
     {
-      "id": "10248567779",
-      "lat": 28.631324,
-      "lon": 77.219566,
-      "label": "Stop 8"
+      "id": "5681450601",
+      "lat": 28.628985,
+      "lon": 77.219526,
+      "label": "\ud83c\udfe5 Destination: All India Institute of Medical Sciences (AIIMS), New Delhi (Trauma Center)"
     }
   ],
+  "hospital_candidates": [
+    {
+      "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
+      "lat": 28.5672,
+      "lon": 77.21,
+      "level": "trauma center",
+      "gateway_node": "5681450601",
+      "live_travel_time_sec": 14.7,
+      "status": "selected_best_destination"
+    },
+    {
+      "name": "VMMC & Safdarjung Hospital",
+      "lat": 28.5673,
+      "lon": 77.205,
+      "level": "trauma center",
+      "gateway_node": "5681450601",
+      "live_travel_time_sec": 14.7,
+      "status": "candidate_destination"
+    },
+    {
+      "name": "Dr. Ram Manohar Lohia Hospital",
+      "lat": 28.6249,
+      "lon": 77.2001,
+      "level": "trauma center",
+      "gateway_node": "12901223731",
+      "live_travel_time_sec": 41.4,
+      "status": "candidate_destination"
+    },
+    {
+      "name": "Max Smart Super Speciality Hospital, Saket",
+      "lat": 28.5273,
+      "lon": 77.2117,
+      "level": "general",
+      "gateway_node": "267250973",
+      "live_travel_time_sec": 42.3,
+      "status": "candidate_destination"
+    },
+    {
+      "name": "Moolchand Hospital, Lajpat Nagar",
+      "lat": 28.5731,
+      "lon": 77.2369,
+      "level": "general",
+      "gateway_node": "267250973",
+      "live_travel_time_sec": 42.3,
+      "status": "candidate_destination"
+    }
+  ],
+  "selected_hospital": {
+    "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
+    "lat": 28.5672,
+    "lon": 77.21,
+    "level": "trauma center",
+    "gateway_node": "5681450601",
+    "live_travel_time_sec": 14.7,
+    "status": "selected_best_destination"
+  },
   "path": [
     {
-      "t": 0,
-      "lat": 28.630571,
-      "lon": 77.22093
+      "t": 0.0,
+      "lat": 28.631399,
+      "lon": 77.219192
     },
     {
-      "t": 1,
-      "lat": 28.630653,
-      "lon": 77.220887
+      "t": 1.0,
+      "lat": 28.631332,
+      "lon": 77.219478
     },
     {
-      "t": 2,
-      "lat": 28.630735,
-      "lon": 77.220845
+      "t": 1.99,
+      "lat": 28.631523,
+      "lon": 77.219578
     },
     {
-      "t": 3,
-      "lat": 28.630817,
-      "lon": 77.220802
+      "t": 2.99,
+      "lat": 28.631677,
+      "lon": 77.219394
     },
     {
-      "t": 4,
-      "lat": 28.630949,
-      "lon": 77.220856
+      "t": 3.98,
+      "lat": 28.631785,
+      "lon": 77.219126
     },
     {
-      "t": 5,
-      "lat": 28.630992,
-      "lon": 77.220946
+      "t": 4.98,
+      "lat": 28.631756,
+      "lon": 77.218884
     },
     {
-      "t": 6,
-      "lat": 28.631042,
-      "lon": 77.221031
+      "t": 5.97,
+      "lat": 28.631538,
+      "lon": 77.218788
     },
     {
-      "t": 7,
-      "lat": 28.631092,
-      "lon": 77.221117
+      "t": 6.97,
+      "lat": 28.631767,
+      "lon": 77.218928
     },
     {
-      "t": 8,
-      "lat": 28.631145,
-      "lon": 77.2212
+      "t": 7.96,
+      "lat": 28.631981,
+      "lon": 77.218822
     },
     {
-      "t": 9,
-      "lat": 28.631198,
-      "lon": 77.221282
+      "t": 8.96,
+      "lat": 28.632179,
+      "lon": 77.218632
     },
     {
-      "t": 10,
-      "lat": 28.631258,
-      "lon": 77.221359
+      "t": 9.95,
+      "lat": 28.632408,
+      "lon": 77.218495
     },
     {
-      "t": 11,
-      "lat": 28.631319,
-      "lon": 77.221435
+      "t": 10.95,
+      "lat": 28.63266,
+      "lon": 77.218426
     },
     {
-      "t": 12,
-      "lat": 28.631385,
-      "lon": 77.221505
+      "t": 11.94,
+      "lat": 28.632919,
+      "lon": 77.218423
     },
     {
-      "t": 13,
-      "lat": 28.63149,
-      "lon": 77.221605
+      "t": 12.94,
+      "lat": 28.633171,
+      "lon": 77.218489
     },
     {
-      "t": 14,
-      "lat": 28.631567,
-      "lon": 77.22166
+      "t": 13.93,
+      "lat": 28.633402,
+      "lon": 77.218621
     },
     {
-      "t": 15,
-      "lat": 28.631754,
-      "lon": 77.22179
+      "t": 14.93,
+      "lat": 28.633604,
+      "lon": 77.218806
     },
     {
-      "t": 16,
-      "lat": 28.631833,
-      "lon": 77.22184
+      "t": 15.92,
+      "lat": 28.633763,
+      "lon": 77.219039
     },
     {
-      "t": 17,
-      "lat": 28.631914,
-      "lon": 77.221884
+      "t": 16.92,
+      "lat": 28.633871,
+      "lon": 77.219307
     },
     {
-      "t": 18,
-      "lat": 28.631997,
-      "lon": 77.221926
+      "t": 17.91,
+      "lat": 28.633919,
+      "lon": 77.219597
     },
     {
-      "t": 19,
-      "lat": 28.632081,
-      "lon": 77.221963
+      "t": 18.91,
+      "lat": 28.633911,
+      "lon": 77.219892
     },
     {
-      "t": 20,
-      "lat": 28.63221,
-      "lon": 77.22201
+      "t": 19.9,
+      "lat": 28.633841,
+      "lon": 77.220176
     },
     {
-      "t": 21,
-      "lat": 28.632297,
-      "lon": 77.222038
+      "t": 20.9,
+      "lat": 28.633806,
+      "lon": 77.220439
     },
     {
-      "t": 22,
-      "lat": 28.632385,
-      "lon": 77.222059
+      "t": 21.89,
+      "lat": 28.634025,
+      "lon": 77.220599
     },
     {
-      "t": 23,
-      "lat": 28.632519,
-      "lon": 77.222086
+      "t": 22.89,
+      "lat": 28.634243,
+      "lon": 77.220758
     },
     {
-      "t": 24,
-      "lat": 28.632609,
-      "lon": 77.222096
+      "t": 23.89,
+      "lat": 28.634462,
+      "lon": 77.220918
     },
     {
-      "t": 25,
-      "lat": 28.632649,
-      "lon": 77.222213
+      "t": 24.88,
+      "lat": 28.634679,
+      "lon": 77.22108
     },
     {
-      "t": 26,
-      "lat": 28.632648,
-      "lon": 77.222316
+      "t": 25.88,
+      "lat": 28.634895,
+      "lon": 77.221244
     },
     {
-      "t": 27,
-      "lat": 28.632648,
-      "lon": 77.222418
+      "t": 26.87,
+      "lat": 28.635107,
+      "lon": 77.221414
     },
     {
-      "t": 28,
-      "lat": 28.632647,
-      "lon": 77.222521
+      "t": 27.87,
+      "lat": 28.635101,
+      "lon": 77.221676
     },
     {
-      "t": 29,
-      "lat": 28.632645,
-      "lon": 77.222623
+      "t": 28.86,
+      "lat": 28.634918,
+      "lon": 77.221886
     },
     {
-      "t": 30,
-      "lat": 28.632635,
-      "lon": 77.222725
+      "t": 29.86,
+      "lat": 28.634731,
+      "lon": 77.222091
     },
     {
-      "t": 31,
-      "lat": 28.632616,
-      "lon": 77.222825
+      "t": 30.85,
+      "lat": 28.634532,
+      "lon": 77.222281
     },
     {
-      "t": 32,
-      "lat": 28.632554,
-      "lon": 77.222984
+      "t": 31.85,
+      "lat": 28.634322,
+      "lon": 77.222454
     },
     {
-      "t": 33,
-      "lat": 28.632464,
-      "lon": 77.222977
+      "t": 32.84,
+      "lat": 28.634097,
+      "lon": 77.222601
     },
     {
-      "t": 34,
-      "lat": 28.632375,
-      "lon": 77.222962
+      "t": 33.84,
+      "lat": 28.633866,
+      "lon": 77.222736
     },
     {
-      "t": 35,
-      "lat": 28.632285,
-      "lon": 77.222946
+      "t": 34.83,
+      "lat": 28.633623,
+      "lon": 77.222838
     },
     {
-      "t": 36,
-      "lat": 28.632119,
-      "lon": 77.222911
+      "t": 35.83,
+      "lat": 28.633372,
+      "lon": 77.222914
     },
     {
-      "t": 37,
-      "lat": 28.632032,
-      "lon": 77.222885
+      "t": 36.82,
+      "lat": 28.633117,
+      "lon": 77.222967
     },
     {
-      "t": 38,
-      "lat": 28.631945,
-      "lon": 77.222858
+      "t": 37.82,
+      "lat": 28.632858,
+      "lon": 77.22299
     },
     {
-      "t": 39,
-      "lat": 28.631754,
-      "lon": 77.222769
+      "t": 38.81,
+      "lat": 28.632598,
+      "lon": 77.222985
     },
     {
-      "t": 40,
-      "lat": 28.631674,
-      "lon": 77.222722
+      "t": 39.81,
+      "lat": 28.632341,
+      "lon": 77.222956
     },
     {
-      "t": 41,
-      "lat": 28.631594,
-      "lon": 77.222674
+      "t": 40.8,
+      "lat": 28.632086,
+      "lon": 77.222901
     },
     {
-      "t": 42,
-      "lat": 28.631514,
-      "lon": 77.222626
+      "t": 41.8,
+      "lat": 28.631838,
+      "lon": 77.222815
     },
     {
-      "t": 43,
-      "lat": 28.631434,
-      "lon": 77.222578
+      "t": 42.79,
+      "lat": 28.631606,
+      "lon": 77.222681
     },
     {
-      "t": 44,
-      "lat": 28.631174,
-      "lon": 77.222382
+      "t": 43.79,
+      "lat": 28.631378,
+      "lon": 77.22254
     },
     {
-      "t": 45,
-      "lat": 28.631022,
-      "lon": 77.222286
+      "t": 44.78,
+      "lat": 28.631164,
+      "lon": 77.222375
     },
     {
-      "t": 46,
-      "lat": 28.630956,
-      "lon": 77.222216
+      "t": 45.78,
+      "lat": 28.630951,
+      "lon": 77.222211
     },
     {
-      "t": 47,
-      "lat": 28.630828,
-      "lon": 77.222081
+      "t": 46.77,
+      "lat": 28.630761,
+      "lon": 77.222009
     },
     {
-      "t": 48,
-      "lat": 28.630762,
-      "lon": 77.22201
+      "t": 47.77,
+      "lat": 28.630586,
+      "lon": 77.221791
     },
     {
-      "t": 49,
-      "lat": 28.630697,
-      "lon": 77.221939
+      "t": 48.77,
+      "lat": 28.630417,
+      "lon": 77.221567
     },
     {
-      "t": 50,
-      "lat": 28.630576,
-      "lon": 77.221779
+      "t": 49.76,
+      "lat": 28.63025,
+      "lon": 77.221341
     },
     {
-      "t": 51,
-      "lat": 28.630484,
-      "lon": 77.221656
+      "t": 50.76,
+      "lat": 28.630142,
+      "lon": 77.221073
     },
     {
-      "t": 52,
-      "lat": 28.630347,
-      "lon": 77.221476
+      "t": 51.75,
+      "lat": 28.630043,
+      "lon": 77.2208
     },
     {
-      "t": 53,
-      "lat": 28.630287,
-      "lon": 77.221399
+      "t": 52.75,
+      "lat": 28.629971,
+      "lon": 77.220516
     },
     {
-      "t": 54,
-      "lat": 28.630206,
-      "lon": 77.221228
+      "t": 53.74,
+      "lat": 28.62992,
+      "lon": 77.220226
     },
     {
-      "t": 55,
-      "lat": 28.630167,
-      "lon": 77.221135
+      "t": 54.74,
+      "lat": 28.629894,
+      "lon": 77.219932
     },
     {
-      "t": 56,
+      "t": 55.73,
+      "lat": 28.629828,
+      "lon": 77.219663
+    },
+    {
+      "t": 56.73,
+      "lat": 28.629593,
+      "lon": 77.219565
+    },
+    {
+      "t": 57.72,
+      "lat": 28.629334,
+      "lon": 77.219549
+    },
+    {
+      "t": 58.72,
+      "lat": 28.629075,
+      "lon": 77.219532
+    },
+    {
+      "t": 59.71,
+      "lat": 28.628967,
+      "lon": 77.219737
+    },
+    {
+      "t": 60.71,
+      "lat": 28.628961,
+      "lon": 77.220033
+    },
+    {
+      "t": 61.7,
+      "lat": 28.628948,
+      "lon": 77.220328
+    },
+    {
+      "t": 62.7,
+      "lat": 28.628941,
+      "lon": 77.220624
+    },
+    {
+      "t": 63.69,
+      "lat": 28.629005,
+      "lon": 77.220908
+    },
+    {
+      "t": 64.69,
+      "lat": 28.629105,
+      "lon": 77.221181
+    },
+    {
+      "t": 65.68,
+      "lat": 28.629218,
+      "lon": 77.221447
+    },
+    {
+      "t": 66.68,
+      "lat": 28.629376,
+      "lon": 77.221638
+    },
+    {
+      "t": 67.67,
+      "lat": 28.629608,
+      "lon": 77.221503
+    },
+    {
+      "t": 68.67,
+      "lat": 28.629839,
+      "lon": 77.221369
+    },
+    {
+      "t": 69.66,
+      "lat": 28.63004,
+      "lon": 77.221187
+    },
+    {
+      "t": 70.66,
       "lat": 28.630084,
-      "lon": 77.220921
+      "lon": 77.220918
     },
     {
-      "t": 57,
-      "lat": 28.630022,
-      "lon": 77.220735
+      "t": 71.66,
+      "lat": 28.629995,
+      "lon": 77.22064
     },
     {
-      "t": 58,
-      "lat": 28.629978,
-      "lon": 77.220552
-    },
-    {
-      "t": 59,
-      "lat": 28.62996,
-      "lon": 77.220452
-    },
-    {
-      "t": 60,
+      "t": 72.65,
       "lat": 28.629942,
-      "lon": 77.220352
+      "lon": 77.220351
     },
     {
-      "t": 61,
-      "lat": 28.629925,
-      "lon": 77.220251
+      "t": 73.65,
+      "lat": 28.629904,
+      "lon": 77.220059
     },
     {
-      "t": 62,
-      "lat": 28.629912,
-      "lon": 77.22015
+      "t": 74.64,
+      "lat": 28.629882,
+      "lon": 77.219764
     },
     {
-      "t": 63,
-      "lat": 28.629896,
-      "lon": 77.219952
+      "t": 75.64,
+      "lat": 28.629965,
+      "lon": 77.219512
     },
     {
-      "t": 64,
-      "lat": 28.629887,
-      "lon": 77.21985
+      "t": 76.63,
+      "lat": 28.630218,
+      "lon": 77.219504
     },
     {
-      "t": 65,
-      "lat": 28.629889,
-      "lon": 77.219588
+      "t": 77.63,
+      "lat": 28.630477,
+      "lon": 77.21952
     },
     {
-      "t": 66,
-      "lat": 28.63007,
-      "lon": 77.219496
+      "t": 78.62,
+      "lat": 28.63069,
+      "lon": 77.219619
     },
     {
-      "t": 67,
-      "lat": 28.63016,
-      "lon": 77.219501
+      "t": 79.62,
+      "lat": 28.630697,
+      "lon": 77.219914
     },
     {
-      "t": 68,
-      "lat": 28.630295,
-      "lon": 77.219509
+      "t": 80.61,
+      "lat": 28.630736,
+      "lon": 77.220206
     },
     {
-      "t": 69,
-      "lat": 28.630385,
-      "lon": 77.219514
+      "t": 81.61,
+      "lat": 28.630806,
+      "lon": 77.220491
     },
     {
-      "t": 70,
-      "lat": 28.630476,
-      "lon": 77.219519
+      "t": 82.6,
+      "lat": 28.630833,
+      "lon": 77.220758
     },
     {
-      "t": 71,
-      "lat": 28.630566,
-      "lon": 77.219525
+      "t": 83.6,
+      "lat": 28.630597,
+      "lon": 77.22088
     },
     {
-      "t": 72,
-      "lat": 28.630795,
-      "lon": 77.219538
+      "t": 84.59,
+      "lat": 28.630743,
+      "lon": 77.220841
     },
     {
-      "t": 73,
-      "lat": 28.630885,
-      "lon": 77.219543
+      "t": 85.59,
+      "lat": 28.630956,
+      "lon": 77.22087
     },
     {
-      "t": 74,
-      "lat": 28.630975,
-      "lon": 77.219548
+      "t": 86.58,
+      "lat": 28.631094,
+      "lon": 77.22112
     },
     {
-      "t": 75,
-      "lat": 28.631065,
-      "lon": 77.219553
+      "t": 87.58,
+      "lat": 28.631253,
+      "lon": 77.221353
     },
     {
-      "t": 76,
-      "lat": 28.631156,
-      "lon": 77.219558
+      "t": 88.57,
+      "lat": 28.631438,
+      "lon": 77.221561
     },
     {
-      "t": 77,
-      "lat": 28.631246,
-      "lon": 77.219562
+      "t": 89.57,
+      "lat": 28.631655,
+      "lon": 77.221722
     },
     {
-      "t": 78,
-      "lat": 28.631382,
-      "lon": 77.21957
+      "t": 90.56,
+      "lat": 28.631882,
+      "lon": 77.221866
     },
     {
-      "t": 79,
-      "lat": 28.631472,
-      "lon": 77.219575
+      "t": 91.56,
+      "lat": 28.632121,
+      "lon": 77.22198
     },
     {
-      "t": 80,
-      "lat": 28.631563,
-      "lon": 77.21958
+      "t": 92.55,
+      "lat": 28.632372,
+      "lon": 77.222056
     },
     {
-      "t": 81,
-      "lat": 28.631665,
-      "lon": 77.219448
-    },
-    {
-      "t": 82,
-      "lat": 28.631692,
-      "lon": 77.21935
-    },
-    {
-      "t": 83,
-      "lat": 28.631726,
-      "lon": 77.219255
-    },
-    {
-      "t": 84,
-      "lat": 28.631793,
-      "lon": 77.219112
-    },
-    {
-      "t": 85,
-      "lat": 28.631794,
-      "lon": 77.218907
-    },
-    {
-      "t": 86,
-      "lat": 28.631714,
-      "lon": 77.218859
-    },
-    {
-      "t": 87,
-      "lat": 28.631635,
-      "lon": 77.21881
-    },
-    {
-      "t": 88,
-      "lat": 28.631491,
-      "lon": 77.218861
-    },
-    {
-      "t": 89,
-      "lat": 28.631464,
-      "lon": 77.218959
-    },
-    {
-      "t": 90,
-      "lat": 28.631435,
-      "lon": 77.219062
-    },
-    {
-      "t": 91,
-      "lat": 28.631395,
-      "lon": 77.21921
-    },
-    {
-      "t": 92,
-      "lat": 28.631371,
-      "lon": 77.219309
-    },
-    {
-      "t": 93,
-      "lat": 28.631348,
-      "lon": 77.219408
-    },
-    {
-      "t": 94,
-      "lat": 28.631334,
-      "lon": 77.219468
+      "t": 93.55,
+      "lat": 28.632628,
+      "lon": 77.222098
     }
   ],
   "metrics_over_time": [
@@ -537,1214 +593,1209 @@
     },
     {
       "t": 2,
-      "volatility_index": 0.0399,
-      "beta": 0.52,
+      "volatility_index": 0.0034,
+      "beta": 0.5017,
       "tier": "calm"
     },
     {
       "t": 3,
-      "volatility_index": 0.0597,
-      "beta": 0.5298,
+      "volatility_index": 0.01,
+      "beta": 0.505,
       "tier": "calm"
     },
     {
       "t": 4,
-      "volatility_index": 0.0821,
-      "beta": 0.541,
+      "volatility_index": 0.0204,
+      "beta": 0.5102,
       "tier": "calm"
     },
     {
       "t": 5,
-      "volatility_index": 0.1054,
-      "beta": 0.5527,
+      "volatility_index": 0.0417,
+      "beta": 0.5209,
       "tier": "calm"
     },
     {
       "t": 6,
-      "volatility_index": 0.1919,
-      "beta": 0.596,
+      "volatility_index": 0.0624,
+      "beta": 0.5312,
       "tier": "calm"
     },
     {
       "t": 7,
-      "volatility_index": 0.1692,
-      "beta": 0.5846,
+      "volatility_index": 0.055,
+      "beta": 0.5275,
       "tier": "calm"
     },
     {
       "t": 8,
-      "volatility_index": 0.1561,
-      "beta": 0.578,
+      "volatility_index": 0.0487,
+      "beta": 0.5244,
       "tier": "calm"
     },
     {
       "t": 9,
-      "volatility_index": 0.1478,
-      "beta": 0.5739,
+      "volatility_index": 0.0449,
+      "beta": 0.5225,
       "tier": "calm"
     },
     {
       "t": 10,
-      "volatility_index": 0.1436,
-      "beta": 0.5718,
+      "volatility_index": 0.0408,
+      "beta": 0.5204,
       "tier": "calm"
     },
     {
       "t": 11,
-      "volatility_index": 0.1324,
-      "beta": 0.5662,
+      "volatility_index": 0.0375,
+      "beta": 0.5187,
       "tier": "calm"
     },
     {
       "t": 12,
-      "volatility_index": 0.124,
-      "beta": 0.562,
+      "volatility_index": 0.035,
+      "beta": 0.5175,
       "tier": "calm"
     },
     {
       "t": 13,
-      "volatility_index": 0.1157,
-      "beta": 0.5578,
+      "volatility_index": 0.035,
+      "beta": 0.5175,
       "tier": "calm"
     },
     {
       "t": 14,
-      "volatility_index": 0.1185,
-      "beta": 0.5592,
+      "volatility_index": 0.0364,
+      "beta": 0.5182,
       "tier": "calm"
     },
     {
       "t": 15,
-      "volatility_index": 0.1597,
-      "beta": 0.5799,
+      "volatility_index": 0.0375,
+      "beta": 0.5188,
       "tier": "calm"
     },
     {
       "t": 16,
-      "volatility_index": 0.156,
-      "beta": 0.578,
+      "volatility_index": 0.0263,
+      "beta": 0.5131,
       "tier": "calm"
     },
     {
       "t": 17,
-      "volatility_index": 0.1483,
-      "beta": 0.5741,
+      "volatility_index": 0.0193,
+      "beta": 0.5096,
       "tier": "calm"
     },
     {
       "t": 18,
-      "volatility_index": 0.1566,
-      "beta": 0.5783,
+      "volatility_index": 0.0173,
+      "beta": 0.5087,
       "tier": "calm"
     },
     {
       "t": 19,
-      "volatility_index": 0.1606,
-      "beta": 0.5803,
+      "volatility_index": 0.0177,
+      "beta": 0.5089,
       "tier": "calm"
     },
     {
       "t": 20,
-      "volatility_index": 0.1694,
-      "beta": 0.5847,
+      "volatility_index": 0.0165,
+      "beta": 0.5083,
       "tier": "calm"
     },
     {
       "t": 21,
-      "volatility_index": 0.1581,
-      "beta": 0.5791,
+      "volatility_index": 0.0123,
+      "beta": 0.5062,
       "tier": "calm"
     },
     {
       "t": 22,
-      "volatility_index": 0.165,
-      "beta": 0.5825,
+      "volatility_index": 0.0103,
+      "beta": 0.5052,
       "tier": "calm"
     },
     {
       "t": 23,
-      "volatility_index": 0.1596,
-      "beta": 0.5798,
+      "volatility_index": 0.011,
+      "beta": 0.5055,
       "tier": "calm"
     },
     {
       "t": 24,
-      "volatility_index": 0.1596,
-      "beta": 0.5798,
+      "volatility_index": 0.012,
+      "beta": 0.506,
       "tier": "calm"
     },
     {
       "t": 25,
-      "volatility_index": 0.1425,
-      "beta": 0.5713,
+      "volatility_index": 0.0097,
+      "beta": 0.5048,
       "tier": "calm"
     },
     {
       "t": 26,
-      "volatility_index": 0.14,
-      "beta": 0.57,
+      "volatility_index": 0.009,
+      "beta": 0.5045,
       "tier": "calm"
     },
     {
       "t": 27,
-      "volatility_index": 0.1251,
-      "beta": 0.5625,
+      "volatility_index": 0.0109,
+      "beta": 0.5055,
       "tier": "calm"
     },
     {
       "t": 28,
-      "volatility_index": 0.117,
-      "beta": 0.5585,
+      "volatility_index": 0.0125,
+      "beta": 0.5062,
       "tier": "calm"
     },
     {
       "t": 29,
-      "volatility_index": 0.1476,
-      "beta": 0.5738,
+      "volatility_index": 0.0429,
+      "beta": 0.5214,
       "tier": "calm"
     },
     {
       "t": 30,
-      "volatility_index": 0.1302,
-      "beta": 0.5651,
+      "volatility_index": 0.0687,
+      "beta": 0.5343,
       "tier": "calm"
     },
     {
       "t": 31,
-      "volatility_index": 0.1347,
-      "beta": 0.5674,
+      "volatility_index": 0.0967,
+      "beta": 0.5483,
       "tier": "calm"
     },
     {
       "t": 32,
-      "volatility_index": 0.1514,
-      "beta": 0.5757,
+      "volatility_index": 0.127,
+      "beta": 0.5635,
       "tier": "calm"
     },
     {
       "t": 33,
-      "volatility_index": 0.1789,
-      "beta": 0.5895,
+      "volatility_index": 0.1441,
+      "beta": 0.572,
       "tier": "calm"
     },
     {
       "t": 34,
-      "volatility_index": 0.2132,
-      "beta": 0.6066,
+      "volatility_index": 0.18,
+      "beta": 0.59,
       "tier": "calm"
     },
     {
       "t": 35,
-      "volatility_index": 0.2236,
-      "beta": 0.6118,
+      "volatility_index": 0.2022,
+      "beta": 0.6011,
       "tier": "calm"
     },
     {
       "t": 36,
-      "volatility_index": 0.2099,
-      "beta": 0.6049,
+      "volatility_index": 0.2186,
+      "beta": 0.6093,
       "tier": "calm"
     },
     {
       "t": 37,
-      "volatility_index": 0.2046,
-      "beta": 0.6023,
+      "volatility_index": 0.225,
+      "beta": 0.6125,
       "tier": "calm"
     },
     {
       "t": 38,
-      "volatility_index": 0.2354,
-      "beta": 0.6177,
+      "volatility_index": 0.2077,
+      "beta": 0.6039,
       "tier": "calm"
     },
     {
       "t": 39,
-      "volatility_index": 0.261,
-      "beta": 0.6305,
-      "tier": "moderate"
+      "volatility_index": 0.1789,
+      "beta": 0.5894,
+      "tier": "calm"
     },
     {
       "t": 40,
-      "volatility_index": 0.2366,
-      "beta": 0.6183,
+      "volatility_index": 0.1488,
+      "beta": 0.5744,
       "tier": "calm"
     },
     {
       "t": 41,
-      "volatility_index": 0.2154,
-      "beta": 0.6077,
+      "volatility_index": 0.1062,
+      "beta": 0.5531,
       "tier": "calm"
     },
     {
       "t": 42,
-      "volatility_index": 0.2168,
-      "beta": 0.6084,
+      "volatility_index": 0.0765,
+      "beta": 0.5382,
       "tier": "calm"
     },
     {
       "t": 43,
-      "volatility_index": 0.1648,
-      "beta": 0.5824,
+      "volatility_index": 0.0374,
+      "beta": 0.5187,
       "tier": "calm"
     },
     {
       "t": 44,
-      "volatility_index": 0.1869,
-      "beta": 0.5934,
+      "volatility_index": 0.0331,
+      "beta": 0.5165,
       "tier": "calm"
     },
     {
       "t": 45,
-      "volatility_index": 0.1704,
-      "beta": 0.5852,
+      "volatility_index": 0.0305,
+      "beta": 0.5153,
       "tier": "calm"
     },
     {
       "t": 46,
-      "volatility_index": 0.1724,
-      "beta": 0.5862,
+      "volatility_index": 0.0378,
+      "beta": 0.5189,
       "tier": "calm"
     },
     {
       "t": 47,
-      "volatility_index": 0.1655,
-      "beta": 0.5827,
+      "volatility_index": 0.0376,
+      "beta": 0.5188,
       "tier": "calm"
     },
     {
       "t": 48,
-      "volatility_index": 0.1746,
-      "beta": 0.5873,
+      "volatility_index": 0.034,
+      "beta": 0.517,
       "tier": "calm"
     },
     {
       "t": 49,
+      "volatility_index": 0.0341,
+      "beta": 0.517,
+      "tier": "calm"
+    },
+    {
+      "t": 50,
+      "volatility_index": 0.0335,
+      "beta": 0.5167,
+      "tier": "calm"
+    },
+    {
+      "t": 51,
+      "volatility_index": 0.0303,
+      "beta": 0.5151,
+      "tier": "calm"
+    },
+    {
+      "t": 52,
+      "volatility_index": 0.0323,
+      "beta": 0.5161,
+      "tier": "calm"
+    },
+    {
+      "t": 53,
+      "volatility_index": 0.0321,
+      "beta": 0.516,
+      "tier": "calm"
+    },
+    {
+      "t": 54,
+      "volatility_index": 0.053,
+      "beta": 0.5265,
+      "tier": "calm"
+    },
+    {
+      "t": 55,
+      "volatility_index": 0.0686,
+      "beta": 0.5343,
+      "tier": "calm"
+    },
+    {
+      "t": 56,
+      "volatility_index": 0.0801,
+      "beta": 0.5401,
+      "tier": "calm"
+    },
+    {
+      "t": 57,
+      "volatility_index": 0.0822,
+      "beta": 0.5411,
+      "tier": "calm"
+    },
+    {
+      "t": 58,
+      "volatility_index": 0.0745,
+      "beta": 0.5372,
+      "tier": "calm"
+    },
+    {
+      "t": 59,
+      "volatility_index": 0.0727,
+      "beta": 0.5363,
+      "tier": "calm"
+    },
+    {
+      "t": 60,
+      "volatility_index": 0.0759,
+      "beta": 0.5379,
+      "tier": "calm"
+    },
+    {
+      "t": 61,
+      "volatility_index": 0.102,
+      "beta": 0.551,
+      "tier": "calm"
+    },
+    {
+      "t": 62,
+      "volatility_index": 0.1582,
+      "beta": 0.5791,
+      "tier": "calm"
+    },
+    {
+      "t": 63,
+      "volatility_index": 0.1884,
+      "beta": 0.5942,
+      "tier": "calm"
+    },
+    {
+      "t": 64,
+      "volatility_index": 0.2326,
+      "beta": 0.6163,
+      "tier": "calm"
+    },
+    {
+      "t": 65,
+      "volatility_index": 0.2511,
+      "beta": 0.6256,
+      "tier": "moderate"
+    },
+    {
+      "t": 66,
+      "volatility_index": 0.2413,
+      "beta": 0.6206,
+      "tier": "calm"
+    },
+    {
+      "t": 67,
+      "volatility_index": 0.2062,
+      "beta": 0.6031,
+      "tier": "calm"
+    },
+    {
+      "t": 68,
+      "volatility_index": 0.1778,
+      "beta": 0.5889,
+      "tier": "calm"
+    },
+    {
+      "t": 69,
+      "volatility_index": 0.1735,
+      "beta": 0.5867,
+      "tier": "calm"
+    },
+    {
+      "t": 70,
+      "volatility_index": 0.167,
+      "beta": 0.5835,
+      "tier": "calm"
+    },
+    {
+      "t": 71,
+      "volatility_index": 0.1621,
+      "beta": 0.5811,
+      "tier": "calm"
+    },
+    {
+      "t": 72,
+      "volatility_index": 0.1573,
+      "beta": 0.5787,
+      "tier": "calm"
+    },
+    {
+      "t": 73,
+      "volatility_index": 0.1222,
+      "beta": 0.5611,
+      "tier": "calm"
+    },
+    {
+      "t": 74,
+      "volatility_index": 0.0632,
+      "beta": 0.5316,
+      "tier": "calm"
+    },
+    {
+      "t": 75,
+      "volatility_index": 0.037,
+      "beta": 0.5185,
+      "tier": "calm"
+    },
+    {
+      "t": 76,
+      "volatility_index": 0.0371,
+      "beta": 0.5186,
+      "tier": "calm"
+    },
+    {
+      "t": 77,
+      "volatility_index": 0.0373,
+      "beta": 0.5187,
+      "tier": "calm"
+    },
+    {
+      "t": 78,
+      "volatility_index": 0.0396,
+      "beta": 0.5198,
+      "tier": "calm"
+    },
+    {
+      "t": 79,
+      "volatility_index": 0.0461,
+      "beta": 0.5231,
+      "tier": "calm"
+    },
+    {
+      "t": 80,
+      "volatility_index": 0.0735,
+      "beta": 0.5368,
+      "tier": "calm"
+    },
+    {
+      "t": 81,
+      "volatility_index": 0.0829,
+      "beta": 0.5415,
+      "tier": "calm"
+    },
+    {
+      "t": 82,
+      "volatility_index": 0.1024,
+      "beta": 0.5512,
+      "tier": "calm"
+    },
+    {
+      "t": 83,
+      "volatility_index": 0.1137,
+      "beta": 0.5569,
+      "tier": "calm"
+    },
+    {
+      "t": 84,
+      "volatility_index": 0.1394,
+      "beta": 0.5697,
+      "tier": "calm"
+    },
+    {
+      "t": 85,
+      "volatility_index": 0.1539,
+      "beta": 0.577,
+      "tier": "calm"
+    },
+    {
+      "t": 86,
+      "volatility_index": 0.1847,
+      "beta": 0.5924,
+      "tier": "calm"
+    },
+    {
+      "t": 87,
+      "volatility_index": 0.2115,
+      "beta": 0.6057,
+      "tier": "calm"
+    },
+    {
+      "t": 88,
+      "volatility_index": 0.1911,
+      "beta": 0.5955,
+      "tier": "calm"
+    },
+    {
+      "t": 89,
+      "volatility_index": 0.2012,
+      "beta": 0.6006,
+      "tier": "calm"
+    },
+    {
+      "t": 90,
+      "volatility_index": 0.1949,
+      "beta": 0.5975,
+      "tier": "calm"
+    },
+    {
+      "t": 91,
+      "volatility_index": 0.1861,
+      "beta": 0.593,
+      "tier": "calm"
+    },
+    {
+      "t": 92,
+      "volatility_index": 0.1594,
+      "beta": 0.5797,
+      "tier": "calm"
+    },
+    {
+      "t": 93,
+      "volatility_index": 0.1424,
+      "beta": 0.5712,
+      "tier": "calm"
+    },
+    {
+      "t": 94,
+      "volatility_index": 0.1341,
+      "beta": 0.5671,
+      "tier": "calm"
+    },
+    {
+      "t": 95,
+      "volatility_index": 0.1299,
+      "beta": 0.5649,
+      "tier": "calm"
+    },
+    {
+      "t": 96,
+      "volatility_index": 0.1178,
+      "beta": 0.5589,
+      "tier": "calm"
+    },
+    {
+      "t": 97,
+      "volatility_index": 0.1099,
+      "beta": 0.5549,
+      "tier": "calm"
+    },
+    {
+      "t": 98,
+      "volatility_index": 0.1115,
+      "beta": 0.5558,
+      "tier": "calm"
+    },
+    {
+      "t": 99,
+      "volatility_index": 0.1305,
+      "beta": 0.5653,
+      "tier": "calm"
+    },
+    {
+      "t": 100,
+      "volatility_index": 0.1508,
+      "beta": 0.5754,
+      "tier": "calm"
+    },
+    {
+      "t": 101,
+      "volatility_index": 0.1749,
+      "beta": 0.5875,
+      "tier": "calm"
+    },
+    {
+      "t": 102,
+      "volatility_index": 0.1693,
+      "beta": 0.5847,
+      "tier": "calm"
+    },
+    {
+      "t": 103,
+      "volatility_index": 0.1666,
+      "beta": 0.5833,
+      "tier": "calm"
+    },
+    {
+      "t": 104,
+      "volatility_index": 0.1466,
+      "beta": 0.5733,
+      "tier": "calm"
+    },
+    {
+      "t": 105,
+      "volatility_index": 0.1142,
+      "beta": 0.5571,
+      "tier": "calm"
+    },
+    {
+      "t": 106,
+      "volatility_index": 0.0853,
+      "beta": 0.5427,
+      "tier": "calm"
+    },
+    {
+      "t": 107,
+      "volatility_index": 0.0881,
+      "beta": 0.544,
+      "tier": "calm"
+    },
+    {
+      "t": 108,
+      "volatility_index": 0.0863,
+      "beta": 0.5431,
+      "tier": "calm"
+    },
+    {
+      "t": 109,
+      "volatility_index": 0.1116,
+      "beta": 0.5558,
+      "tier": "calm"
+    },
+    {
+      "t": 110,
+      "volatility_index": 0.1338,
+      "beta": 0.5669,
+      "tier": "calm"
+    },
+    {
+      "t": 111,
       "volatility_index": 0.1691,
       "beta": 0.5845,
       "tier": "calm"
     },
     {
-      "t": 50,
-      "volatility_index": 0.1528,
-      "beta": 0.5764,
-      "tier": "calm"
-    },
-    {
-      "t": 51,
-      "volatility_index": 0.0945,
-      "beta": 0.5472,
-      "tier": "calm"
-    },
-    {
-      "t": 52,
-      "volatility_index": 0.0906,
-      "beta": 0.5453,
-      "tier": "calm"
-    },
-    {
-      "t": 53,
-      "volatility_index": 0.0943,
-      "beta": 0.5472,
-      "tier": "calm"
-    },
-    {
-      "t": 54,
-      "volatility_index": 0.0938,
-      "beta": 0.5469,
-      "tier": "calm"
-    },
-    {
-      "t": 55,
-      "volatility_index": 0.0482,
-      "beta": 0.5241,
-      "tier": "calm"
-    },
-    {
-      "t": 56,
-      "volatility_index": 0.0468,
-      "beta": 0.5234,
-      "tier": "calm"
-    },
-    {
-      "t": 57,
-      "volatility_index": 0.0776,
-      "beta": 0.5388,
-      "tier": "calm"
-    },
-    {
-      "t": 58,
-      "volatility_index": 0.0696,
-      "beta": 0.5348,
-      "tier": "calm"
-    },
-    {
-      "t": 59,
-      "volatility_index": 0.0708,
-      "beta": 0.5354,
-      "tier": "calm"
-    },
-    {
-      "t": 60,
-      "volatility_index": 0.0896,
-      "beta": 0.5448,
-      "tier": "calm"
-    },
-    {
-      "t": 61,
-      "volatility_index": 0.091,
-      "beta": 0.5455,
-      "tier": "calm"
-    },
-    {
-      "t": 62,
-      "volatility_index": 0.0923,
-      "beta": 0.5461,
-      "tier": "calm"
-    },
-    {
-      "t": 63,
-      "volatility_index": 0.1013,
-      "beta": 0.5506,
-      "tier": "calm"
-    },
-    {
-      "t": 64,
-      "volatility_index": 0.1931,
-      "beta": 0.5965,
-      "tier": "calm"
-    },
-    {
-      "t": 65,
-      "volatility_index": 0.1808,
-      "beta": 0.5904,
-      "tier": "calm"
-    },
-    {
-      "t": 66,
-      "volatility_index": 0.1742,
-      "beta": 0.5871,
-      "tier": "calm"
-    },
-    {
-      "t": 67,
-      "volatility_index": 0.2228,
-      "beta": 0.6114,
-      "tier": "calm"
-    },
-    {
-      "t": 68,
-      "volatility_index": 0.2424,
-      "beta": 0.6212,
-      "tier": "calm"
-    },
-    {
-      "t": 69,
-      "volatility_index": 0.2335,
-      "beta": 0.6167,
-      "tier": "calm"
-    },
-    {
-      "t": 70,
-      "volatility_index": 0.2587,
-      "beta": 0.6293,
-      "tier": "moderate"
-    },
-    {
-      "t": 71,
-      "volatility_index": 0.2643,
-      "beta": 0.6322,
-      "tier": "moderate"
-    },
-    {
-      "t": 72,
-      "volatility_index": 0.2723,
-      "beta": 0.6362,
-      "tier": "moderate"
-    },
-    {
-      "t": 73,
-      "volatility_index": 0.2489,
-      "beta": 0.6244,
-      "tier": "calm"
-    },
-    {
-      "t": 74,
-      "volatility_index": 0.2097,
-      "beta": 0.6048,
-      "tier": "calm"
-    },
-    {
-      "t": 75,
-      "volatility_index": 0.2099,
-      "beta": 0.6049,
-      "tier": "calm"
-    },
-    {
-      "t": 76,
-      "volatility_index": 0.1834,
-      "beta": 0.5917,
-      "tier": "calm"
-    },
-    {
-      "t": 77,
-      "volatility_index": 0.1571,
-      "beta": 0.5786,
-      "tier": "calm"
-    },
-    {
-      "t": 78,
-      "volatility_index": 0.1397,
-      "beta": 0.5699,
-      "tier": "calm"
-    },
-    {
-      "t": 79,
-      "volatility_index": 0.1319,
-      "beta": 0.5659,
-      "tier": "calm"
-    },
-    {
-      "t": 80,
-      "volatility_index": 0.112,
-      "beta": 0.556,
-      "tier": "calm"
-    },
-    {
-      "t": 81,
-      "volatility_index": 0.0922,
-      "beta": 0.5461,
-      "tier": "calm"
-    },
-    {
-      "t": 82,
-      "volatility_index": 0.0877,
-      "beta": 0.5439,
-      "tier": "calm"
-    },
-    {
-      "t": 83,
-      "volatility_index": 0.0945,
-      "beta": 0.5473,
-      "tier": "calm"
-    },
-    {
-      "t": 84,
-      "volatility_index": 0.1739,
-      "beta": 0.587,
-      "tier": "calm"
-    },
-    {
-      "t": 85,
-      "volatility_index": 0.2676,
-      "beta": 0.6338,
-      "tier": "moderate"
-    },
-    {
-      "t": 86,
-      "volatility_index": 0.3019,
-      "beta": 0.6509,
-      "tier": "moderate"
-    },
-    {
-      "t": 87,
-      "volatility_index": 0.305,
-      "beta": 0.6525,
-      "tier": "moderate"
-    },
-    {
-      "t": 88,
-      "volatility_index": 0.3004,
-      "beta": 0.6502,
-      "tier": "moderate"
-    },
-    {
-      "t": 89,
-      "volatility_index": 0.3684,
-      "beta": 0.6842,
-      "tier": "moderate"
-    },
-    {
-      "t": 90,
-      "volatility_index": 0.3425,
-      "beta": 0.6712,
-      "tier": "moderate"
-    },
-    {
-      "t": 91,
-      "volatility_index": 0.3393,
-      "beta": 0.6697,
-      "tier": "moderate"
-    },
-    {
-      "t": 92,
-      "volatility_index": 0.3308,
-      "beta": 0.6654,
-      "tier": "moderate"
-    },
-    {
-      "t": 93,
-      "volatility_index": 0.3176,
-      "beta": 0.6588,
-      "tier": "moderate"
-    },
-    {
-      "t": 94,
-      "volatility_index": 0.2942,
-      "beta": 0.6471,
-      "tier": "moderate"
-    },
-    {
-      "t": 95,
-      "volatility_index": 0.3037,
-      "beta": 0.6518,
-      "tier": "moderate"
-    },
-    {
-      "t": 96,
-      "volatility_index": 0.274,
-      "beta": 0.637,
-      "tier": "moderate"
-    },
-    {
-      "t": 97,
-      "volatility_index": 0.3135,
-      "beta": 0.6568,
-      "tier": "moderate"
-    },
-    {
-      "t": 98,
-      "volatility_index": 0.358,
-      "beta": 0.679,
-      "tier": "moderate"
-    },
-    {
-      "t": 99,
-      "volatility_index": 0.3594,
-      "beta": 0.6797,
-      "tier": "moderate"
-    },
-    {
-      "t": 100,
-      "volatility_index": 0.3669,
-      "beta": 0.6834,
-      "tier": "moderate"
-    },
-    {
-      "t": 101,
-      "volatility_index": 0.3639,
-      "beta": 0.6819,
-      "tier": "moderate"
-    },
-    {
-      "t": 102,
-      "volatility_index": 0.361,
-      "beta": 0.6805,
-      "tier": "moderate"
-    },
-    {
-      "t": 103,
-      "volatility_index": 0.361,
-      "beta": 0.6805,
-      "tier": "moderate"
-    },
-    {
-      "t": 104,
-      "volatility_index": 0.3365,
-      "beta": 0.6683,
-      "tier": "moderate"
-    },
-    {
-      "t": 105,
-      "volatility_index": 0.3312,
-      "beta": 0.6656,
-      "tier": "moderate"
-    },
-    {
-      "t": 106,
-      "volatility_index": 0.3174,
-      "beta": 0.6587,
-      "tier": "moderate"
-    },
-    {
-      "t": 107,
-      "volatility_index": 0.3001,
-      "beta": 0.6501,
-      "tier": "moderate"
-    },
-    {
-      "t": 108,
-      "volatility_index": 0.2886,
-      "beta": 0.6443,
-      "tier": "moderate"
-    },
-    {
-      "t": 109,
-      "volatility_index": 0.286,
-      "beta": 0.643,
-      "tier": "moderate"
-    },
-    {
-      "t": 110,
-      "volatility_index": 0.2234,
-      "beta": 0.6117,
-      "tier": "calm"
-    },
-    {
-      "t": 111,
-      "volatility_index": 0.224,
-      "beta": 0.612,
-      "tier": "calm"
-    },
-    {
       "t": 112,
-      "volatility_index": 0.2305,
-      "beta": 0.6152,
-      "tier": "calm"
+      "volatility_index": 0.2593,
+      "beta": 0.6297,
+      "tier": "moderate"
     },
     {
       "t": 113,
-      "volatility_index": 0.3676,
-      "beta": 0.6838,
+      "volatility_index": 0.3031,
+      "beta": 0.6516,
       "tier": "moderate"
     },
     {
       "t": 114,
-      "volatility_index": 0.4408,
-      "beta": 0.7204,
+      "volatility_index": 0.3801,
+      "beta": 0.69,
       "tier": "moderate"
     },
     {
       "t": 115,
-      "volatility_index": 0.4508,
-      "beta": 0.7254,
+      "volatility_index": 0.4089,
+      "beta": 0.7045,
       "tier": "moderate"
     },
     {
       "t": 116,
-      "volatility_index": 0.4881,
-      "beta": 0.7441,
+      "volatility_index": 0.4146,
+      "beta": 0.7073,
       "tier": "moderate"
     },
     {
       "t": 117,
-      "volatility_index": 0.4993,
-      "beta": 0.7496,
+      "volatility_index": 0.4008,
+      "beta": 0.7004,
       "tier": "moderate"
     },
     {
       "t": 118,
-      "volatility_index": 0.5321,
-      "beta": 0.766,
-      "tier": "turbulent"
+      "volatility_index": 0.3958,
+      "beta": 0.6979,
+      "tier": "moderate"
     },
     {
       "t": 119,
-      "volatility_index": 0.5143,
-      "beta": 0.7572,
-      "tier": "turbulent"
-    },
-    {
-      "t": 120,
-      "volatility_index": 0.4747,
-      "beta": 0.7374,
-      "tier": "moderate"
-    },
-    {
-      "t": 121,
-      "volatility_index": 0.4604,
-      "beta": 0.7302,
-      "tier": "moderate"
-    },
-    {
-      "t": 122,
-      "volatility_index": 0.3752,
-      "beta": 0.6876,
-      "tier": "moderate"
-    },
-    {
-      "t": 123,
-      "volatility_index": 0.35,
-      "beta": 0.675,
-      "tier": "moderate"
-    },
-    {
-      "t": 124,
-      "volatility_index": 0.2874,
-      "beta": 0.6437,
-      "tier": "moderate"
-    },
-    {
-      "t": 125,
-      "volatility_index": 0.183,
-      "beta": 0.5915,
-      "tier": "calm"
-    },
-    {
-      "t": 126,
-      "volatility_index": 0.1532,
-      "beta": 0.5766,
-      "tier": "calm"
-    },
-    {
-      "t": 127,
-      "volatility_index": 0.1314,
-      "beta": 0.5657,
-      "tier": "calm"
-    },
-    {
-      "t": 128,
-      "volatility_index": 0.1542,
-      "beta": 0.5771,
-      "tier": "calm"
-    },
-    {
-      "t": 129,
-      "volatility_index": 0.1604,
-      "beta": 0.5802,
-      "tier": "calm"
-    },
-    {
-      "t": 130,
-      "volatility_index": 0.2874,
-      "beta": 0.6437,
-      "tier": "moderate"
-    },
-    {
-      "t": 131,
-      "volatility_index": 0.2915,
-      "beta": 0.6458,
-      "tier": "moderate"
-    },
-    {
-      "t": 132,
-      "volatility_index": 0.3247,
-      "beta": 0.6624,
-      "tier": "moderate"
-    },
-    {
-      "t": 133,
-      "volatility_index": 0.2903,
-      "beta": 0.6451,
-      "tier": "moderate"
-    },
-    {
-      "t": 134,
-      "volatility_index": 0.2903,
-      "beta": 0.6452,
-      "tier": "moderate"
-    },
-    {
-      "t": 135,
-      "volatility_index": 0.3049,
-      "beta": 0.6525,
-      "tier": "moderate"
-    },
-    {
-      "t": 136,
-      "volatility_index": 0.3134,
-      "beta": 0.6567,
-      "tier": "moderate"
-    },
-    {
-      "t": 137,
-      "volatility_index": 0.3051,
-      "beta": 0.6526,
-      "tier": "moderate"
-    },
-    {
-      "t": 138,
-      "volatility_index": 0.2965,
-      "beta": 0.6482,
-      "tier": "moderate"
-    },
-    {
-      "t": 139,
-      "volatility_index": 0.2942,
-      "beta": 0.6471,
-      "tier": "moderate"
-    },
-    {
-      "t": 140,
-      "volatility_index": 0.2894,
-      "beta": 0.6447,
-      "tier": "moderate"
-    },
-    {
-      "t": 141,
-      "volatility_index": 0.2941,
-      "beta": 0.647,
-      "tier": "moderate"
-    },
-    {
-      "t": 142,
-      "volatility_index": 0.363,
-      "beta": 0.6815,
-      "tier": "moderate"
-    },
-    {
-      "t": 143,
-      "volatility_index": 0.453,
-      "beta": 0.7265,
-      "tier": "moderate"
-    },
-    {
-      "t": 144,
-      "volatility_index": 0.5085,
-      "beta": 0.7543,
-      "tier": "turbulent"
-    },
-    {
-      "t": 145,
-      "volatility_index": 0.4493,
-      "beta": 0.7247,
-      "tier": "moderate"
-    },
-    {
-      "t": 146,
-      "volatility_index": 0.4579,
-      "beta": 0.7289,
-      "tier": "moderate"
-    },
-    {
-      "t": 147,
-      "volatility_index": 0.4059,
-      "beta": 0.703,
-      "tier": "moderate"
-    },
-    {
-      "t": 148,
-      "volatility_index": 0.4254,
-      "beta": 0.7127,
-      "tier": "moderate"
-    },
-    {
-      "t": 149,
-      "volatility_index": 0.4045,
-      "beta": 0.7023,
-      "tier": "moderate"
-    },
-    {
-      "t": 150,
-      "volatility_index": 0.351,
-      "beta": 0.6755,
-      "tier": "moderate"
-    },
-    {
-      "t": 151,
-      "volatility_index": 0.3505,
-      "beta": 0.6752,
-      "tier": "moderate"
-    },
-    {
-      "t": 152,
       "volatility_index": 0.3551,
       "beta": 0.6775,
       "tier": "moderate"
     },
     {
-      "t": 153,
-      "volatility_index": 0.3637,
-      "beta": 0.6819,
+      "t": 120,
+      "volatility_index": 0.2893,
+      "beta": 0.6447,
       "tier": "moderate"
     },
     {
-      "t": 154,
-      "volatility_index": 0.3571,
-      "beta": 0.6785,
+      "t": 121,
+      "volatility_index": 0.264,
+      "beta": 0.632,
       "tier": "moderate"
     },
     {
-      "t": 155,
-      "volatility_index": 0.3224,
-      "beta": 0.6612,
-      "tier": "moderate"
-    },
-    {
-      "t": 156,
-      "volatility_index": 0.3237,
-      "beta": 0.6618,
-      "tier": "moderate"
-    },
-    {
-      "t": 157,
-      "volatility_index": 0.3646,
-      "beta": 0.6823,
-      "tier": "moderate"
-    },
-    {
-      "t": 158,
-      "volatility_index": 0.3507,
-      "beta": 0.6753,
-      "tier": "moderate"
-    },
-    {
-      "t": 159,
-      "volatility_index": 0.3267,
-      "beta": 0.6634,
-      "tier": "moderate"
-    },
-    {
-      "t": 160,
-      "volatility_index": 0.3144,
-      "beta": 0.6572,
-      "tier": "moderate"
-    },
-    {
-      "t": 161,
-      "volatility_index": 0.3107,
-      "beta": 0.6554,
-      "tier": "moderate"
-    },
-    {
-      "t": 162,
-      "volatility_index": 0.3107,
-      "beta": 0.6554,
-      "tier": "moderate"
-    },
-    {
-      "t": 163,
-      "volatility_index": 0.2887,
-      "beta": 0.6444,
-      "tier": "moderate"
-    },
-    {
-      "t": 164,
-      "volatility_index": 0.3195,
-      "beta": 0.6598,
-      "tier": "moderate"
-    },
-    {
-      "t": 165,
-      "volatility_index": 0.3443,
-      "beta": 0.6722,
-      "tier": "moderate"
-    },
-    {
-      "t": 166,
-      "volatility_index": 0.3813,
-      "beta": 0.6907,
-      "tier": "moderate"
-    },
-    {
-      "t": 167,
-      "volatility_index": 0.3973,
-      "beta": 0.6986,
-      "tier": "moderate"
-    },
-    {
-      "t": 168,
-      "volatility_index": 0.4094,
-      "beta": 0.7047,
-      "tier": "moderate"
-    },
-    {
-      "t": 169,
-      "volatility_index": 0.4079,
-      "beta": 0.704,
-      "tier": "moderate"
-    },
-    {
-      "t": 170,
-      "volatility_index": 0.4037,
-      "beta": 0.7018,
-      "tier": "moderate"
-    },
-    {
-      "t": 171,
-      "volatility_index": 0.4069,
-      "beta": 0.7034,
-      "tier": "moderate"
-    },
-    {
-      "t": 172,
-      "volatility_index": 0.3785,
-      "beta": 0.6893,
-      "tier": "moderate"
-    },
-    {
-      "t": 173,
-      "volatility_index": 0.3638,
-      "beta": 0.6819,
-      "tier": "moderate"
-    },
-    {
-      "t": 174,
-      "volatility_index": 0.3556,
-      "beta": 0.6778,
-      "tier": "moderate"
-    },
-    {
-      "t": 175,
-      "volatility_index": 0.3561,
-      "beta": 0.678,
-      "tier": "moderate"
-    },
-    {
-      "t": 176,
-      "volatility_index": 0.3744,
-      "beta": 0.6872,
-      "tier": "moderate"
-    },
-    {
-      "t": 177,
-      "volatility_index": 0.3931,
-      "beta": 0.6966,
-      "tier": "moderate"
-    },
-    {
-      "t": 178,
-      "volatility_index": 0.3776,
-      "beta": 0.6888,
-      "tier": "moderate"
-    },
-    {
-      "t": 179,
-      "volatility_index": 0.3697,
-      "beta": 0.6849,
-      "tier": "moderate"
-    },
-    {
-      "t": 180,
-      "volatility_index": 0.3376,
-      "beta": 0.6688,
-      "tier": "moderate"
-    },
-    {
-      "t": 181,
-      "volatility_index": 0.3218,
-      "beta": 0.6609,
-      "tier": "moderate"
-    },
-    {
-      "t": 182,
-      "volatility_index": 0.3037,
-      "beta": 0.6519,
-      "tier": "moderate"
-    },
-    {
-      "t": 183,
-      "volatility_index": 0.2774,
-      "beta": 0.6387,
-      "tier": "moderate"
-    },
-    {
-      "t": 184,
-      "volatility_index": 0.294,
-      "beta": 0.647,
-      "tier": "moderate"
-    },
-    {
-      "t": 185,
-      "volatility_index": 0.2953,
-      "beta": 0.6477,
-      "tier": "moderate"
-    },
-    {
-      "t": 186,
-      "volatility_index": 0.2879,
-      "beta": 0.6439,
-      "tier": "moderate"
-    },
-    {
-      "t": 187,
-      "volatility_index": 0.1811,
-      "beta": 0.5906,
+      "t": 122,
+      "volatility_index": 0.2368,
+      "beta": 0.6184,
       "tier": "calm"
     },
     {
-      "t": 188,
-      "volatility_index": 0.1293,
+      "t": 123,
+      "volatility_index": 0.1924,
+      "beta": 0.5962,
+      "tier": "calm"
+    },
+    {
+      "t": 124,
+      "volatility_index": 0.1959,
+      "beta": 0.5979,
+      "tier": "calm"
+    },
+    {
+      "t": 125,
+      "volatility_index": 0.204,
+      "beta": 0.602,
+      "tier": "calm"
+    },
+    {
+      "t": 126,
+      "volatility_index": 0.2218,
+      "beta": 0.6109,
+      "tier": "calm"
+    },
+    {
+      "t": 127,
+      "volatility_index": 0.2164,
+      "beta": 0.6082,
+      "tier": "calm"
+    },
+    {
+      "t": 128,
+      "volatility_index": 0.2153,
+      "beta": 0.6077,
+      "tier": "calm"
+    },
+    {
+      "t": 129,
+      "volatility_index": 0.1748,
+      "beta": 0.5874,
+      "tier": "calm"
+    },
+    {
+      "t": 130,
+      "volatility_index": 0.1733,
+      "beta": 0.5866,
+      "tier": "calm"
+    },
+    {
+      "t": 131,
+      "volatility_index": 0.1237,
+      "beta": 0.5619,
+      "tier": "calm"
+    },
+    {
+      "t": 132,
+      "volatility_index": 0.0879,
+      "beta": 0.5439,
+      "tier": "calm"
+    },
+    {
+      "t": 133,
+      "volatility_index": 0.0759,
+      "beta": 0.538,
+      "tier": "calm"
+    },
+    {
+      "t": 134,
+      "volatility_index": 0.0651,
+      "beta": 0.5325,
+      "tier": "calm"
+    },
+    {
+      "t": 135,
+      "volatility_index": 0.0677,
+      "beta": 0.5339,
+      "tier": "calm"
+    },
+    {
+      "t": 136,
+      "volatility_index": 0.0833,
+      "beta": 0.5417,
+      "tier": "calm"
+    },
+    {
+      "t": 137,
+      "volatility_index": 0.1292,
       "beta": 0.5646,
       "tier": "calm"
     },
     {
+      "t": 138,
+      "volatility_index": 0.1286,
+      "beta": 0.5643,
+      "tier": "calm"
+    },
+    {
+      "t": 139,
+      "volatility_index": 0.1433,
+      "beta": 0.5716,
+      "tier": "calm"
+    },
+    {
+      "t": 140,
+      "volatility_index": 0.1436,
+      "beta": 0.5718,
+      "tier": "calm"
+    },
+    {
+      "t": 141,
+      "volatility_index": 0.1809,
+      "beta": 0.5905,
+      "tier": "calm"
+    },
+    {
+      "t": 142,
+      "volatility_index": 0.1854,
+      "beta": 0.5927,
+      "tier": "calm"
+    },
+    {
+      "t": 143,
+      "volatility_index": 0.1834,
+      "beta": 0.5917,
+      "tier": "calm"
+    },
+    {
+      "t": 144,
+      "volatility_index": 0.1801,
+      "beta": 0.5901,
+      "tier": "calm"
+    },
+    {
+      "t": 145,
+      "volatility_index": 0.1353,
+      "beta": 0.5676,
+      "tier": "calm"
+    },
+    {
+      "t": 146,
+      "volatility_index": 0.1127,
+      "beta": 0.5564,
+      "tier": "calm"
+    },
+    {
+      "t": 147,
+      "volatility_index": 0.0954,
+      "beta": 0.5477,
+      "tier": "calm"
+    },
+    {
+      "t": 148,
+      "volatility_index": 0.1012,
+      "beta": 0.5506,
+      "tier": "calm"
+    },
+    {
+      "t": 149,
+      "volatility_index": 0.101,
+      "beta": 0.5505,
+      "tier": "calm"
+    },
+    {
+      "t": 150,
+      "volatility_index": 0.1012,
+      "beta": 0.5506,
+      "tier": "calm"
+    },
+    {
+      "t": 151,
+      "volatility_index": 0.1114,
+      "beta": 0.5557,
+      "tier": "calm"
+    },
+    {
+      "t": 152,
+      "volatility_index": 0.102,
+      "beta": 0.551,
+      "tier": "calm"
+    },
+    {
+      "t": 153,
+      "volatility_index": 0.1004,
+      "beta": 0.5502,
+      "tier": "calm"
+    },
+    {
+      "t": 154,
+      "volatility_index": 0.1146,
+      "beta": 0.5573,
+      "tier": "calm"
+    },
+    {
+      "t": 155,
+      "volatility_index": 0.1703,
+      "beta": 0.5852,
+      "tier": "calm"
+    },
+    {
+      "t": 156,
+      "volatility_index": 0.1666,
+      "beta": 0.5833,
+      "tier": "calm"
+    },
+    {
+      "t": 157,
+      "volatility_index": 0.1678,
+      "beta": 0.5839,
+      "tier": "calm"
+    },
+    {
+      "t": 158,
+      "volatility_index": 0.1653,
+      "beta": 0.5827,
+      "tier": "calm"
+    },
+    {
+      "t": 159,
+      "volatility_index": 0.1689,
+      "beta": 0.5844,
+      "tier": "calm"
+    },
+    {
+      "t": 160,
+      "volatility_index": 0.1482,
+      "beta": 0.5741,
+      "tier": "calm"
+    },
+    {
+      "t": 161,
+      "volatility_index": 0.1518,
+      "beta": 0.5759,
+      "tier": "calm"
+    },
+    {
+      "t": 162,
+      "volatility_index": 0.156,
+      "beta": 0.578,
+      "tier": "calm"
+    },
+    {
+      "t": 163,
+      "volatility_index": 0.1374,
+      "beta": 0.5687,
+      "tier": "calm"
+    },
+    {
+      "t": 164,
+      "volatility_index": 0.1251,
+      "beta": 0.5626,
+      "tier": "calm"
+    },
+    {
+      "t": 165,
+      "volatility_index": 0.123,
+      "beta": 0.5615,
+      "tier": "calm"
+    },
+    {
+      "t": 166,
+      "volatility_index": 0.1563,
+      "beta": 0.5781,
+      "tier": "calm"
+    },
+    {
+      "t": 167,
+      "volatility_index": 0.1794,
+      "beta": 0.5897,
+      "tier": "calm"
+    },
+    {
+      "t": 168,
+      "volatility_index": 0.1795,
+      "beta": 0.5897,
+      "tier": "calm"
+    },
+    {
+      "t": 169,
+      "volatility_index": 0.1793,
+      "beta": 0.5897,
+      "tier": "calm"
+    },
+    {
+      "t": 170,
+      "volatility_index": 0.1514,
+      "beta": 0.5757,
+      "tier": "calm"
+    },
+    {
+      "t": 171,
+      "volatility_index": 0.1464,
+      "beta": 0.5732,
+      "tier": "calm"
+    },
+    {
+      "t": 172,
+      "volatility_index": 0.165,
+      "beta": 0.5825,
+      "tier": "calm"
+    },
+    {
+      "t": 173,
+      "volatility_index": 0.1632,
+      "beta": 0.5816,
+      "tier": "calm"
+    },
+    {
+      "t": 174,
+      "volatility_index": 0.1651,
+      "beta": 0.5825,
+      "tier": "calm"
+    },
+    {
+      "t": 175,
+      "volatility_index": 0.1688,
+      "beta": 0.5844,
+      "tier": "calm"
+    },
+    {
+      "t": 176,
+      "volatility_index": 0.1385,
+      "beta": 0.5693,
+      "tier": "calm"
+    },
+    {
+      "t": 177,
+      "volatility_index": 0.1056,
+      "beta": 0.5528,
+      "tier": "calm"
+    },
+    {
+      "t": 178,
+      "volatility_index": 0.1022,
+      "beta": 0.5511,
+      "tier": "calm"
+    },
+    {
+      "t": 179,
+      "volatility_index": 0.0893,
+      "beta": 0.5447,
+      "tier": "calm"
+    },
+    {
+      "t": 180,
+      "volatility_index": 0.1111,
+      "beta": 0.5556,
+      "tier": "calm"
+    },
+    {
+      "t": 181,
+      "volatility_index": 0.1069,
+      "beta": 0.5534,
+      "tier": "calm"
+    },
+    {
+      "t": 182,
+      "volatility_index": 0.1027,
+      "beta": 0.5514,
+      "tier": "calm"
+    },
+    {
+      "t": 183,
+      "volatility_index": 0.1191,
+      "beta": 0.5595,
+      "tier": "calm"
+    },
+    {
+      "t": 184,
+      "volatility_index": 0.1327,
+      "beta": 0.5663,
+      "tier": "calm"
+    },
+    {
+      "t": 185,
+      "volatility_index": 0.1425,
+      "beta": 0.5713,
+      "tier": "calm"
+    },
+    {
+      "t": 186,
+      "volatility_index": 0.1426,
+      "beta": 0.5713,
+      "tier": "calm"
+    },
+    {
+      "t": 187,
+      "volatility_index": 0.1406,
+      "beta": 0.5703,
+      "tier": "calm"
+    },
+    {
+      "t": 188,
+      "volatility_index": 0.1428,
+      "beta": 0.5714,
+      "tier": "calm"
+    },
+    {
       "t": 189,
-      "volatility_index": 0.1355,
-      "beta": 0.5677,
+      "volatility_index": 0.1441,
+      "beta": 0.5721,
       "tier": "calm"
     },
     {
       "t": 190,
-      "volatility_index": 0.1472,
-      "beta": 0.5736,
+      "volatility_index": 0.1142,
+      "beta": 0.5571,
       "tier": "calm"
     },
     {
       "t": 191,
-      "volatility_index": 0.1643,
-      "beta": 0.5822,
+      "volatility_index": 0.0933,
+      "beta": 0.5466,
       "tier": "calm"
     },
     {
       "t": 192,
-      "volatility_index": 0.2421,
-      "beta": 0.621,
+      "volatility_index": 0.093,
+      "beta": 0.5465,
       "tier": "calm"
     },
     {
       "t": 193,
-      "volatility_index": 0.2512,
-      "beta": 0.6256,
-      "tier": "moderate"
+      "volatility_index": 0.0782,
+      "beta": 0.5391,
+      "tier": "calm"
     },
     {
       "t": 194,
-      "volatility_index": 0.2442,
-      "beta": 0.6221,
+      "volatility_index": 0.1007,
+      "beta": 0.5503,
       "tier": "calm"
     },
     {
       "t": 195,
-      "volatility_index": 0.2524,
-      "beta": 0.6262,
-      "tier": "moderate"
+      "volatility_index": 0.1071,
+      "beta": 0.5535,
+      "tier": "calm"
     },
     {
       "t": 196,
-      "volatility_index": 0.2541,
-      "beta": 0.627,
-      "tier": "moderate"
+      "volatility_index": 0.1204,
+      "beta": 0.5602,
+      "tier": "calm"
     },
     {
       "t": 197,
-      "volatility_index": 0.3076,
-      "beta": 0.6538,
-      "tier": "moderate"
+      "volatility_index": 0.1209,
+      "beta": 0.5604,
+      "tier": "calm"
     },
     {
       "t": 198,
-      "volatility_index": 0.3056,
-      "beta": 0.6528,
-      "tier": "moderate"
+      "volatility_index": 0.1098,
+      "beta": 0.5549,
+      "tier": "calm"
     },
     {
       "t": 199,
-      "volatility_index": 0.3068,
-      "beta": 0.6534,
-      "tier": "moderate"
+      "volatility_index": 0.0952,
+      "beta": 0.5476,
+      "tier": "calm"
     },
     {
       "t": 200,
-      "volatility_index": 0.2968,
-      "beta": 0.6484,
-      "tier": "moderate"
+      "volatility_index": 0.0663,
+      "beta": 0.5332,
+      "tier": "calm"
     }
   ],
   "events": [
     {
-      "t": 1,
+      "t": 0.0,
       "type": "replan",
-      "detail": "Initial delivery route planned \u2014 optimized stop order for departure"
+      "detail": "Emergency route dispatched \u2014 prioritized fastest corridor to patient pickup & trauma care"
     },
     {
-      "t": 121,
+      "t": 120.0,
       "type": "replan",
-      "detail": "Traffic getting less predictable (volatility 0.46) \u2014 re-planning stop order to bypass forming delays"
-    },
-    {
-      "t": 195,
-      "type": "replan",
-      "detail": "Traffic getting less predictable (volatility 0.25) \u2014 re-planning stop order to bypass forming delays"
+      "detail": "Traffic getting less predictable (volatility 0.29) \u2014 re-planning corridor to bypass forming delays to hospital"
     }
   ],
   "completion_time": 93.55

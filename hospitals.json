@@ -1,0 +1,32 @@
+[
+  {
+    "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
+    "lat": 28.5672,
+    "lon": 77.21,
+    "level": "trauma center"
+  },
+  {
+    "name": "VMMC & Safdarjung Hospital",
+    "lat": 28.5673,
+    "lon": 77.205,
+    "level": "trauma center"
+  },
+  {
+    "name": "Max Smart Super Speciality Hospital, Saket",
+    "lat": 28.5273,
+    "lon": 77.2117,
+    "level": "general"
+  },
+  {
+    "name": "Moolchand Hospital, Lajpat Nagar",
+    "lat": 28.5731,
+    "lon": 77.2369,
+    "level": "general"
+  },
+  {
+    "name": "Dr. Ram Manohar Lohia Hospital",
+    "lat": 28.6249,
+    "lon": 77.2001,
+    "level": "trauma center"
+  }
+]

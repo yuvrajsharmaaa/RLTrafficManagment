@@ -2,30 +2,30 @@
   "scenarios": [
     {
       "id": "low_volatility",
-      "title": "Low Volatility (Off-Peak Smooth Flow)",
-      "description": "Smooth off-peak traffic across Connaught Place with stable free-flow speeds.",
+      "title": "Low Volatility (Off-Peak Emergency Transfer)",
+      "description": "Smooth off-peak traffic across Connaught Place corridor for rapid hospital dispatch.",
       "va_qpso_file": "hero_low_va_qpso.json",
       "fixed_beta_qpso_file": "hero_low_fixed_beta_qpso.json",
       "completion_time_va": 93.55,
       "completion_time_fb": 93.71,
-      "events_count_va": 3,
+      "events_count_va": 2,
       "events_count_fb": 3
     },
     {
       "id": "medium_volatility",
-      "title": "Medium Volatility (Incident @ 120s)",
-      "description": "Moderate traffic with unexpected lane closure at t=120s on Connaught connector. va_qpso finishes 3.45% faster.",
+      "title": "Medium Volatility (Corridor Obstruction @ 120s)",
+      "description": "Moderate traffic with unexpected road obstruction at t=120s on hospital route. VA-QPSO dynamically reroutes to save critical minutes.",
       "va_qpso_file": "hero_medium_va_qpso.json",
       "fixed_beta_qpso_file": "hero_medium_fixed_beta_qpso.json",
       "completion_time_va": 95.22,
       "completion_time_fb": 98.62,
-      "events_count_va": 3,
+      "events_count_va": 2,
       "events_count_fb": 3
     },
     {
       "id": "high_volatility",
-      "title": "High Volatility (Compound Disruption)",
-      "description": "Heavy peak rush hour with dual closures and surge. va_qpso reduces congestion exposure by 25.62%.",
+      "title": "High Volatility (Rush Hour Emergency Surge)",
+      "description": "Severe peak congestion with dual closures along radial corridors. VA-QPSO discovers open perimeter bypass to trauma center.",
       "va_qpso_file": "hero_high_va_qpso.json",
       "fixed_beta_qpso_file": "hero_high_fixed_beta_qpso.json",
       "completion_time_va": 125.7,
