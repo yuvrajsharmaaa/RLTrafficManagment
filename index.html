@@ -201,6 +201,103 @@
       color: var(--signal);
     }
 
+    button.live-btn {
+      border: 1.5px solid var(--signal);
+      background: rgba(76, 126, 255, 0.14);
+      color: #fff;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 10px rgba(76, 126, 255, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    button.live-btn:hover {
+      background: var(--signal);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(76, 126, 255, 0.45);
+    }
+
+    button.live-btn.loading {
+      opacity: 0.9;
+      cursor: wait;
+      border-color: var(--moderate);
+      background: rgba(251, 191, 36, 0.16);
+      color: var(--moderate);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+    }
+
+    .live-spinner {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: live-spin 0.7s linear infinite;
+    }
+
+    @keyframes live-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .patient-pickup-pin.picked-live {
+      box-shadow: 0 0 16px rgba(229, 72, 77, 0.85), 0 0 0 4px rgba(229, 72, 77, 0.3);
+      border-color: #fff;
+      animation: live-pickup-pulse 1.2s infinite alternate;
+    }
+
+    @keyframes live-pickup-pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.15); }
+    }
+
+    .map-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 990;
+      background: rgba(18, 22, 31, 0.88);
+      border: 1px solid var(--hairline-strong);
+      color: var(--text-secondary);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      letter-spacing: 0.01em;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .live-banner {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: var(--surface);
+      border: 1.5px solid var(--signal);
+      color: var(--text-primary);
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+      white-space: nowrap;
+      animation: banner-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes banner-pop {
+      from { opacity: 0; transform: translate(-50%, -8px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
     #scenario-selector {
       max-width: 260px;
     }
@@ -1131,6 +1228,7 @@
         <option value="hero_low_va_qpso">Light Traffic (Off-Peak Run) — Adaptive Routing</option>
         <option value="hero_low_fixed_beta_qpso">Light Traffic (Off-Peak Run) — Fixed Baseline</option>
       </select>
+      <button id="btn-run-live" class="live-btn" title="Compute real-time ambulance corridor from incident location via VA-QPSO">⚡ Run Live</button>
       <button id="btn-toggle-compare" class="compare-btn">Compare Adaptive vs Baseline</button>
       <button id="btn-reset-view">Center Map</button>
       <button id="btn-toggle-tiles">Toggle Map Theme</button>
@@ -1144,6 +1242,8 @@
   <!-- Single Route Map View (the hero) -->
   <main id="single-view">
     <div id="map"></div>
+    <div id="live-banner" class="live-banner" hidden></div>
+    <div id="map-interaction-hint" class="map-hint">Click map to set emergency incident location &bull; Click &ldquo;Run Live&rdquo; to dispatch</div>
   </main>
 
   <!-- Split Comparison Dual View -->
@@ -1357,6 +1457,12 @@
         }
       });
 
+      // Allow user to click anywhere on map to pick a custom incident location
+      map.on('click', (e) => {
+        if (isComparisonMode) return;
+        setCustomIncidentLocation(e.latlng.lat, e.latlng.lng);
+      });
+
       const mapContainer = document.getElementById('map');
       if (isDarkTiles && mapContainer) {
         mapContainer.classList.add('dark-tiles');
@@ -1364,6 +1470,188 @@
     }
 
     initMainMap();
+
+    // -------------------------------------------------------------
+    // Interactive Incident Location Picking & Live Routing
+    // -------------------------------------------------------------
+    let pickedIncident = null;
+    let pickedIncidentMarker = null;
+
+    function setCustomIncidentLocation(lat, lon) {
+      pickedIncident = { lat, lon };
+
+      if (pickedIncidentMarker) {
+        map.removeLayer(pickedIncidentMarker);
+      }
+
+      const pickupHtml = `
+        <div class="patient-pickup-pin picked-live" title="Emergency Incident Location">
+          <span class="pin-symbol">🚨</span>
+          <div class="pin-label-callout">Picked Incident</div>
+        </div>
+      `;
+      const pickupIcon = L.divIcon({
+        className: 'custom-pin',
+        html: pickupHtml,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
+      });
+
+      pickedIncidentMarker = L.marker([lat, lon], { icon: pickupIcon, zIndexOffset: 1200 }).addTo(map);
+
+      const popupContent = document.createElement('div');
+      popupContent.innerHTML = `
+        <b style="color:#E8EAED;">🚨 Emergency Incident Picked</b><br>
+        <span style="font-family:var(--font-mono);font-size:11px;color:#9AA2B2;">${lat.toFixed(4)}, ${lon.toFixed(4)}</span><br>
+        <button id="btn-popup-plan-now" style="margin-top:8px;width:100%;padding:6px 10px;font-size:11px;background:#4C7EFF;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-family:var(--font-heading);">⚡ Run Live Route Here</button>
+      `;
+
+      pickedIncidentMarker.bindPopup(popupContent).openPopup();
+
+      setTimeout(() => {
+        const popupBtn = document.getElementById('btn-popup-plan-now');
+        if (popupBtn) {
+          popupBtn.addEventListener('click', () => {
+            if (pickedIncidentMarker) pickedIncidentMarker.closePopup();
+            runLivePlan();
+          });
+        }
+      }, 80);
+
+      // Update map hint
+      const hintEl = document.getElementById('map-interaction-hint');
+      if (hintEl) {
+        hintEl.innerText = `Incident selected (${lat.toFixed(3)}, ${lon.toFixed(3)}) — Click "Run Live" to compute corridor`;
+        hintEl.style.borderColor = 'var(--signal)';
+        hintEl.style.color = 'var(--text-primary)';
+      }
+
+      // Update button callout
+      const btn = document.getElementById('btn-run-live');
+      if (btn && !btn.disabled) {
+        btn.innerHTML = `⚡ Run Live (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+      }
+    }
+
+    async function runLivePlan() {
+      if (isComparisonMode) {
+        toggleComparisonMode();
+      }
+      pause();
+
+      const btn = document.getElementById('btn-run-live');
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = `<span class="live-spinner"></span> Live run in progress`;
+      }
+
+      const liveBanner = document.getElementById('live-banner');
+      if (liveBanner) {
+        liveBanner.hidden = false;
+        liveBanner.innerHTML = `<span class="live-spinner"></span> Computing live route via VA-QPSO & SUMO snapshot...`;
+      }
+
+      // Use picked incident if set, otherwise map center or central Connaught Place
+      let incident_lat = 28.6325;
+      let incident_lon = 77.2215;
+
+      if (pickedIncident) {
+        incident_lat = pickedIncident.lat;
+        incident_lon = pickedIncident.lon;
+      } else if (map) {
+        const center = map.getCenter();
+        if (center && Math.abs(center.lat - 28.63) < 0.15 && Math.abs(center.lng - 77.22) < 0.15) {
+          incident_lat = center.lat;
+          incident_lon = center.lng;
+        }
+      }
+
+      // Check tier from scenario selector
+      const selVal = document.getElementById('scenario-selector').value;
+      let tier = 'medium';
+      if (selVal.includes('high')) tier = 'high';
+      else if (selVal.includes('low')) tier = 'low';
+
+      const t0 = performance.now();
+      try {
+        const res = await fetch('/api/plan-route', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            incident_lat: incident_lat,
+            incident_lon: incident_lon,
+            scenario_tier: tier,
+            seed: Math.floor(Math.random() * 1000) + 1,
+            use_live_sumo: true,
+            num_stops: 8
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        const elapsedMs = Math.round(performance.now() - t0);
+
+        // Clean up temporary marker since renderSingleScenario places the official stops
+        if (pickedIncidentMarker) {
+          map.removeLayer(pickedIncidentMarker);
+          pickedIncidentMarker = null;
+        }
+        pickedIncident = null;
+
+        // Render the real calculated route
+        renderSingleScenario(data);
+
+        // Update scenario selector with this live run
+        const selector = document.getElementById('scenario-selector');
+        let liveOpt = selector.querySelector('option[data-live="true"]');
+        if (!liveOpt) {
+          liveOpt = document.createElement('option');
+          liveOpt.setAttribute('data-live', 'true');
+          selector.insertBefore(liveOpt, selector.firstChild);
+        }
+        const hName = (data.selected_hospital && data.selected_hospital.name)
+          ? data.selected_hospital.name.split(',')[0]
+          : 'Hospital';
+        liveOpt.value = 'live_custom_run';
+        liveOpt.textContent = `⚡ Live Run: ${hName} (${data.completion_time.toFixed(0)}s ETA)`;
+        selector.value = 'live_custom_run';
+
+        // Show completion banner
+        if (liveBanner) {
+          liveBanner.innerHTML = `✓ Live corridor computed in ${elapsedMs}ms (${data.source === 'live_bounded_sumo' ? 'SUMO live snapshot' : 'calibrated scenario'}) &bull; ETA: ${formatETA(data.completion_time)}`;
+          setTimeout(() => {
+            liveBanner.hidden = true;
+          }, 4000);
+        }
+
+        // Reset map hint
+        const hintEl = document.getElementById('map-interaction-hint');
+        if (hintEl) {
+          hintEl.innerText = 'Click map to set emergency incident location &bull; Click "Run Live" to dispatch';
+          hintEl.style.borderColor = '';
+          hintEl.style.color = '';
+        }
+
+        play();
+      } catch (err) {
+        console.error('Live route planning failed:', err);
+        if (liveBanner) {
+          liveBanner.innerHTML = `⚠️ Route calculation failed: ${err.message}`;
+          setTimeout(() => { liveBanner.hidden = true; }, 5000);
+        }
+        alert(`Could not compute live route: ${err.message}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          btn.innerHTML = '⚡ Run Live';
+        }
+      }
+    }
 
     // -------------------------------------------------------------
     // Data Loading with Resilient Fallback
@@ -2156,6 +2444,21 @@
 
     document.getElementById('scenario-selector').addEventListener('change', (e) => {
       pause();
+      if (pickedIncidentMarker && map) {
+        map.removeLayer(pickedIncidentMarker);
+        pickedIncidentMarker = null;
+        pickedIncident = null;
+      }
+      const hintEl = document.getElementById('map-interaction-hint');
+      if (hintEl) {
+        hintEl.innerText = 'Click map to set emergency incident location • Click "Run Live" to dispatch';
+        hintEl.style.borderColor = '';
+        hintEl.style.color = '';
+      }
+      const btn = document.getElementById('btn-run-live');
+      if (btn && !btn.disabled) {
+        btn.innerHTML = '⚡ Run Live';
+      }
       if (isComparisonMode) {
         toggleComparisonMode(); // return to single mode for clean switch
       }
@@ -2163,6 +2466,11 @@
     });
 
     document.getElementById('btn-toggle-compare').addEventListener('click', toggleComparisonMode);
+
+    const btnRunLive = document.getElementById('btn-run-live');
+    if (btnRunLive) {
+      btnRunLive.addEventListener('click', runLivePlan);
+    }
 
     document.getElementById('btn-toggle-tiles').addEventListener('click', () => {
       isDarkTiles = !isDarkTiles;

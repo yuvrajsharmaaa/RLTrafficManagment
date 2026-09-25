@@ -1,0 +1,19 @@
+services:
+  trafficmgmt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: trafficmgmt-api:latest
+    container_name: trafficmgmt-server
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:8000"
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

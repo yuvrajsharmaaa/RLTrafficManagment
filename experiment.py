@@ -115,6 +115,19 @@ def compute_iterations_to_95(history: np.ndarray) -> int:
     return int(indices[0]) if len(indices) > 0 else len(history) - 1
 
 
+def compute_iterations_to_margin(history: np.ndarray, margin: float = 0.05) -> int:
+    """
+    Iterations to reach within margin ratio (default 5%) of that run's own best-found fitness:
+    Target: f_t <= (1.0 + margin) * f_star.
+    """
+    if len(history) == 0:
+        return 0
+    f_star = history[-1]
+    target = f_star * (1.0 + margin)
+    indices = np.where(history <= target + 1e-12)[0]
+    return int(indices[0]) if len(indices) > 0 else len(history) - 1
+
+
 def compute_hit_rate(scores: np.ndarray, ref_bests: np.ndarray, tol: float = 1e-4) -> float:
     """
     Percentage of trials that reach within `tol` of the reference best solution
@@ -355,13 +368,18 @@ def run_convergence_experiment(
         mean_score = float(np.mean(scores))
         std_score = float(np.std(scores))
 
-        # 1. Iterations to reach 95% of run's own best fitness
+        # 1. Iterations to reach 95% of run's own best fitness / improvement
         iter_95_list = [compute_iterations_to_95(histories[algo][i]) for i in range(num_seeds)]
         mean_iter_95 = float(np.mean(iter_95_list))
         std_iter_95 = float(np.std(iter_95_list))
 
+        iter_5pct_margin_list = [compute_iterations_to_margin(histories[algo][i], margin=0.05) for i in range(num_seeds)]
+        mean_iter_5pct = float(np.mean(iter_5pct_margin_list))
+        std_iter_5pct = float(np.std(iter_5pct_margin_list))
+
         # 2. Hit rate: % of trials reaching within tolerance of reference best
         hit_rate = compute_hit_rate(scores, ref_bests, tol=tolerance)
+        hit_rate_05pct = compute_hit_rate(scores, ref_bests * 1.005, tol=0.0)
         hit_rate_1pct = compute_hit_rate(scores, ref_bests * 1.01, tol=0.0)
 
         # Average runtime
@@ -379,7 +397,10 @@ def run_convergence_experiment(
             "std_fitness": round(std_score, 4),
             "mean_iterations_to_95": round(mean_iter_95, 2),
             "std_iterations_to_95": round(std_iter_95, 2),
+            "mean_iterations_to_5pct_margin": round(mean_iter_5pct, 2),
+            "std_iterations_to_5pct_margin": round(std_iter_5pct, 2),
             "hit_rate_strict_pct": round(hit_rate, 2),
+            "hit_rate_05pct_pct": round(hit_rate_05pct, 2),
             "hit_rate_1pct_pct": round(hit_rate_1pct, 2),
             "avg_runtime_ms": round(avg_time_ms, 2),
         })
@@ -669,6 +690,7 @@ def main():
     parser.add_argument("--output", type=str, default="results/experiments.csv", help="Simulation CSV path")
     parser.add_argument("--json-output", type=str, default="results/experiments.json", help="Simulation JSON path")
     parser.add_argument("--output-plot", type=str, default="results/convergence_comparison.png", help="Convergence plot PNG path")
+    parser.add_argument("--tolerance", type=float, default=1e-3, help="Tolerance for hit rate vs reference best (default: 1e-3)")
     parser.add_argument("--use-libsumo", action="store_true", help="Use libsumo if installed")
     args = parser.parse_args()
 
@@ -686,6 +708,7 @@ def main():
             num_seeds=args.num_seeds,
             start_seed=args.start_seed,
             tier=tier_to_run,
+            tolerance=args.tolerance,
             output_plot=args.output_plot,
         )
 
