@@ -1800,12 +1800,16 @@
     {
       "t": 0.0,
       "type": "replan",
-      "detail": "Emergency route dispatched \u2014 prioritized fastest corridor to patient pickup & trauma care"
+      "detail": "Emergency corridor dispatched. Prioritized fastest path to patient pickup and trauma care.",
+      "eta_before": 0,
+      "eta_after": 95
     },
     {
-      "t": 120.0,
+      "t": 55.0,
       "type": "replan",
-      "detail": "Traffic conditions steady \u2014 maintaining optimal green-wave corridor for minimal transit time to hospital"
+      "detail": "Traffic unpredictability surged to 0.54 (Turbulent). Re-planned ambulance bypass corridor around congestion.",
+      "eta_before": 75,
+      "eta_after": 40
     }
   ],
   "completion_time": 95.22

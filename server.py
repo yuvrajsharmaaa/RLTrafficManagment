@@ -38,7 +38,7 @@ class DemoHandler(BaseHTTPRequestHandler):
         try:
             body = path.read_bytes()
         except OSError:
-            self.send_json(HTTPStatus.NOT_FOUND, {"error": "Requested demo file was not found."})
+            self.send_json(HTTPStatus.NOT_FOUND, {"error": "Requested file not found."})
             return
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", content_type)
@@ -64,7 +64,7 @@ class DemoHandler(BaseHTTPRequestHandler):
             self.serve_run(request_path.removeprefix("/frontend_data/").removesuffix(".json"))
             return
 
-        self.send_json(HTTPStatus.NOT_FOUND, {"error": "No such demo resource."})
+        self.send_json(HTTPStatus.NOT_FOUND, {"error": "Resource not found."})
 
     def serve_run(self, run_id: str) -> None:
         clean_id = run_id.removesuffix(".json")
@@ -81,7 +81,7 @@ class DemoHandler(BaseHTTPRequestHandler):
         if not found:
             self.send_json(
                 HTTPStatus.NOT_FOUND,
-                {"error": f"Bundled run '{run_id}' was not found. Export hero data into {self.data_dir.name}/."},
+                {"error": f"Run '{run_id}' not found in {self.data_dir.name}/."},
             )
             return
         self.send_file(found, "application/json; charset=utf-8")

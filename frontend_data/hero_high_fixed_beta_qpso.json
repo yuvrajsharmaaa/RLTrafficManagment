@@ -1870,17 +1870,17 @@
     {
       "t": 0.0,
       "type": "replan",
-      "detail": "Emergency route dispatched \u2014 prioritized fastest corridor to patient pickup & trauma care"
+      "detail": "Emergency corridor dispatched. Prioritized fastest path to patient pickup and hospital."
     },
     {
       "t": 70.0,
       "type": "replan",
-      "detail": "Traffic conditions steady \u2014 maintaining optimal green-wave corridor for minimal transit time to hospital"
+      "detail": "Traffic conditions steady. Maintained standard corridor for hospital transit."
     },
     {
       "t": 140.0,
       "type": "replan",
-      "detail": "Traffic conditions steady \u2014 maintaining optimal green-wave corridor for minimal transit time to hospital"
+      "detail": "Traffic conditions steady. Maintained standard corridor for hospital transit."
     }
   ],
   "completion_time": 109.37

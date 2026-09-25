@@ -1790,12 +1790,16 @@
     {
       "t": 0.0,
       "type": "replan",
-      "detail": "Emergency route dispatched \u2014 prioritized fastest corridor to patient pickup & trauma care"
+      "detail": "Emergency corridor dispatched. Prioritized fastest path to patient pickup and trauma care.",
+      "eta_before": 0,
+      "eta_after": 94
     },
     {
-      "t": 120.0,
+      "t": 40.0,
       "type": "replan",
-      "detail": "Traffic getting less predictable (volatility 0.29) \u2014 re-planning corridor to bypass forming delays to hospital"
+      "detail": "Traffic fluctuation detected (V=0.28). Re-planned corridor to preserve shortest travel time to hospital.",
+      "eta_before": 68,
+      "eta_after": 54
     }
   ],
   "completion_time": 93.55

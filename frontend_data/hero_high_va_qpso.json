@@ -1950,12 +1950,16 @@
     {
       "t": 0.0,
       "type": "replan",
-      "detail": "Emergency route dispatched \u2014 prioritized fastest corridor to patient pickup & trauma care"
+      "detail": "Emergency corridor dispatched. Prioritized fastest path to patient pickup and trauma care.",
+      "eta_before": 0,
+      "eta_after": 126
     },
     {
-      "t": 120.0,
+      "t": 38.0,
       "type": "replan",
-      "detail": "Traffic conditions steady \u2014 maintaining optimal green-wave corridor for minimal transit time to hospital"
+      "detail": "Severe peak congestion detected along radial corridor (V=0.45). Re-planned corridor onto open perimeter bypass to trauma center.",
+      "eta_before": 135,
+      "eta_after": 88
     }
   ],
   "completion_time": 125.7

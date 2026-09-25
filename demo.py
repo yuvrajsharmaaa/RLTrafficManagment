@@ -38,8 +38,8 @@ from traci.exceptions import FatalTraCIError, TraCIException
 
 # Page Configuration
 st.set_page_config(
-    page_title="QPSO Traffic Route Optimizer - Live Demo",
-    page_icon="🚚",
+    page_title="Ambulance Emergency Route Dispatch — Live Monitor",
+    page_icon="🚑",
     layout="wide",
 )
 
@@ -76,8 +76,8 @@ def build_live_distance_matrix(network_graph: NetworkGraph, state: Dict[str, Any
 # ----------------------------------------------------------------------
 # Header
 # ----------------------------------------------------------------------
-st.title("🚚 QPSO Delivery Route Optimizer — Live Mechanism Feed")
-st.caption("Demonstrating real-time volatility tracking, adaptive replan cadence, and reactive detour triggers on the Delhi network.")
+st.title("🚑 Ambulance Emergency Route Dispatch — Live Monitor")
+st.caption("Tracks live traffic volatility, adapts replanning cadence, and executes real-time detour routing for Delhi hospital corridors.")
 
 # ----------------------------------------------------------------------
 # Sidebar Controls
@@ -99,12 +99,12 @@ with st.sidebar:
             format_func=lambda x: f"{x.upper()} Volatility" + (" (Road Closure @ 120s)" if x == "medium" else " (Compound Closure + Surge)" if x == "high" else " (Smooth Flow)")
         )
         sim_duration = st.slider("Simulation Duration (seconds)", min_value=60, max_value=600, value=300, step=30)
-        sim_speed = st.slider("Step Sleep (sec)", min_value=0.0, max_value=0.2, value=0.01, step=0.01, help="Artificially slow down simulation for visual inspection.")
-        start_btn = st.button("▶️ Start Live Simulation", type="primary")
+        sim_speed = st.slider("Step Sleep (sec)", min_value=0.0, max_value=0.2, value=0.01, step=0.01, help="Slow down simulation for visual inspection.")
+        start_btn = st.button("Start Live Simulation", type="primary")
     else:
         log_path_input = st.text_input("Event Log Path", value=DEFAULT_LOG)
         replay_speed = st.slider("Replay Delay (sec)", min_value=0.0, max_value=1.0, value=0.1, step=0.05)
-        start_btn = st.button("▶️ Start Replay", type="primary")
+        start_btn = st.button("Start Replay", type="primary")
 
 # ----------------------------------------------------------------------
 # Dashboard Layout Placeholders
@@ -121,12 +121,12 @@ st.divider()
 col_left, col_right = st.columns([1, 2])
 
 with col_left:
-    st.subheader("📍 Current Delivery Route")
+    st.subheader("📍 Active Corridor Stops")
     route_status_box = st.empty()
     route_table_box = st.empty()
 
 with col_right:
-    st.subheader("⚡ Live Mechanism Event Feed")
+    st.subheader("⚡ Decision Event Feed")
     event_summary_box = st.empty()
     event_table_box = st.empty()
 
@@ -148,7 +148,7 @@ def render_route(stops: List[str], best_order: List[int], fitness: float):
         "Node ID": ordered_stops,
         "Order Index": best_order,
     })
-    route_table_box.dataframe(route_df, use_container_width=True, hide_index=True)
+    route_table_box.dataframe(route_df, width="stretch", hide_index=True)
 
 
 def render_event_feed(events: List[Dict[str, Any]]):
@@ -182,7 +182,7 @@ def render_event_feed(events: List[Dict[str, Any]]):
         })
 
     event_df = pd.DataFrame(display_rows)
-    event_table_box.dataframe(event_df, use_container_width=True, hide_index=True)
+    event_table_box.dataframe(event_df, width="stretch", hide_index=True)
 
 
 # ----------------------------------------------------------------------
@@ -196,7 +196,7 @@ if start_btn:
             with open(log_path_input, "r", encoding="utf-8") as f:
                 lines = f.readlines()
 
-            st.success(f"Loaded {len(lines)} events from `{log_path_input}`. Replaying...")
+            st.success(f"Loaded {len(lines)} events from `{log_path_input}`. Replay in progress...")
             all_events = []
             replan_count = 0
             reroute_count = 0
@@ -224,7 +224,7 @@ if start_btn:
                 if replay_speed > 0:
                     time.sleep(replay_speed)
 
-            st.success("Replay complete!")
+            st.success("Replay complete.")
 
     else:
         # Live Simulation Mode
@@ -363,10 +363,10 @@ if start_btn:
             extractor.close()
 
         progress_bar.progress(1.0)
-        st.success(f"Simulation completed: {sim_time:.0f}s simulated, {replan_count} replans, {reroute_count} reactive detours.")
+        st.success(f"Live simulation complete: {sim_time:.0f}s simulated, {replan_count} replans, {reroute_count} reactive detours.")
 else:
     # Initial state display before start is clicked
-    st.info("💡 **Ready to run**: Select your scenario in the sidebar and click **Start Simulation** (or **Start Replay**) to begin live execution.")
+    st.info("Select a scenario and click **Start Live Simulation** or **Start Replay** to begin.")
     if os.path.exists(DEFAULT_LOG):
         try:
             with open(DEFAULT_LOG, "r", encoding="utf-8") as f:
@@ -393,5 +393,5 @@ else:
             pass
     else:
         render_kpis(0.0, 0.0, 120.0, 0, 0)
-        route_status_box.info("No active route yet. Click Start in the sidebar.")
+        route_status_box.info("No active corridor selected. Click Start Live Simulation or Start Replay in sidebar.")
         event_table_box.write("No events recorded yet.")

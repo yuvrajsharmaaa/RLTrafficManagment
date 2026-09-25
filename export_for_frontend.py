@@ -97,13 +97,13 @@ SCENARIO_MAP = {
         "cfg": str(PROJECT_ROOT / "networks" / "delhi" / "scenarios" / "medium" / "scenario.sumocfg"),
         "key": "medium_volatility",
         "title": "Medium Volatility (Corridor Obstruction @ 120s)",
-        "description": "Moderate traffic with unexpected road obstruction at t=120s on hospital route. VA-QPSO dynamically reroutes to save critical minutes.",
+        "description": "Moderate traffic with unexpected road obstruction at t=120s. Adaptive routing redirects ambulance around obstruction.",
     },
     "high": {
         "cfg": str(PROJECT_ROOT / "networks" / "delhi" / "scenarios" / "high" / "scenario.sumocfg"),
         "key": "high_volatility",
         "title": "High Volatility (Rush Hour Emergency Surge)",
-        "description": "Severe peak congestion with dual closures along radial corridors. VA-QPSO discovers open perimeter bypass to trauma center.",
+        "description": "Severe peak congestion with dual road closures. Adaptive routing finds open perimeter corridor to trauma center.",
     },
 }
 
@@ -150,14 +150,14 @@ def get_road_name(net: Any, edge_id: str) -> str:
 def make_plain_replan_detail(v: float, trigger: str, fitness: float, t: float) -> str:
     """Generate clear, non-technical plain English explanation for judges."""
     if t <= 1.5:
-        return "Emergency route dispatched — prioritized fastest corridor to patient pickup & trauma care"
+        return "Emergency corridor dispatched. Prioritized fastest path to patient pickup and hospital."
     if trigger == "arbiter":
-        return "Critical congestion detected on ambulance corridor — quantum re-planning triggered to clear hospital route"
+        return "High congestion detected ahead. Triggered emergency re-planning to clear hospital route."
     if v >= 0.50:
-        return f"Severe corridor turbulence detected (volatility {v:.2f}) — expanding quantum search to discover hospital perimeter bypass"
+        return f"Severe traffic turbulence detected (volatility {v:.2f}). Expanded search breadth to find clear hospital corridor."
     if v >= 0.25:
-        return f"Traffic getting less predictable (volatility {v:.2f}) — re-planning corridor to bypass forming delays to hospital"
-    return "Traffic conditions steady — maintaining optimal green-wave corridor for minimal transit time to hospital"
+        return f"Traffic unpredictability increased (volatility {v:.2f}). Re-planned corridor to bypass forming congestion."
+    return "Traffic conditions steady. Maintained corridor for fastest transit time to hospital."
 
 
 def make_plain_reroute_detail(net: Any, from_edge: str, to_edge: str, occ_before: float) -> str:
@@ -166,8 +166,8 @@ def make_plain_reroute_detail(net: Any, from_edge: str, to_edge: str, occ_before
     to_road = get_road_name(net, to_edge)
     occ_pct = int(round(occ_before * 100))
     if from_road != to_road and not to_road.startswith("corridor"):
-        return f"Rerouted around a jam on {from_road} ({occ_pct}% congested) onto {to_road} to save time reaching the hospital"
-    return f"Tactical detour around heavy traffic on {from_road} ({occ_pct}% congested) to speed up emergency hospital arrival"
+        return f"Detoured around congestion on {from_road} ({occ_pct}% congested) onto {to_road} to reach hospital faster."
+    return f"Detoured around heavy traffic on {from_road} ({occ_pct}% congested) to speed up hospital arrival."
 
 
 def event_detail(event: dict[str, Any], net: Any = None) -> str:
@@ -184,10 +184,10 @@ def event_detail(event: dict[str, Any], net: Any = None) -> str:
         occ = float(event.get("occupancy_before", 0.8))
         if net and from_edge:
             return make_plain_reroute_detail(net, from_edge, to_edge, occ)
-        return "Rerouted onto a clearer emergency corridor to avoid delays reaching the hospital."
+        return "Detoured onto clearer corridor to avoid hospital transit delays."
     if kind == "replan":
         return make_plain_replan_detail(volatility, trigger, fitness, sim_time)
-    return "Traffic state update recorded."
+    return "Recorded traffic state update."
 
 
 def frontend_events(events: Iterable[dict[str, Any]], net: Any = None) -> list[dict[str, Any]]:

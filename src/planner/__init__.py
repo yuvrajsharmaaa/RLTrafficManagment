@@ -1,5 +1,5 @@
 """
-Route Planning & Optimization algorithms (QPSO and baselines).
+Route Planning & Optimization algorithms (QPSO, PSO, GA, and Dijkstra Baselines).
 """
 
 from .objective import RoutingObjective
@@ -13,6 +13,18 @@ from .qpso_encoding import (
 )
 from .fitness import score_route, route_components
 from .qpso import fixed_beta_qpso, va_qpso, replan, default_budget
+from .pso_baseline import standard_pso, replan as pso_replan
+from .ga_baseline import genetic_algorithm, replan as ga_replan
+from .dijkstra_baseline import (
+    ALGORITHM_LABEL as DIJKSTRA_NN_LABEL,
+    NAIVE_LABEL as DIJKSTRA_NAIVE_LABEL,
+    ALL_STARTS_LABEL as DIJKSTRA_ALL_STARTS_LABEL,
+    dijkstra_nearest_neighbor,
+    dijkstra_all_starts_nearest_neighbor,
+    dijkstra_naive,
+    dijkstra_from_graph,
+    replan as dijkstra_replan,
+)
 
 __all__ = [
     "RoutingObjective",
@@ -29,4 +41,16 @@ __all__ = [
     "va_qpso",
     "replan",
     "default_budget",
+    "standard_pso",
+    "pso_replan",
+    "genetic_algorithm",
+    "ga_replan",
+    "DIJKSTRA_NN_LABEL",
+    "DIJKSTRA_NAIVE_LABEL",
+    "DIJKSTRA_ALL_STARTS_LABEL",
+    "dijkstra_nearest_neighbor",
+    "dijkstra_all_starts_nearest_neighbor",
+    "dijkstra_naive",
+    "dijkstra_from_graph",
+    "dijkstra_replan",
 ]

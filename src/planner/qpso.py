@@ -54,7 +54,7 @@ and are then scaled off `dim` by default_budget() -- a flat budget silently
 degrades as the problem grows. Pass explicit values to override.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -107,7 +107,8 @@ def _run_qpso(
     patience: int,
     tol: float,
     max_restarts: int,
-) -> Tuple[np.ndarray, float]:
+    return_history: bool = False,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Shared QPSO core loop (Sun, Feng & Xu, 2004) with restart-on-stagnation
     -- see module docstring for the exact update equations and the restart
@@ -133,6 +134,7 @@ def _run_qpso(
 
     iterations_since_improvement = 0
     unproductive_restarts = 0
+    history: List[float] = []
 
     for t in range(max_iterations):
         # 1. Evaluate fitness, update personal_best / global_best.
@@ -149,6 +151,9 @@ def _run_qpso(
                 best_score = score
                 best_position = np.copy(positions[i])
                 unproductive_restarts = 0
+
+        if return_history:
+            history.append(float(best_score))
 
         # Restart-on-stagnation (see module docstring). The swarm is cleared
         # entirely, global_best included, so the next cycle is an untouched
@@ -181,6 +186,11 @@ def _run_qpso(
         positions = p + sign * beta * np.abs(mbest - positions) * np.log(1.0 / u)
         positions = np.clip(positions, bounds[0], bounds[1])
 
+    if return_history:
+        while len(history) < max_iterations:
+            history.append(float(best_score))
+        return best_position, best_score, np.asarray(history, dtype=float)
+
     return best_position, best_score
 
 
@@ -196,7 +206,8 @@ def fixed_beta_qpso(
     patience: int = 15,
     tol: float = 1e-6,
     max_restarts: Optional[int] = None,
-) -> Tuple[np.ndarray, float]:
+    return_history: bool = False,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Standard linear-anneal beta baseline, used throughout the QPSO literature
     to compare novel variants against (this is that baseline, not a
@@ -213,7 +224,7 @@ def fixed_beta_qpso(
     def beta_fn(t: int) -> float:
         return beta_max - (beta_max - beta_min) * (t / max_iterations)
 
-    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts)
+    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=return_history)
 
 
 # --- va_qpso: volatility-adaptive beta (this project's contribution) ------
@@ -248,7 +259,8 @@ def va_qpso(
     patience: int = 15,
     tol: float = 1e-6,
     max_restarts: Optional[int] = None,
-) -> Tuple[np.ndarray, float]:
+    return_history: bool = False,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     beta = beta_min + (beta_max - beta_min) * volatility_index
 
@@ -267,7 +279,7 @@ def va_qpso(
     def beta_fn(t: int) -> float:
         return beta
 
-    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts)
+    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=return_history)
 
 
 def replan(
@@ -285,7 +297,8 @@ def replan(
     tol: float = 1e-6,
     max_restarts: Optional[int] = None,
     algorithm: str = "va_qpso",
-) -> Tuple[np.ndarray, float]:
+    return_history: bool = False,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Run QPSO to convergence (see module docstring for the stopping
     criterion) on a frozen re-plan snapshot, and return the best stop order
@@ -319,7 +332,7 @@ def replan(
         return score_route(order, distance_matrix, congestion_lookup, weights)
 
     if algorithm == "va_qpso":
-        best_position, best_score = va_qpso(
+        res = va_qpso(
             dim=n,
             fitness_fn=fitness_fn,
             volatility_index=volatility_index,
@@ -331,9 +344,10 @@ def replan(
             patience=patience,
             tol=tol,
             max_restarts=max_restarts,
+            return_history=return_history,
         )
     elif algorithm == "fixed_beta_qpso":
-        best_position, best_score = fixed_beta_qpso(
+        res = fixed_beta_qpso(
             dim=n,
             fitness_fn=fitness_fn,
             num_particles=num_particles,
@@ -344,9 +358,14 @@ def replan(
             patience=patience,
             tol=tol,
             max_restarts=max_restarts,
+            return_history=return_history,
         )
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}. Must be 'va_qpso' or 'fixed_beta_qpso'.")
 
-    best_order = decode_order(best_position)
-    return best_order, best_score
+    if return_history:
+        best_pos, best_score, history = res
+        return decode_order(best_pos), best_score, history
+
+    best_pos, best_score = res
+    return decode_order(best_pos), best_score

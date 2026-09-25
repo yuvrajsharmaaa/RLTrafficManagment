@@ -1,7 +1,7 @@
 {
-  "name": "Delhi QPSO Emergency Route Optimizer",
-  "short_name": "QPSO EMS",
-  "description": "Real-Time Quantum Swarm Ambulance Navigation & Volatility Adaptation in Delhi",
+  "name": "Delhi Ambulance Dispatch — Adaptive Routing",
+  "short_name": "Ambulance Route",
+  "description": "Emergency ambulance route dispatch with adaptive traffic re-planning in Delhi",
   "start_url": "./index.html",
   "id": "./index.html",
   "scope": "./",

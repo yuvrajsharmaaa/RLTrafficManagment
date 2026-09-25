@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>QPSO Ambulance Route Optimizer — Delhi Mission Control</title>
-  <meta name="description" content="Real-time interactive Leaflet visualization and side-by-side comparison of Volatility-Adaptive QPSO emergency ambulance dispatch on Delhi road network.">
+  <title>Delhi Ambulance Dispatch — Adaptive Route Control</title>
+  <meta name="description" content="Real-time interactive Leaflet visualization and side-by-side comparison of adaptive emergency ambulance routing on the Delhi road network.">
 
   <!-- PWA & Mobile Web App Meta Tags -->
   <link rel="manifest" href="manifest.json">
@@ -36,7 +36,7 @@
       --bg: #0A0E14;
       --surface: #12161F;
       --text-primary: #E8EAED;
-      --text-secondary: #8B93A1;
+      --text-secondary: #9AA2B2;
       --signal: #4C7EFF;
       --signal-dim: rgba(76, 126, 255, 0.14);
 
@@ -80,6 +80,10 @@
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
+    }
+
+    .mobile-only {
+      display: none !important;
     }
 
     /* =============================================================
@@ -159,8 +163,25 @@
       color: var(--text-primary);
     }
 
-    select:focus-visible, button:focus-visible {
-      border-color: var(--signal);
+    /* Visible keyboard focus states across all interactive elements */
+    :focus-visible {
+      outline: 2px solid var(--signal) !important;
+      outline-offset: 2px !important;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    .info-btn:focus-visible,
+    .event-feed-header:focus-visible,
+    .btn-help:focus-visible,
+    .timeline-slider:focus-visible,
+    .leaflet-control-zoom a:focus-visible,
+    .leaflet-control-attribution a:focus-visible {
+      outline: 2px solid var(--signal) !important;
+      outline-offset: 2px !important;
+      border-color: var(--signal) !important;
+      box-shadow: 0 0 0 3px rgba(76, 126, 255, 0.28) !important;
     }
 
     button.primary {
@@ -277,15 +298,9 @@
     .patient-pickup-pin::after {
       content: '';
       position: absolute;
-      inset: -5px;
+      inset: -4px;
       border-radius: 50%;
-      border: 1.5px solid rgba(76, 126, 255, 0.5);
-      animation: pickup-beacon 2s infinite ease-out;
-    }
-
-    @keyframes pickup-beacon {
-      0% { transform: scale(0.95); opacity: 0.9; }
-      100% { transform: scale(1.5); opacity: 0; }
+      border: 1.5px solid rgba(76, 126, 255, 0.4);
     }
 
     .patient-pickup-pin.mini {
@@ -530,23 +545,27 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
+      width: 14px !important;
+      height: 14px !important;
+      min-height: 14px !important;
+      max-height: 14px !important;
+      border-radius: 50% !important;
       border: 1px solid var(--hairline-strong);
       color: var(--text-secondary);
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 700;
       background: transparent;
       padding: 0;
       cursor: help;
       touch-action: manipulation;
       position: relative;
+      flex: 0 0 14px !important;
+      box-sizing: border-box;
     }
     .info-btn::before {
       content: '';
       position: absolute;
-      inset: -10px;
+      inset: -14px;
     }
 
     .metric-card {
@@ -962,8 +981,16 @@
         min-height: 40px;
       }
 
-      button {
+      button:not(.info-btn) {
         min-height: 40px;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only {
+        display: inline !important;
       }
 
       #btn-reset-view, #btn-toggle-tiles {
@@ -979,15 +1006,15 @@
       }
 
       .instrument-strip {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1.15fr 1.25fr 1.1fr;
       }
 
       .instrument-col {
-        padding: 10px 10px;
+        padding: 8px 8px;
       }
 
       .instrument-value-hero {
-        font-size: 28px;
+        font-size: 26px;
       }
 
       .instrument-value {
@@ -995,11 +1022,25 @@
       }
 
       .instrument-label {
-        font-size: 9px;
+        font-size: 8.5px;
       }
 
       .instrument-subrow {
-        font-size: 10px;
+        font-size: 9.5px;
+        gap: 3px;
+      }
+
+      .instrument-col.instrument-tier .instrument-subrow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1px;
+        margin-top: 4px;
+      }
+
+      .instrument-sublabel {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
       }
 
       .tier-badge {
@@ -1050,6 +1091,24 @@
         font-size: 12px;
       }
     }
+
+    /* =============================================================
+       Respect User's Reduced Motion Preferences
+       ============================================================= */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .tier-pulse {
+        animation: none !important;
+      }
+      .event-feed-body {
+        transition: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1060,21 +1119,21 @@
       <div class="brand-mark">🚑</div>
       <div>
         <div class="brand-name">Delhi EMS Routing</div>
-        <div class="brand-sub">Volatility-Adaptive QPSO Dispatch</div>
+        <div class="brand-sub">Adaptive Emergency Routing</div>
       </div>
     </div>
     <div class="top-controls">
       <select id="scenario-selector" aria-label="Select Scenario">
-        <option value="hero_medium_va_qpso" selected>Medium Volatility (Corridor Obstruction @ 120s) — VA-QPSO</option>
-        <option value="hero_medium_fixed_beta_qpso">Medium Volatility (Corridor Obstruction @ 120s) — Fixed Beta</option>
-        <option value="hero_high_va_qpso">High Volatility (Rush Hour Surge) — VA-QPSO</option>
-        <option value="hero_high_fixed_beta_qpso">High Volatility (Rush Hour Surge) — Fixed Beta</option>
-        <option value="hero_low_va_qpso">Low Volatility (Off-Peak Transfer) — VA-QPSO</option>
-        <option value="hero_low_fixed_beta_qpso">Low Volatility (Off-Peak Transfer) — Fixed Beta</option>
+        <option value="hero_medium_va_qpso" selected>Moderate Traffic (Sudden Obstruction) — Adaptive Routing</option>
+        <option value="hero_medium_fixed_beta_qpso">Moderate Traffic (Sudden Obstruction) — Fixed Baseline</option>
+        <option value="hero_high_va_qpso">Heavy Traffic (Peak Rush Hour) — Adaptive Routing</option>
+        <option value="hero_high_fixed_beta_qpso">Heavy Traffic (Peak Rush Hour) — Fixed Baseline</option>
+        <option value="hero_low_va_qpso">Light Traffic (Off-Peak Run) — Adaptive Routing</option>
+        <option value="hero_low_fixed_beta_qpso">Light Traffic (Off-Peak Run) — Fixed Baseline</option>
       </select>
-      <button id="btn-toggle-compare" class="compare-btn">Compare Adaptive vs Fixed</button>
+      <button id="btn-toggle-compare" class="compare-btn">Compare Adaptive vs Baseline</button>
       <button id="btn-reset-view">Center Map</button>
-      <button id="btn-toggle-tiles">Map Style</button>
+      <button id="btn-toggle-tiles">Toggle Map Theme</button>
       <div id="top-tier-indicator" class="top-tier-indicator calm">
         <span class="tier-dot"></span>
         <span id="top-tier-text">Calm</span>
@@ -1091,30 +1150,30 @@
   <section id="comparison-view" class="comparison-view" hidden>
     <div class="comparison-readout">
       <div class="comparison-readout-col">
-        <span class="comparison-label">Adaptive — VA-QPSO</span>
+        <span class="comparison-label">Adaptive Routing (VA-QPSO)</span>
         <span id="clock-adaptive" class="comparison-readout-value">--:--</span>
       </div>
       <div class="comparison-readout-col">
-        <span class="comparison-label">Baseline — Fixed Beta</span>
+        <span class="comparison-label">Fixed Baseline (Standard)</span>
         <span id="clock-fixed" class="comparison-readout-value">--:--</span>
       </div>
     </div>
 
     <div id="comparison-headline-bar" class="comparison-diff">
       <div id="comparison-headline-text" class="comparison-diff-value">--:--</div>
-      <div id="comparison-headline-sub" class="comparison-diff-label">Time difference</div>
+      <div id="comparison-headline-sub" class="comparison-diff-label">Time saved by adaptive routing</div>
     </div>
 
     <div class="comparison-maps">
       <div id="card-adaptive" class="comparison-map-col">
-        <div class="comparison-map-label">VA-QPSO — Adaptive</div>
+        <div class="comparison-map-label">Adaptive Routing (VA-QPSO)</div>
         <div id="map-adaptive" class="comparison-map-container"></div>
-        <div id="banner-adaptive" class="comparison-banner">Adaptive Route Reached Hospital First</div>
+        <div id="banner-adaptive" class="comparison-banner">Adaptive route reached hospital first</div>
       </div>
       <div id="card-fixed" class="comparison-map-col">
-        <div class="comparison-map-label">Fixed Beta — Baseline</div>
+        <div class="comparison-map-label">Fixed Baseline (Standard)</div>
         <div id="map-fixed" class="comparison-map-container"></div>
-        <div id="banner-fixed" class="comparison-banner">Hospital Reached</div>
+        <div id="banner-fixed" class="comparison-banner">Baseline route reached hospital</div>
       </div>
     </div>
   </section>
@@ -1143,18 +1202,18 @@
     <div class="instrument-col instrument-volatility">
       <div class="metric-card">
         <div class="instrument-label-row">
-          <span class="instrument-label">Volatility (V)</span>
-          <span class="info-btn">i</span>
+          <span class="instrument-label"><span class="desktop-only">Traffic </span>Unpredictability (V)</span>
+          <button class="info-btn" type="button" aria-label="Info on traffic unpredictability">i</button>
         </div>
         <div id="metric-volatility" class="instrument-value mono">0.0000</div>
         <div class="volatility-gauge"><div id="volatility-gauge-fill" class="volatility-gauge-fill"></div></div>
-        <div class="tooltip-content">Traffic unpredictability index [0 to 1]. Measures speed variance across the network.</div>
+        <div class="tooltip-content">Measures speed variation across the network from 0 (stable) to 1 (turbulent). Higher unpredictability triggers route re-planning.</div>
       </div>
       <div class="metric-card instrument-subrow" style="margin-top:8px;">
-        <span class="instrument-sublabel">Beta (&beta;)</span>
+        <span class="instrument-sublabel"><span class="desktop-only">Search </span>Breadth (β)</span>
         <span id="metric-beta" class="instrument-subvalue">0.5000</span>
-        <span class="info-btn">i</span>
-        <div class="tooltip-content">Quantum search aggressiveness (potential well width). Automatically expands during traffic turbulence.</div>
+        <button class="info-btn" type="button" aria-label="Info on search breadth">i</button>
+        <div class="tooltip-content">Controls how broadly the planner searches for alternate streets. Expands automatically during traffic turbulence.</div>
       </div>
     </div>
 
@@ -1165,8 +1224,8 @@
         <span id="tier-text">Calm</span>
       </div>
       <div class="instrument-subrow">
-        <span class="instrument-sublabel">Algorithm</span>
-        <span id="metric-algorithm" class="instrument-subvalue">VA-QPSO</span>
+        <span class="instrument-sublabel"><span class="desktop-only">Method</span><span class="mobile-only">Mode</span></span>
+        <span id="metric-algorithm" class="instrument-subvalue">Adaptive Routing</span>
       </div>
     </div>
   </section>
@@ -1174,14 +1233,14 @@
   <!-- Event feed: chronological, collapsible -->
   <section id="event-drawer" class="event-feed">
     <button id="event-drawer-handle" class="event-feed-header" aria-expanded="false" aria-label="Toggle Decision Event Feed">
-      <span id="event-time" class="event-feed-time mono">T = 0s [Ready]</span>
-      <span id="event-desc" class="event-feed-desc">Dispatching ambulance corridor...</span>
+      <span id="event-time" class="event-feed-time mono">T = 0s [DISPATCH]</span>
+      <span id="event-desc" class="event-feed-desc">Ambulance corridor dispatched to AIIMS Trauma Center.</span>
       <span id="drawer-toggle-icon" class="event-feed-toggle">▾</span>
     </button>
     <div id="event-drawer-body" class="event-feed-body">
       <div id="drawer-log-list" class="event-feed-list">
         <div class="event-feed-item">
-          <strong>T = 0s:</strong> Ambulance corridor initialized. Destination: AIIMS Trauma Center.
+          <strong>T = 0s:</strong> Ambulance corridor dispatched to AIIMS Trauma Center.
         </div>
       </div>
     </div>
@@ -1189,11 +1248,11 @@
 
   <!-- Playback dock -->
   <footer class="playback-bar">
-    <input type="range" id="timeline" class="timeline-slider" min="0" max="100" value="0" step="0.1" aria-label="Timeline Scrubber">
+    <input type="range" id="timeline" class="timeline-slider" min="0" max="100" value="0" step="0.1" aria-label="Playback Timeline">
     <div id="time-display" class="time-display mono">0.0s / --s</div>
     <div class="playback-controls">
       <button id="btn-play-pause" class="primary">▶ Play</button>
-      <button id="btn-restart" title="Restart Run">↺</button>
+      <button id="btn-restart" title="Restart Route">↺</button>
       <select id="speed-selector" aria-label="Playback Speed">
         <option value="0.5">0.5x</option>
         <option value="1.0" selected>1.0x</option>
@@ -1205,19 +1264,19 @@
   </footer>
 
   <!-- Help floating button -->
-  <button id="btn-open-intro" class="btn-help" title="Demo Explanation Guide">?</button>
+  <button id="btn-open-intro" class="btn-help" title="Ambulance Routing Guide">?</button>
 
   <!-- Intro Onboarding Modal -->
   <div id="intro-modal" class="modal-overlay">
     <div class="modal-card">
-      <h2>🚑 Emergency Mission Control Quickstart</h2>
-      <p>Welcome to the <strong>Delhi QPSO Emergency Route Optimizer</strong> simulation demo. Key metrics to monitor:</p>
+      <h2>🚑 Ambulance Route Dispatch Guide</h2>
+      <p>This system guides an emergency ambulance through dynamic Delhi traffic to the nearest trauma center:</p>
       <ul>
-        <li><strong>ETA to Hospital:</strong> The primary emergency metric tracking remaining transit time to trauma center care.</li>
-        <li><strong>Traffic Volatility Tracking:</strong> Real-time variance in road traffic conditions dictates when the quantum swarm dynamically replans bypass routes.</li>
-        <li><strong>Side-by-Side Comparison:</strong> Compare adaptive vs static baseline routing to observe critical time saved for patient survival.</li>
+        <li><strong>ETA to Hospital:</strong> Shows remaining drive time. Ticks down to reflect time saved when the route re-plans.</li>
+        <li><strong>Traffic Unpredictability:</strong> Tracks road congestion changes. Higher unpredictability triggers automatic route re-planning.</li>
+        <li><strong>Adaptive vs. Baseline:</strong> Compares real-time adaptive routing against a fixed standard route.</li>
       </ul>
-      <button id="btn-close-intro" class="primary">Enter Mission Control</button>
+      <button id="btn-close-intro" class="primary">Start Route Simulation</button>
     </div>
   </div>
 
@@ -1285,6 +1344,18 @@
         maxZoom: 19,
         attribution: OSM_ATTRIBUTION
       }).addTo(map);
+
+      // Clear any SVG route stroke animation if user interacts with map
+      map.on('movestart zoomstart', () => {
+        if (routePolyline) {
+          const p = routePolyline.getElement ? routePolyline.getElement() : routePolyline._path;
+          if (p) {
+            p.style.transition = '';
+            p.style.strokeDasharray = '';
+            p.style.strokeDashoffset = '';
+          }
+        }
+      });
 
       const mapContainer = document.getElementById('map');
       if (isDarkTiles && mapContainer) {
@@ -1382,7 +1453,7 @@
     }
 
     // -------------------------------------------------------------
-    // Time & Formatting Utilities (Ambulance Mission Control)
+    // Time & Formatting Utilities (Ambulance Route Dispatch)
     // -------------------------------------------------------------
     function formatETA(seconds) {
       const rem = Math.max(0, seconds);
@@ -1399,6 +1470,149 @@
         return `${m}m ${rem < 10 ? '0' : ''}${rem}s`;
       }
       return `${s.toFixed(1)}s`;
+    }
+
+    // -------------------------------------------------------------
+    // Orchestrated Decision Motion (Re-plan Event)
+    // When a re-plan event fires:
+    // 1. The route line redraws with a brief, precise transition (~400ms)
+    // 2. The ETA number ticks to its new value rather than snap-changing
+    // -------------------------------------------------------------
+    let isETATicking = false;
+    let etaTickAnimation = null;
+    let currentDisplayedETASeconds = null;
+    let lastFiredReplanT = -1;
+
+    function triggerRouteRedrawAnimation(polyline, durationMs = 400) {
+      if (!polyline) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return; // Respect user preference: instant redraw with zero motion
+      }
+      const pathEl = polyline.getElement ? polyline.getElement() : polyline._path;
+      if (!pathEl) return;
+
+      requestAnimationFrame(() => {
+        try {
+          const len = (typeof pathEl.getTotalLength === 'function')
+            ? Math.ceil(pathEl.getTotalLength())
+            : 2500;
+          if (!len || len <= 0) return;
+
+          pathEl.style.transition = 'none';
+          pathEl.style.strokeDasharray = `${len} ${len}`;
+          pathEl.style.strokeDashoffset = `${len}`;
+
+          // Force layout reflow
+          void pathEl.getBoundingClientRect();
+
+          pathEl.style.transition = `stroke-dashoffset ${durationMs}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+          pathEl.style.strokeDashoffset = '0';
+
+          clearTimeout(polyline._drawAnimTimer);
+          polyline._drawAnimTimer = setTimeout(() => {
+            if (pathEl) {
+              pathEl.style.transition = '';
+              pathEl.style.strokeDasharray = '';
+              pathEl.style.strokeDashoffset = '';
+            }
+          }, durationMs + 60);
+        } catch (err) {
+          console.warn('[RouteRedrawAnimation] Error:', err);
+        }
+      });
+    }
+
+    function tickETANumber(fromSeconds, toSeconds, durationMs = 400) {
+      if (etaTickAnimation) {
+        cancelAnimationFrame(etaTickAnimation);
+        etaTickAnimation = null;
+      }
+
+      const etaDisplay = document.getElementById('metric-eta-large');
+      if (!etaDisplay) return;
+
+      const startVal = Math.max(0, fromSeconds);
+      const endVal = Math.max(0, toSeconds);
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(startVal - endVal) < 0.5) {
+        etaDisplay.innerText = formatETA(endVal);
+        currentDisplayedETASeconds = endVal;
+        isETATicking = false;
+        return;
+      }
+
+      isETATicking = true;
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1.0, elapsed / durationMs);
+        // Cubic ease-out: rapid initial tick, precise deceleration to final value
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const currentVal = Math.round(startVal + (endVal - startVal) * ease);
+
+        etaDisplay.innerText = formatETA(currentVal);
+        currentDisplayedETASeconds = currentVal;
+
+        if (progress < 1.0) {
+          etaTickAnimation = requestAnimationFrame(step);
+        } else {
+          etaDisplay.innerText = formatETA(endVal);
+          currentDisplayedETASeconds = endVal;
+          isETATicking = false;
+          etaTickAnimation = null;
+        }
+      }
+
+      etaTickAnimation = requestAnimationFrame(step);
+    }
+
+    function triggerOrchestratedMotionMoment(ev, t) {
+      // 1. Redraw Route Line on Map (~400ms transition)
+      if (routePolyline) {
+        triggerRouteRedrawAnimation(routePolyline, 400);
+      }
+      if (isComparisonMode && adaptiveVisual && adaptiveVisual.route) {
+        triggerRouteRedrawAnimation(adaptiveVisual.route, 400);
+      }
+
+      // 2. Tick ETA Number to its new value rather than snap-changing (~400ms)
+      const rem = currentRunData ? Math.max(0, currentRunData.completion_time - t) : 0;
+      let fromSec, toSec;
+
+      if (typeof ev.eta_before === 'number' && typeof ev.eta_after === 'number') {
+        fromSec = ev.eta_before;
+        toSec = ev.eta_after;
+      } else if (t === 0.0) {
+        fromSec = 0;
+        toSec = currentRunData ? currentRunData.completion_time : rem;
+      } else {
+        const penaltySec = ev.time_saved || 35;
+        fromSec = (currentDisplayedETASeconds !== null) ? currentDisplayedETASeconds + penaltySec : rem + penaltySec;
+        toSec = rem;
+      }
+
+      tickETANumber(fromSec, toSec, 400);
+    }
+
+    function checkAndTriggerReplanMotion(t) {
+      if (!currentRunData || !currentRunData.events) return;
+
+      // If user scrubs or rewinds back past last fired event, reset
+      if (t < lastFiredReplanT - 0.5) {
+        lastFiredReplanT = -1;
+      }
+
+      for (let i = 0; i < currentRunData.events.length; i++) {
+        const ev = currentRunData.events[i];
+        if (ev.type === 'replan') {
+          if (t >= ev.t && lastFiredReplanT < ev.t && (t - ev.t) <= Math.max(2.5, playbackSpeed * 0.6)) {
+            lastFiredReplanT = ev.t;
+            triggerOrchestratedMotionMoment(ev, t);
+            break;
+          }
+        }
+      }
     }
 
     // -------------------------------------------------------------
@@ -1450,7 +1664,7 @@
 
         // Patient Pickup Location Pin (Incident)
         const pickupHtml = `
-          <div class="patient-pickup-pin" title="Patient Pickup (Incident Location)">
+          <div class="patient-pickup-pin" title="Patient Pickup Location">
             <span class="pin-symbol">🚨</span>
             <div class="pin-label-callout">Patient Pickup</div>
           </div>
@@ -1462,7 +1676,7 @@
           iconAnchor: [16, 16]
         });
         const pickupMarker = L.marker([pickupStop.lat, pickupStop.lon], { icon: pickupIcon, zIndexOffset: 900 })
-          .bindPopup(`<b>🚨 Patient Incident & Pickup Location</b><br>Junction: ${pickupStop.id}`)
+          .bindPopup(`<b>🚨 Patient Pickup Location</b><br>Junction: ${pickupStop.id}`)
           .addTo(map);
         stopMarkers.push(pickupMarker);
 
@@ -1482,7 +1696,7 @@
           iconAnchor: [17, 17]
         });
         const destMarker = L.marker([destStop.lat, destStop.lon], { icon: hospitalIcon, zIndexOffset: 950 })
-          .bindPopup(`<b>🏥 Destination: ${destName}</b><br><span style="color:#4C7EFF;font-weight:600;">${destLevel}</span><br>Live Travel Time: ${(data.selected_hospital && data.selected_hospital.live_travel_time_sec) ? data.selected_hospital.live_travel_time_sec.toFixed(1) + 's' : ''}`)
+          .bindPopup(`<b>🏥 Destination Hospital: ${destName}</b><br><span style="color:#4C7EFF;font-weight:600;">${destLevel}</span><br>Estimated Drive Time: ${(data.selected_hospital && data.selected_hospital.live_travel_time_sec) ? data.selected_hospital.live_travel_time_sec.toFixed(0) + 's' : ''}`)
           .addTo(map);
         stopMarkers.push(destMarker);
       }
@@ -1503,7 +1717,7 @@
             iconAnchor: [11, 11]
           });
           const candMarker = L.marker([cand.lat, cand.lon], { icon: candIcon, zIndexOffset: 500 })
-            .bindPopup(`<b>🏥 ${cand.name}</b><br><span style="color:#8B93A1;font-size:11px;">Candidate (${cand.level})</span>`)
+            .bindPopup(`<b>🏥 ${cand.name}</b><br><span style="color:#8B93A1;font-size:11px;">Alternate Hospital (${cand.level})</span>`)
             .addTo(map);
           stopMarkers.push(candMarker);
         });
@@ -1546,7 +1760,7 @@
 
       // Telemetry HUD Stats
       document.getElementById('metric-route-time').innerText = `${data.completion_time.toFixed(1)}s`;
-      document.getElementById('metric-algorithm').innerText = data.algorithm === 'va_qpso' ? 'VA-QPSO' : 'Fixed Beta';
+      document.getElementById('metric-algorithm').innerText = data.algorithm === 'va_qpso' ? 'Adaptive Routing' : 'Fixed Baseline';
       document.getElementById('timeline').max = data.completion_time;
       document.getElementById('timeline').value = 0;
       document.getElementById('time-display').innerText = `0.0s / ${data.completion_time.toFixed(1)}s`;
@@ -1562,12 +1776,19 @@
             </div>`;
           }).join('');
         } else {
-          drawerList.innerHTML = '<div class="event-feed-item">No corridor disruptions detected. Unhindered transit to destination hospital.</div>';
+          drawerList.innerHTML = '<div class="event-feed-item">Zero traffic disruptions detected. Corridor clear to destination hospital.</div>';
         }
       }
 
       playbackTime = 0.0;
+      lastFiredReplanT = -1;
       updatePlayback(0.0);
+
+      // Orchestrated initial presentation: draw route line and tick initial ETA
+      if (routePolyline) {
+        triggerRouteRedrawAnimation(routePolyline, 400);
+      }
+      tickETANumber(0, data.completion_time, 400);
     }
 
     // -------------------------------------------------------------
@@ -1581,6 +1802,9 @@
 
       if (!currentRunData) return;
 
+      // Check for re-plan events to fire orchestrated motion
+      checkAndTriggerReplanMotion(t);
+
       // Move ambulance marker
       const pos = getInterpolatedPosition(currentRunData.path, t);
       if (pos && vehicleMarker) vehicleMarker.setLatLng(pos);
@@ -1591,8 +1815,9 @@
       const etaStatusTag = document.getElementById('eta-status-tag');
       const etaStatusText = document.getElementById('eta-status-text');
 
-      if (etaDisplay) {
+      if (etaDisplay && !isETATicking) {
         etaDisplay.innerText = formatETA(rem);
+        currentDisplayedETASeconds = rem;
       }
       if (etaStatusTag && etaStatusText) {
         if (rem > 0) {
@@ -1657,12 +1882,12 @@
         const destStop = run.stops[run.stops.length - 1];
 
         const pickupHtml = `
-          <div class="patient-pickup-pin mini" title="Patient Incident & Pickup Location">
+          <div class="patient-pickup-pin mini" title="Patient Pickup Location">
             <span class="pin-symbol">🚨</span>
           </div>
         `;
         const pIcon = L.divIcon({ className: 'custom-pin', html: pickupHtml, iconSize: [24, 24], iconAnchor: [12, 12] });
-        L.marker([pickupStop.lat, pickupStop.lon], { icon: pIcon }).bindPopup('<b>🚨 Patient Incident & Pickup Location</b>').addTo(cmpMap);
+        L.marker([pickupStop.lat, pickupStop.lon], { icon: pIcon }).bindPopup('<b>🚨 Patient Pickup Location</b>').addTo(cmpMap);
 
         const destName = (run.selected_hospital && run.selected_hospital.name) || destStop.label || 'Destination Hospital';
         const hospitalHtml = `
@@ -1671,7 +1896,7 @@
           </div>
         `;
         const hIcon = L.divIcon({ className: 'custom-pin', html: hospitalHtml, iconSize: [26, 26], iconAnchor: [13, 13] });
-        L.marker([destStop.lat, destStop.lon], { icon: hIcon }).bindPopup(`<b>🏥 ${destName}</b>`).addTo(cmpMap);
+        L.marker([destStop.lat, destStop.lon], { icon: hIcon }).bindPopup(`<b>🏥 Destination Hospital: ${destName}</b>`).addTo(cmpMap);
       }
 
       // Candidate Hospitals
@@ -1680,7 +1905,7 @@
           if (run.selected_hospital && cand.name === run.selected_hospital.name) return;
           const candHtml = `<div class="hospital-candidate-pin mini" title="${cand.name}">🏥</div>`;
           const candIcon = L.divIcon({ className: 'custom-pin', html: candHtml, iconSize: [16, 16], iconAnchor: [8, 8] });
-          L.marker([cand.lat, cand.lon], { icon: candIcon }).bindPopup(`<b>🏥 ${cand.name}</b>`).addTo(cmpMap);
+          L.marker([cand.lat, cand.lon], { icon: candIcon }).bindPopup(`<b>🏥 ${cand.name}</b><br><span style="color:#8B93A1;font-size:11px;">Alternate Hospital (${cand.level})</span>`).addTo(cmpMap);
         });
       }
 
@@ -1712,7 +1937,7 @@
         cmpView.hidden = true;
         singleView.hidden = false;
         hud.style.display = 'grid';
-        toggleBtn.innerText = 'Compare Adaptive vs Fixed';
+        toggleBtn.innerText = 'Compare Adaptive vs Baseline';
         toggleBtn.classList.remove('active');
         map.invalidateSize();
         updatePlayback(playbackTime);
@@ -1725,7 +1950,7 @@
       singleView.hidden = true;
       cmpView.hidden = false;
       hud.style.display = 'none';
-      toggleBtn.innerText = 'Single Route View';
+      toggleBtn.innerText = 'Exit Comparison';
       toggleBtn.classList.add('active');
 
       const currentScenarioVal = document.getElementById('scenario-selector').value;
@@ -1766,11 +1991,11 @@
         if (diff > 0) {
           headlineEl.textContent = formatTimeSaved(diff);
           headlineEl.classList.remove('negative');
-          headlineSub.innerText = 'Faster to hospital — VA-QPSO adaptive routing';
+          headlineSub.innerText = 'Adaptive routing reached hospital faster';
         } else if (diff < 0) {
           headlineEl.textContent = formatTimeSaved(diff);
           headlineEl.classList.add('negative');
-          headlineSub.innerText = 'Faster to hospital — fixed-beta baseline';
+          headlineSub.innerText = 'Fixed baseline reached hospital faster';
         } else {
           headlineEl.textContent = '00:00';
           headlineEl.classList.remove('negative');
@@ -1784,7 +2009,7 @@
         play();
       } catch (err) {
         console.error('Error loading comparison runs:', err);
-        alert('Could not load matched pair for comparison. Make sure data is generated in frontend_data/.');
+        alert('Unable to load comparison run data. Ensure scenario data files exist in frontend_data.');
         toggleComparisonMode();
       }
     }
@@ -1830,7 +2055,7 @@
 
       if (t >= adaptiveRunData.completion_time && diff > 0) {
         const savedStr = formatTimeSaved(diff);
-        bannerAdaptive.innerText = `Adaptive routing reached the hospital ${savedStr} faster`;
+        bannerAdaptive.innerText = `Adaptive routing arrived ${savedStr} faster`;
         bannerAdaptive.style.display = 'block';
         cardAdaptive.classList.add('winner');
       } else {
@@ -1905,11 +2130,23 @@
     document.getElementById('btn-restart').addEventListener('click', () => {
       pause();
       playbackTime = 0.0;
+      lastFiredReplanT = -1;
       updatePlayback(0.0);
+      if (routePolyline) {
+        triggerRouteRedrawAnimation(routePolyline, 400);
+      }
+      if (currentRunData) {
+        tickETANumber(0, currentRunData.completion_time, 400);
+      }
     });
 
     document.getElementById('timeline').addEventListener('input', (e) => {
       playbackTime = parseFloat(e.target.value);
+      if (etaTickAnimation) {
+        cancelAnimationFrame(etaTickAnimation);
+        etaTickAnimation = null;
+        isETATicking = false;
+      }
       updatePlayback(playbackTime);
     });
 
@@ -2036,7 +2273,7 @@
         renderSingleScenario(data);
       } catch (err) {
         console.error(err);
-        document.getElementById('event-desc').innerText = `Error loading scenario: ${err.message}`;
+        document.getElementById('event-desc').innerText = `Failed to load scenario: ${err.message}`;
       }
     }
 
