@@ -69,6 +69,12 @@ try:
 except ImportError:
     HAS_SIMULATION = False
 
+try:
+    from src.planner.qpso import va_beta_floor
+except ImportError:  # planner deps unavailable; same formula as src/planner/qpso.py
+    def va_beta_floor(volatility_index: float, beta_min: float = 0.5) -> float:
+        return beta_min + 0.25 * volatility_index
+
 # Constants
 DEFAULT_NET_FILE = str(PROJECT_ROOT / "networks" / "delhi" / "delhi_intersection.net.xml")
 DEFAULT_FRONTEND_DIR = str(PROJECT_ROOT / "frontend_data")
@@ -487,7 +493,7 @@ def metrics(events: list[dict[str, Any]], completion_time: float, algorithm: str
     result = []
     for event in updates:
         volatility = max(0.0, min(1.0, float(event["volatility_index"])))
-        beta = 0.5 + 0.5 * volatility if algorithm == "va_qpso" else 0.75
+        beta = va_beta_floor(volatility) if algorithm == "va_qpso" else 0.75
         result.append({
             "t": round(min(float(event.get("sim_time", 0.0)), completion_time), 2),
             "volatility_index": round(volatility, 4),
@@ -807,7 +813,7 @@ def run_and_export_trial(
             v_val = nvi.update(edge_speeds)
             v_val = max(0.0, min(1.0, v_val))
 
-            beta_val = (0.5 + 0.5 * v_val) if algorithm == "va_qpso" else 0.75
+            beta_val = va_beta_floor(v_val) if algorithm == "va_qpso" else 0.75
             tier_label = tier_for(v_val)
 
             metrics_over_time.append({

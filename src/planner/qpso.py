@@ -16,7 +16,9 @@ Exact update equations used below (particle i, dimension d, iteration t):
 
 This is the standard form cited throughout the QPSO literature -- not a
 simplified variant. Both variants below (fixed_beta_qpso, va_qpso) share this
-exact core loop; they differ ONLY in how `beta` is computed each iteration.
+exact core loop; they differ ONLY in how `beta` is computed each iteration:
+both anneal linearly from beta_max, fixed_beta_qpso down to beta_min and
+va_qpso down to a volatility-dependent floor beta_min + 0.25 * V.
 
 Restart-on-stagnation
 ---------------------
@@ -63,6 +65,38 @@ from .qpso_encoding import decode_order
 
 FitnessFn = Callable[[np.ndarray], float]
 BetaFn = Callable[[int], float]  # iteration t -> beta(t)
+
+# Shared by fixed_beta_qpso and va_qpso so both start from the same beta and
+# anneal over the same range.
+DEFAULT_BETA_MAX = 1.0
+DEFAULT_BETA_MIN = 0.5
+# How far above beta_min the va_qpso floor rises at volatility_index = 1.
+VA_FLOOR_SPAN = 0.25
+
+
+def va_beta_floor(
+    volatility_index: float,
+    beta_min: float = DEFAULT_BETA_MIN,
+) -> float:
+    """beta_floor(V) = beta_min + 0.25 * V -- where va_qpso's anneal ends."""
+    return beta_min + VA_FLOOR_SPAN * volatility_index
+
+
+def va_beta(
+    t: int,
+    max_iterations: int,
+    volatility_index: float,
+    beta_max: float = DEFAULT_BETA_MAX,
+    beta_min: float = DEFAULT_BETA_MIN,
+) -> float:
+    """
+    beta(t, V) = beta_floor(V) + (beta_max - beta_floor(V)) * (1 - t / T_max)
+
+    Starts at beta_max (same as fixed_beta_qpso) and contracts linearly to
+    beta_floor(V) at t = T_max = max_iterations.
+    """
+    floor = va_beta_floor(volatility_index, beta_min)
+    return floor + (beta_max - floor) * (1.0 - t / max_iterations)
 
 
 def default_budget(dim: int) -> Tuple[int, int, int]:
@@ -346,15 +380,21 @@ def fixed_beta_qpso(
 # computable from the optimizer alone, with no reference to the problem it
 # is solving.
 #
-# va_qpso instead derives beta from a measurement of the EXTERNAL
-# environment being optimized over: live traffic volatility on the road
-# network (see volatility.NetworkVolatilityIndex), taken at the moment
-# replan() is invoked. It has nothing to do with this swarm run's iteration
-# count, fitness history, or particle spread -- a converged, static swarm
-# and a freshly-initialized one get the same beta if network conditions are
-# the same. That is the paper's actual contribution, so it must stay
-# unambiguous in code and comments alike: no iteration/fitness/diversity
-# term is allowed to leak into how beta is computed here.
+# va_qpso keeps the same linear anneal as fixed_beta_qpso -- same start
+# (beta_max), same global-iteration progress t / T_max -- but where the
+# anneal ENDS is set by a measurement of the EXTERNAL environment: live
+# traffic volatility on the road network (see volatility.NetworkVolatilityIndex),
+# taken at the moment replan() is invoked and held for that run:
+#
+#     beta_floor(V) = beta_min + 0.25 * V
+#     beta(t, V)    = beta_floor(V) + (beta_max - beta_floor(V)) * (1 - t / T_max)
+#
+# At V = 0 this is exactly fixed_beta_qpso's schedule. Higher volatility
+# raises the floor, so the swarm contracts less and keeps more exploration
+# in reserve under chaotic traffic. The iteration term only shapes the
+# schedule, and that shape is the same for both variants. What volatility
+# changes is the floor. No fitness-history or particle-diversity term
+# enters beta.
 @overload
 def va_qpso(
     dim: int,
@@ -429,22 +469,23 @@ def va_qpso(
     return_history: bool = False,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
-    beta = beta_min + (beta_max - beta_min) * volatility_index
+    beta(t, V) = beta_floor(V) + (beta_max - beta_floor(V)) * (1 - t / T_max),
+    beta_floor(V) = beta_min + 0.25 * V   (see va_beta / va_beta_floor)
 
     volatility_index must already be normalized to [0, 1] (e.g. from
     volatility.NetworkVolatilityIndex.update()) and is held fixed for the
     whole run: it is a snapshot of network conditions at replan time, not a
-    per-iteration swarm-state signal.
+    per-iteration swarm-state signal. t is the global iteration index, as in
+    fixed_beta_qpso, so the anneal spans the whole budget across restarts.
     """
     if not 0.0 <= volatility_index <= 1.0:
         raise ValueError(f"volatility_index must be in [0, 1], got {volatility_index}")
 
     num_particles, max_iterations, max_restarts = _resolve_budget(
         dim, num_particles, max_iterations, max_restarts)
-    beta = beta_min + (beta_max - beta_min) * volatility_index
 
     def beta_fn(t: int) -> float:
-        return beta
+        return va_beta(t, max_iterations, volatility_index, beta_max, beta_min)
 
     if return_history:
         return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=True)

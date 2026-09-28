@@ -54,7 +54,7 @@ try:
     import traci
 
     import export_for_frontend as eff
-    from src.planner.qpso import replan as qpso_replan
+    from src.planner.qpso import replan as qpso_replan, va_beta_floor
     from src.planner.qpso_encoding import (
         _reachable_from,
         _reverse_adjacency,
@@ -419,7 +419,8 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
             seed=seed,
         )
 
-    beta_val = 0.5 + 0.5 * v_val
+    # va_qpso anneals from 1.0 toward this floor; report the floor.
+    beta_val = va_beta_floor(v_val)
 
     # 5. Build Live Edge-Weighted Travel Times
     edge_weights: Dict[str, float] = {}
@@ -484,7 +485,7 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
             "type": "replan",
             "detail": (
                 f"Traffic unpredictability {v_val:.2f} ({tier_label}). "
-                f"VA-QPSO adjusted search breadth to β={beta_val:.2f} to bypass congested junctions."
+                f"VA-QPSO set its search-breadth floor to β={beta_val:.2f} to bypass congested junctions."
             ),
             "volatility_index": round(v_val, 4),
             "beta": round(beta_val, 4),
@@ -505,7 +506,7 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
         t_sec = float(s_idx)
         # Small realistic temporal drift around measured volatility
         v_drift = float(np.clip(v_val + 0.03 * math.sin(t_sec / 10.0), 0.0, 1.0))
-        b_drift = 0.5 + 0.5 * v_drift
+        b_drift = va_beta_floor(v_drift)
         metrics_over_time.append({
             "t": t_sec,
             "volatility_index": round(v_drift, 4),

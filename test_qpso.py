@@ -10,8 +10,8 @@ is scaled off dim by qpso.default_budget(). Checks:
   - both reach the TRUE optimum (brute-forced over all 8! = 40320 orderings,
     feasible at this size), not just "better than the naive identity order"
   - va_qpso's beta actually responds to volatility_index -- a volatility of
-    0.0 vs 1.0 (beta_min vs beta_max, held constant for the whole run)
-    changes the swarm's trajectory under an otherwise identical seed.
+    0.0 vs 1.0 (anneal floor 0.5 vs 0.75) changes the swarm's trajectory
+    under an otherwise identical seed.
     Asserted on the gbest position, not the score: with the scaled default
     budget both settings reliably reach the same (optimal) score, so score
     equality is expected and is not evidence beta was ignored -- only
@@ -100,11 +100,10 @@ def test_va_qpso_beats_identity():
 
 def test_va_qpso_beta_responds_to_volatility_index():
     """
-    va_qpso holds beta constant for the whole run at
-    beta_min + (beta_max - beta_min) * volatility_index. With the same seed
-    and fitness landscape, volatility_index=0.0 (beta=beta_min=0.5) and
-    volatility_index=1.0 (beta=beta_max=1.0) scale every position update
-    differently, so the swarm must traverse a different trajectory.
+    va_qpso anneals beta from beta_max toward beta_min + 0.25 * volatility_index.
+    With the same seed and fitness landscape, volatility_index=0.0 (floor 0.5)
+    and volatility_index=1.0 (floor 0.75) scale every position update after
+    t = 0 differently, so the swarm must traverse a different trajectory.
 
     Asserted on the returned gbest POSITION, not the score: with the scaled
     default budget both settings reliably converge to the SAME (optimal)
