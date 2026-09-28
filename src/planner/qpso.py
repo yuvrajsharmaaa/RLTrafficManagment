@@ -54,7 +54,7 @@ and are then scaled off `dim` by default_budget() -- a flat budget silently
 degrades as the problem grows. Pass explicit values to override.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Union, overload
 
 import numpy as np
 
@@ -94,6 +94,58 @@ def _resolve_budget(dim, num_particles, max_iterations, max_restarts):
         iterations if max_iterations is None else max_iterations,
         restarts if max_restarts is None else max_restarts,
     )
+
+
+@overload
+def _run_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    beta_fn: BetaFn,
+    num_particles: int,
+    max_iterations: int,
+    bounds: Tuple[float, float],
+    seed: Optional[int],
+    patience: int,
+    tol: float,
+    max_restarts: int,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def _run_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    beta_fn: BetaFn,
+    num_particles: int,
+    max_iterations: int,
+    bounds: Tuple[float, float],
+    seed: Optional[int],
+    patience: int,
+    tol: float,
+    max_restarts: int,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def _run_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    beta_fn: BetaFn,
+    num_particles: int,
+    max_iterations: int,
+    bounds: Tuple[float, float],
+    seed: Optional[int],
+    patience: int,
+    tol: float,
+    max_restarts: int,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
 
 
 def _run_qpso(
@@ -194,6 +246,61 @@ def _run_qpso(
     return best_position, best_score
 
 
+@overload
+def fixed_beta_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def fixed_beta_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def fixed_beta_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def fixed_beta_qpso(
     dim: int,
     fitness_fn: FitnessFn,
@@ -224,7 +331,9 @@ def fixed_beta_qpso(
     def beta_fn(t: int) -> float:
         return beta_max - (beta_max - beta_min) * (t / max_iterations)
 
-    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=return_history)
+    if return_history:
+        return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=True)
+    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=False)
 
 
 # --- va_qpso: volatility-adaptive beta (this project's contribution) ------
@@ -246,6 +355,64 @@ def fixed_beta_qpso(
 # the same. That is the paper's actual contribution, so it must stay
 # unambiguous in code and comments alike: no iteration/fitness/diversity
 # term is allowed to leak into how beta is computed here.
+@overload
+def va_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    volatility_index: float,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def va_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    volatility_index: float,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def va_qpso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    volatility_index: float,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def va_qpso(
     dim: int,
     fitness_fn: FitnessFn,
@@ -279,7 +446,76 @@ def va_qpso(
     def beta_fn(t: int) -> float:
         return beta
 
-    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=return_history)
+    if return_history:
+        return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=True)
+    return _run_qpso(dim, fitness_fn, beta_fn, num_particles, max_iterations, bounds, seed, patience, tol, max_restarts, return_history=False)
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    algorithm: str = ...,
+    physical_distance_matrix: Optional[np.ndarray] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    algorithm: str = ...,
+    return_history: Literal[False] = ...,
+    physical_distance_matrix: Optional[np.ndarray] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    beta_max: float = ...,
+    beta_min: float = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    algorithm: str = ...,
+    return_history: bool = ...,
+    physical_distance_matrix: Optional[np.ndarray] = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
 
 
 def replan(
@@ -298,6 +534,7 @@ def replan(
     max_restarts: Optional[int] = None,
     algorithm: str = "va_qpso",
     return_history: bool = False,
+    physical_distance_matrix: Optional[np.ndarray] = None,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Run QPSO to convergence (see module docstring for the stopping
@@ -315,6 +552,8 @@ def replan(
             volatility.NetworkVolatilityIndex.update(), used when algorithm="va_qpso".
         weights: (w1, w2, w3) passed through to score_route for (T, D, C).
         algorithm: "va_qpso" (volatility-adaptive) or "fixed_beta_qpso" (linear anneal).
+        physical_distance_matrix: Optional (n, n) matrix of edge lengths (m) along the
+            time-optimal path. If passed, both matrices are passed to score_route.
 
     Returns:
         (best_order, best_score): best_order is the decoded visit-order
@@ -326,13 +565,40 @@ def replan(
         raise ValueError(
             f"distance_matrix shape {distance_matrix.shape} does not match len(stops)={n}."
         )
+    if physical_distance_matrix is not None and physical_distance_matrix.shape != (n, n):
+        raise ValueError(
+            f"physical_distance_matrix shape {physical_distance_matrix.shape} does not match len(stops)={n}."
+        )
 
     def fitness_fn(x: np.ndarray) -> float:
         order = decode_order(x)
-        return score_route(order, distance_matrix, congestion_lookup, weights)
+        return score_route(
+            order,
+            distance_matrix,
+            physical_distance_matrix if physical_distance_matrix is not None else distance_matrix,
+            congestion_lookup,
+            weights,
+        )
 
     if algorithm == "va_qpso":
-        res = va_qpso(
+        if return_history:
+            best_pos_v, best_score_v, history_v = va_qpso(
+                dim=n,
+                fitness_fn=fitness_fn,
+                volatility_index=volatility_index,
+                num_particles=num_particles,
+                max_iterations=max_iterations,
+                beta_max=beta_max,
+                beta_min=beta_min,
+                seed=seed,
+                patience=patience,
+                tol=tol,
+                max_restarts=max_restarts,
+                return_history=True,
+            )
+            return decode_order(best_pos_v), best_score_v, history_v
+
+        best_pos_v, best_score_v = va_qpso(
             dim=n,
             fitness_fn=fitness_fn,
             volatility_index=volatility_index,
@@ -344,10 +610,28 @@ def replan(
             patience=patience,
             tol=tol,
             max_restarts=max_restarts,
-            return_history=return_history,
+            return_history=False,
         )
+        return decode_order(best_pos_v), best_score_v
+
     elif algorithm == "fixed_beta_qpso":
-        res = fixed_beta_qpso(
+        if return_history:
+            best_pos_f, best_score_f, history_f = fixed_beta_qpso(
+                dim=n,
+                fitness_fn=fitness_fn,
+                num_particles=num_particles,
+                max_iterations=max_iterations,
+                beta_max=beta_max,
+                beta_min=beta_min,
+                seed=seed,
+                patience=patience,
+                tol=tol,
+                max_restarts=max_restarts,
+                return_history=True,
+            )
+            return decode_order(best_pos_f), best_score_f, history_f
+
+        best_pos_f, best_score_f = fixed_beta_qpso(
             dim=n,
             fitness_fn=fitness_fn,
             num_particles=num_particles,
@@ -358,14 +642,9 @@ def replan(
             patience=patience,
             tol=tol,
             max_restarts=max_restarts,
-            return_history=return_history,
+            return_history=False,
         )
+        return decode_order(best_pos_f), best_score_f
+
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}. Must be 'va_qpso' or 'fixed_beta_qpso'.")
-
-    if return_history:
-        best_pos, best_score, history = res
-        return decode_order(best_pos), best_score, history
-
-    best_pos, best_score = res
-    return decode_order(best_pos), best_score

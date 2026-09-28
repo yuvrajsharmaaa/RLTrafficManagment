@@ -36,7 +36,7 @@ Exact Problem Representation & Fitness Parity:
   tol = 1e-6
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Union, overload
 import numpy as np
 
 from .fitness import CongestionLookup, score_route
@@ -69,6 +69,73 @@ def _resolve_budget(dim: int, num_particles: Optional[int], max_iterations: Opti
         iterations if max_iterations is None else max_iterations,
         restarts if max_restarts is None else max_restarts,
     )
+
+
+@overload
+def standard_pso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    w_max: float = ...,
+    w_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def standard_pso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    w_max: float = ...,
+    w_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def standard_pso(
+    dim: int,
+    fitness_fn: FitnessFn,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    w_max: float = ...,
+    w_min: float = ...,
+    bounds: Tuple[float, float] = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
 
 
 def standard_pso(
@@ -203,6 +270,73 @@ def standard_pso(
     return best_position, best_score
 
 
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    num_particles: Optional[int] = ...,
+    max_iterations: Optional[int] = ...,
+    w: float = ...,
+    c1: float = ...,
+    c2: float = ...,
+    w_schedule: str = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def replan(
     stops: List[str],
     distance_matrix: np.ndarray,
@@ -220,6 +354,7 @@ def replan(
     tol: float = 1e-6,
     max_restarts: Optional[int] = None,
     return_history: bool = False,
+    physical_distance_matrix: Optional[np.ndarray] = None,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Execute standard PSO to sequence stops on a frozen state snapshot.
@@ -244,6 +379,7 @@ def replan(
         patience: Stagnation iterations before restart.
         tol: Relative tolerance for improvement.
         max_restarts: Max stagnation restarts.
+        physical_distance_matrix: Optional (n, n) matrix of physical distances (m).
 
     Returns:
         (best_order, best_score): Decoded stop visitation permutation and total fitness.
@@ -253,12 +389,40 @@ def replan(
         raise ValueError(
             f"distance_matrix shape {distance_matrix.shape} does not match len(stops)={n}."
         )
+    if physical_distance_matrix is not None and physical_distance_matrix.shape != (n, n):
+        raise ValueError(
+            f"physical_distance_matrix shape {physical_distance_matrix.shape} does not match len(stops)={n}."
+        )
 
     def fitness_fn(x: np.ndarray) -> float:
         order = decode_order(x)
-        return score_route(order, distance_matrix, congestion_lookup, weights)
+        return score_route(
+            order,
+            distance_matrix,
+            physical_distance_matrix if physical_distance_matrix is not None else distance_matrix,
+            congestion_lookup,
+            weights,
+        )
 
-    res = standard_pso(
+    if return_history:
+        best_pos_h, best_score_h, history = standard_pso(
+            dim=n,
+            fitness_fn=fitness_fn,
+            num_particles=num_particles,
+            max_iterations=max_iterations,
+            w=w,
+            c1=c1,
+            c2=c2,
+            w_schedule=w_schedule,
+            seed=seed,
+            patience=patience,
+            tol=tol,
+            max_restarts=max_restarts,
+            return_history=True,
+        )
+        return decode_order(best_pos_h), best_score_h, history
+
+    best_pos, best_score = standard_pso(
         dim=n,
         fitness_fn=fitness_fn,
         num_particles=num_particles,
@@ -271,12 +435,6 @@ def replan(
         patience=patience,
         tol=tol,
         max_restarts=max_restarts,
-        return_history=return_history,
+        return_history=False,
     )
-
-    if return_history:
-        best_position, best_score, history = res
-        return decode_order(best_position), best_score, history
-
-    best_position, best_score = res
-    return decode_order(best_position), best_score
+    return decode_order(best_pos), best_score

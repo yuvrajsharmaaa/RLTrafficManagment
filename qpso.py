@@ -22,6 +22,7 @@ from src.planner.qpso import (
 )
 from src.planner.qpso_encoding import (
     compute_distance_matrix,
+    compute_travel_and_distance_matrices,
     decode_order,
     pick_mutually_reachable_stops,
     tour_length,
@@ -36,6 +37,7 @@ __all__ = [
     "replan",
     "decode_order",
     "compute_distance_matrix",
+    "compute_travel_and_distance_matrices",
     "pick_mutually_reachable_stops",
     "tour_length",
 ]

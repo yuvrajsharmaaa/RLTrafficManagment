@@ -35,7 +35,7 @@ in all benchmarks, tables, and replan interfaces to maintain scientific accuracy
 academic papers and comparative reports.
 """
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union, overload
 
 import numpy as np
 
@@ -63,6 +63,46 @@ __all__ = [
 ]
 
 
+@overload
+def dijkstra_nearest_neighbor(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: Optional[CongestionLookup] = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    *,
+    return_history: Literal[True],
+    max_iterations: Optional[int] = ...,
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def dijkstra_nearest_neighbor(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: Optional[CongestionLookup] = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    return_history: Literal[False] = ...,
+    max_iterations: Optional[int] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def dijkstra_nearest_neighbor(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: Optional[CongestionLookup] = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    return_history: bool = ...,
+    max_iterations: Optional[int] = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def dijkstra_nearest_neighbor(
     stops: List[str],
     distance_matrix: np.ndarray,
@@ -71,6 +111,7 @@ def dijkstra_nearest_neighbor(
     start_idx: int = 0,
     return_history: bool = False,
     max_iterations: Optional[int] = None,
+    physical_distance_matrix: Optional[np.ndarray] = None,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Construct a delivery route using the greedy Nearest-Neighbor heuristic
@@ -86,6 +127,7 @@ def dijkstra_nearest_neighbor(
         congestion_lookup: Optional edge congestion dictionary for fitness evaluation.
         weights: (w1, w2, w3) weighting for travel time, distance, and congestion.
         start_idx: Index in `stops` to begin the tour from (default: 0).
+        physical_distance_matrix: Optional (n, n) matrix of physical distances (m).
 
     Returns:
         (order, score):
@@ -97,11 +139,21 @@ def dijkstra_nearest_neighbor(
         raise ValueError(
             f"distance_matrix shape {distance_matrix.shape} does not match len(stops)={n}."
         )
+    if physical_distance_matrix is not None and physical_distance_matrix.shape != (n, n):
+        raise ValueError(
+            f"physical_distance_matrix shape {physical_distance_matrix.shape} does not match len(stops)={n}."
+        )
     if n == 0:
         return np.array([], dtype=int), 0.0
     if n == 1:
         order = np.array([0], dtype=int)
-        score = score_route(order, distance_matrix, congestion_lookup or {}, weights)
+        score = score_route(
+            order,
+            distance_matrix,
+            physical_distance_matrix if physical_distance_matrix is not None else distance_matrix,
+            congestion_lookup or {},
+            weights,
+        )
         return order, score
 
     if not (0 <= start_idx < n):
@@ -123,7 +175,13 @@ def dijkstra_nearest_neighbor(
         current = next_stop
 
     order = np.asarray(visited, dtype=int)
-    score = score_route(order, distance_matrix, congestion_lookup or {}, weights)
+    score = score_route(
+        order,
+        distance_matrix,
+        physical_distance_matrix if physical_distance_matrix is not None else distance_matrix,
+        congestion_lookup or {},
+        weights,
+    )
     if return_history:
         iter_count = max_iterations if max_iterations is not None else max(100, 75 * n)
         history = np.full(iter_count, score, dtype=float)
@@ -136,6 +194,7 @@ def dijkstra_all_starts_nearest_neighbor(
     distance_matrix: np.ndarray,
     congestion_lookup: Optional[CongestionLookup] = None,
     weights: Tuple[float, float, float] = (1.0, 1.0, 1.0),
+    physical_distance_matrix: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, float]:
     """
     Multi-start Nearest-Neighbor heuristic across all possible origin stops.
@@ -148,6 +207,7 @@ def dijkstra_all_starts_nearest_neighbor(
         distance_matrix: (n, n) Dijkstra shortest-path distance matrix.
         congestion_lookup: Optional edge congestion lookup.
         weights: (w1, w2, w3) fitness weights.
+        physical_distance_matrix: Optional (n, n) matrix of physical distances (m).
 
     Returns:
         (best_order, best_score): Best visitation permutation and its fitness.
@@ -166,6 +226,7 @@ def dijkstra_all_starts_nearest_neighbor(
             congestion_lookup=congestion_lookup,
             weights=weights,
             start_idx=start,
+            physical_distance_matrix=physical_distance_matrix,
         )
         if score < best_score:
             best_score = score
@@ -270,6 +331,55 @@ def dijkstra_from_graph(
     return order, score
 
 
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    all_starts: bool = ...,
+    *,
+    return_history: Literal[True],
+    max_iterations: Optional[int] = ...,
+    **kwargs,
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    all_starts: bool = ...,
+    return_history: Literal[False] = ...,
+    max_iterations: Optional[int] = ...,
+    **kwargs,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    start_idx: int = ...,
+    all_starts: bool = ...,
+    return_history: bool = ...,
+    max_iterations: Optional[int] = ...,
+    **kwargs,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def replan(
     stops: List[str],
     distance_matrix: np.ndarray,
@@ -280,6 +390,7 @@ def replan(
     all_starts: bool = False,
     return_history: bool = False,
     max_iterations: Optional[int] = None,
+    physical_distance_matrix: Optional[np.ndarray] = None,
     **kwargs,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
@@ -298,6 +409,7 @@ def replan(
         weights: (w1, w2, w3) for travel time, distance, and congestion penalties.
         start_idx: Origin stop index when all_starts is False (default: 0).
         all_starts: If True, evaluates all n starting points and returns the best.
+        physical_distance_matrix: Optional (n, n) matrix of physical distances (m).
         **kwargs: Swallows unused hyperparameter arguments (seed, population_size,
                   max_iterations, etc.) for seamless polymorphic interface compatibility.
 
@@ -310,6 +422,7 @@ def replan(
             distance_matrix=distance_matrix,
             congestion_lookup=congestion_lookup,
             weights=weights,
+            physical_distance_matrix=physical_distance_matrix,
         )
         if return_history:
             iter_count = max_iterations if max_iterations is not None else max(100, 75 * len(stops))
@@ -317,12 +430,25 @@ def replan(
             return order, score, history
         return order, score
 
+    if return_history:
+        return dijkstra_nearest_neighbor(
+            stops=stops,
+            distance_matrix=distance_matrix,
+            congestion_lookup=congestion_lookup,
+            weights=weights,
+            start_idx=start_idx,
+            return_history=True,
+            max_iterations=max_iterations,
+            physical_distance_matrix=physical_distance_matrix,
+        )
+
     return dijkstra_nearest_neighbor(
         stops=stops,
         distance_matrix=distance_matrix,
         congestion_lookup=congestion_lookup,
         weights=weights,
         start_idx=start_idx,
-        return_history=return_history,
+        return_history=False,
         max_iterations=max_iterations,
+        physical_distance_matrix=physical_distance_matrix,
     )

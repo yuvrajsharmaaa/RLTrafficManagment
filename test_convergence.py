@@ -19,6 +19,7 @@ import pytest
 from src.planner.qpso import fixed_beta_qpso, va_qpso, replan as qpso_replan
 from src.planner.pso_baseline import standard_pso, replan as pso_replan
 from src.planner.ga_baseline import genetic_algorithm, replan as ga_replan
+from src.planner.sa_baseline import simulated_annealing, replan as sa_replan
 from src.planner.dijkstra_baseline import dijkstra_nearest_neighbor, replan as dijkstra_replan
 from src.planner.qpso_encoding import decode_order
 
@@ -124,6 +125,23 @@ def test_ga_baseline_history_logging():
     assert np.all(np.diff(hist) <= 1e-9), "GA history must be non-increasing"
 
 
+def test_sa_baseline_history_logging():
+    """Verify Simulated Annealing logs valid per-iteration history."""
+    dim = 4
+    max_iter = 100
+
+    order, score, hist = simulated_annealing(
+        dim=dim,
+        fitness_fn=perm_fitness,
+        max_iterations=max_iter,
+        seed=401,
+        return_history=True,
+    )
+    assert len(hist) == max_iter
+    assert np.isclose(hist[-1], score)
+    assert np.all(np.diff(hist) <= 1e-9), "SA history must be non-increasing"
+
+
 def test_dijkstra_baseline_history_logging():
     """Verify Dijkstra Nearest-Neighbor returns flat trajectory of requested iteration length."""
     stops = ["A", "B", "C", "D"]
@@ -189,13 +207,21 @@ def test_replan_history_parity():
     assert len(h4) == max_iter
     assert np.isclose(h4[-1], s4)
 
-    # 5. Dijkstra NN
-    o5, s5, h5 = dijkstra_replan(
+    # 5. SA
+    o5, s5, h5 = sa_replan(
         stops, dist_mat, congestion_lookup,
         max_iterations=max_iter, return_history=True
     )
     assert len(h5) == max_iter
-    assert np.all(h5 == s5)
+    assert np.isclose(h5[-1], s5)
+
+    # 6. Dijkstra NN
+    o6, s6, h6 = dijkstra_replan(
+        stops, dist_mat, congestion_lookup,
+        max_iterations=max_iter, return_history=True
+    )
+    assert len(h6) == max_iter
+    assert np.all(h6 == s6)
 
 
 def test_convergence_speed_metric():

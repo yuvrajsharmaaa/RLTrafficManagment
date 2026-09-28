@@ -44,7 +44,9 @@ class DijkstraBaseline:
                 continue
             visited.add(current)
 
-            for neighbor, edge_cost in self.adj.get(current, []):
+            for item in self.adj.get(current, []):
+                neighbor = item[0]
+                edge_cost = item[1]
                 if neighbor not in visited:
                     heapq.heappush(pq, (cost + edge_cost, neighbor, path + [neighbor]))
 

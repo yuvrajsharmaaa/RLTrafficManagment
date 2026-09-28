@@ -7,6 +7,7 @@ from .baselines import DijkstraBaseline, StandardPSOBaseline
 from .qpso_encoding import (
     decode_order,
     compute_distance_matrix,
+    compute_travel_and_distance_matrices,
     adjacency_from_network_graph,
     pick_mutually_reachable_stops,
     tour_length,
@@ -15,6 +16,7 @@ from .fitness import score_route, route_components
 from .qpso import fixed_beta_qpso, va_qpso, replan, default_budget
 from .pso_baseline import standard_pso, replan as pso_replan
 from .ga_baseline import genetic_algorithm, replan as ga_replan
+from .sa_baseline import simulated_annealing, replan as sa_replan
 from .dijkstra_baseline import (
     ALGORITHM_LABEL as DIJKSTRA_NN_LABEL,
     NAIVE_LABEL as DIJKSTRA_NAIVE_LABEL,
@@ -32,6 +34,7 @@ __all__ = [
     "StandardPSOBaseline",
     "decode_order",
     "compute_distance_matrix",
+    "compute_travel_and_distance_matrices",
     "adjacency_from_network_graph",
     "pick_mutually_reachable_stops",
     "tour_length",
@@ -45,6 +48,8 @@ __all__ = [
     "pso_replan",
     "genetic_algorithm",
     "ga_replan",
+    "simulated_annealing",
+    "sa_replan",
     "DIJKSTRA_NN_LABEL",
     "DIJKSTRA_NAIVE_LABEL",
     "DIJKSTRA_ALL_STARTS_LABEL",

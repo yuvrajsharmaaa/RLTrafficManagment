@@ -40,6 +40,7 @@ from src.planner.fitness import CongestionLookup, route_components, score_route
 from src.planner.qpso import default_budget, replan as qpso_replan
 from src.planner.pso_baseline import replan as pso_replan
 from src.planner.ga_baseline import replan as ga_replan
+from src.planner.sa_baseline import replan as sa_replan
 from src.planner.dijkstra_baseline import (
     ALGORITHM_LABEL as DIJKSTRA_NN_LABEL,
     replan as dijkstra_replan,
@@ -47,6 +48,7 @@ from src.planner.dijkstra_baseline import (
 from src.planner.qpso_encoding import (
     adjacency_from_network_graph,
     compute_distance_matrix,
+    compute_travel_and_distance_matrices,
     pick_mutually_reachable_stops,
 )
 from src.reactive.arbiter import ReplanArbiter
@@ -76,6 +78,7 @@ ALGORITHM_DISPLAY_NAMES = {
     "fixed_beta_qpso": "Fixed-Beta QPSO (Linear Anneal)",
     "standard_pso": "Standard PSO (Kennedy & Eberhart)",
     "ga": "Permutation GA (OX / Swap / Elitist)",
+    "sa": "Simulated Annealing (2-Opt / Geometric)",
     "dijkstra_nn": DIJKSTRA_NN_LABEL,
 }
 
@@ -84,6 +87,7 @@ ALGORITHM_COLORS = {
     "fixed_beta_qpso": "#9467bd",   # Purple
     "standard_pso": "#ff7f0e",     # Orange
     "ga": "#2ca02c",               # Green
+    "sa": "#8c564b",               # Brown / Chestnut
     "dijkstra_nn": "#d62728",      # Crimson Red
 }
 
@@ -144,11 +148,12 @@ def build_scenario_distance_and_congestion(
     stops: List[str],
     tier: str = "medium",
     seed: int = 42,
-) -> Tuple[np.ndarray, CongestionLookup, float]:
+    return_physical_distance: bool = False,
+) -> Any:
     """
     Construct distance matrix and realistic congestion lookup for a given scenario tier.
     """
-    tier_volatilities = {"low": 0.20, "medium": 0.50, "high": 0.85}
+    tier_volatilities = {"low": 0.20, "medium": 0.50, "high": 0.85, "chaotic": 0.95}
     volatility_index = tier_volatilities.get(tier.lower(), 0.50)
 
     rng = np.random.default_rng(seed)
@@ -162,7 +167,11 @@ def build_scenario_distance_and_congestion(
         edge_weights[edge_id] = base_time * congestion_factor
 
     adjacency = adjacency_from_network_graph(network_graph, edge_weights)
-    distance_matrix = compute_distance_matrix(adjacency, stops)
+    if return_physical_distance:
+        distance_matrix, physical_distance_matrix = compute_travel_and_distance_matrices(adjacency, stops)
+    else:
+        distance_matrix = compute_distance_matrix(adjacency, stops)
+        physical_distance_matrix = None
 
     congestion_lookup: CongestionLookup = {}
     n = len(stops)
@@ -180,6 +189,8 @@ def build_scenario_distance_and_congestion(
             if edge_records:
                 congestion_lookup[(i, j)] = edge_records
 
+    if return_physical_distance:
+        return distance_matrix, physical_distance_matrix, congestion_lookup, volatility_index
     return distance_matrix, congestion_lookup, volatility_index
 
 
@@ -267,13 +278,13 @@ def run_convergence_experiment(
     budget = default_budget(n)
     max_iters = budget[1]
 
-    algorithms = ["va_qpso", "fixed_beta_qpso", "standard_pso", "ga", "dijkstra_nn"]
+    algorithms = ["va_qpso", "fixed_beta_qpso", "standard_pso", "ga", "sa", "dijkstra_nn"]
     seeds = [start_seed + i for i in range(num_seeds)]
 
     print("\n" + "=" * 92)
     print(f" RUNNING ROUTE OPTIMIZATION CONVERGENCE BENCHMARK ({num_seeds} Seeded Trials)")
     print(f" Problem Size: {n} Stops | Scenario Tier: {tier.upper()} | Max Iterations: {max_iters}")
-    print(f" Algorithms: VA-QPSO, Fixed-Beta QPSO, Standard PSO, Permutation GA, {DIJKSTRA_NN_LABEL}")
+    print(f" Algorithms: VA-QPSO, Fixed-Beta QPSO, Standard PSO, Permutation GA, SA (2-Opt), {DIJKSTRA_NN_LABEL}")
     print("=" * 92 + "\n")
 
     # Storage for histories and scores: algo -> array of shape (num_seeds, max_iters)
@@ -287,8 +298,8 @@ def run_convergence_experiment(
 
     # Execute seeded trials
     for s_idx, seed in enumerate(seeds):
-        dist_mat, cong_lookup, vol_idx = build_scenario_distance_and_congestion(
-            network_graph, stops, tier=tier, seed=seed
+        dist_mat, phys_mat, cong_lookup, vol_idx = build_scenario_distance_and_congestion(
+            network_graph, stops, tier=tier, seed=seed, return_physical_distance=True
         )
 
         for algo in algorithms:
@@ -302,6 +313,7 @@ def run_convergence_experiment(
                     algorithm=algo,
                     seed=seed,
                     return_history=True,
+                    physical_distance_matrix=phys_mat,
                 )
             elif algo == "standard_pso":
                 order, score, hist = pso_replan(
@@ -311,6 +323,7 @@ def run_convergence_experiment(
                     volatility_index=vol_idx,
                     seed=seed,
                     return_history=True,
+                    physical_distance_matrix=phys_mat,
                 )
             elif algo == "ga":
                 order, score, hist = ga_replan(
@@ -320,6 +333,17 @@ def run_convergence_experiment(
                     volatility_index=vol_idx,
                     seed=seed,
                     return_history=True,
+                    physical_distance_matrix=phys_mat,
+                )
+            elif algo == "sa":
+                order, score, hist = sa_replan(
+                    stops=stops,
+                    distance_matrix=dist_mat,
+                    congestion_lookup=cong_lookup,
+                    volatility_index=vol_idx,
+                    seed=seed,
+                    return_history=True,
+                    physical_distance_matrix=phys_mat,
                 )
             elif algo == "dijkstra_nn":
                 order, score, hist = dijkstra_replan(
@@ -330,6 +354,7 @@ def run_convergence_experiment(
                     start_idx=0,
                     return_history=True,
                     max_iterations=max_iters,
+                    physical_distance_matrix=phys_mat,
                 )
             else:
                 raise ValueError(f"Unknown algorithm: {algo}")
@@ -449,7 +474,8 @@ def build_live_distance_and_congestion(
     network_graph: NetworkGraph,
     state: Dict[str, Any],
     stops: List[str],
-) -> Tuple[np.ndarray, CongestionLookup]:
+    return_physical_distance: bool = False,
+) -> Any:
     """
     Build live-weighted travel-time matrix and per-leg congestion lookup from TraCI state.
     """
@@ -460,7 +486,11 @@ def build_live_distance_and_congestion(
             edge_weights[edge_id] = network_graph.edges[edge_id]["length"] / speed
 
     adjacency = adjacency_from_network_graph(network_graph, edge_weights)
-    distance_matrix = compute_distance_matrix(adjacency, stops)
+    if return_physical_distance:
+        distance_matrix, physical_distance_matrix = compute_travel_and_distance_matrices(adjacency, stops)
+    else:
+        distance_matrix = compute_distance_matrix(adjacency, stops)
+        physical_distance_matrix = None
 
     congestion_lookup: CongestionLookup = {}
     n = len(stops)
@@ -478,6 +508,8 @@ def build_live_distance_and_congestion(
             if edge_records:
                 congestion_lookup[(i, j)] = edge_records
 
+    if return_physical_distance:
+        return distance_matrix, physical_distance_matrix, congestion_lookup
     return distance_matrix, congestion_lookup
 
 
@@ -578,8 +610,8 @@ def run_single_trial(
             is_arbiter_triggered = arbiter.should_trigger_early_replan(sim_time)
 
             if is_scheduled or is_arbiter_triggered:
-                distance_matrix, congestion_lookup = build_live_distance_and_congestion(
-                    network_graph, state, stops
+                distance_matrix, physical_distance_matrix, congestion_lookup = build_live_distance_and_congestion(
+                    network_graph, state, stops, return_physical_distance=True
                 )
 
                 replan_seed = (seed * 10007 + replan_count * 31) % (2**31 - 1)
@@ -592,6 +624,7 @@ def run_single_trial(
                         volatility_index=volatility_index,
                         algorithm=algorithm,
                         seed=replan_seed,
+                        physical_distance_matrix=physical_distance_matrix,
                     )
                 elif algorithm in ("standard_pso", "pso"):
                     best_order, best_score = pso_replan(
@@ -600,6 +633,7 @@ def run_single_trial(
                         congestion_lookup,
                         volatility_index=volatility_index,
                         seed=replan_seed,
+                        physical_distance_matrix=physical_distance_matrix,
                     )
                 elif algorithm in ("ga", "permutation_ga"):
                     best_order, best_score = ga_replan(
@@ -608,6 +642,16 @@ def run_single_trial(
                         congestion_lookup,
                         volatility_index=volatility_index,
                         seed=replan_seed,
+                        physical_distance_matrix=physical_distance_matrix,
+                    )
+                elif algorithm in ("sa", "simulated_annealing"):
+                    best_order, best_score = sa_replan(
+                        stops,
+                        distance_matrix,
+                        congestion_lookup,
+                        volatility_index=volatility_index,
+                        seed=replan_seed,
+                        physical_distance_matrix=physical_distance_matrix,
                     )
                 elif algorithm in ("dijkstra_nn", "dijkstra"):
                     best_order, best_score = dijkstra_replan(
@@ -616,13 +660,14 @@ def run_single_trial(
                         congestion_lookup,
                         volatility_index=volatility_index,
                         start_idx=0,
+                        physical_distance_matrix=physical_distance_matrix,
                     )
                 else:
                     raise ValueError(f"Unknown simulation algorithm: {algorithm}")
 
                 current_best_order = best_order
                 last_T, last_D, last_C = route_components(
-                    current_best_order, distance_matrix, congestion_lookup
+                    current_best_order, distance_matrix, physical_distance_matrix, congestion_lookup
                 )
 
                 if algorithm == "va_qpso":
@@ -669,8 +714,8 @@ def print_statistical_summary(df: pd.DataFrame):
 
     for tier in df["tier"].unique():
         sub_df = df[df["tier"] == tier]
-        print(f"\n[Tier: {tier.upper()}]")
-        for algo in sub_df["algorithm"].unique():
+        print(f"\n[Tier: {str(tier).upper()}]")
+        for algo in np.unique(sub_df["algorithm"]):
             algo_df = sub_df[sub_df["algorithm"] == algo]
             tt = algo_df["total_route_completion_time"]
             cong = algo_df["congestion_exposure_score"]
@@ -691,13 +736,14 @@ def main():
     parser.add_argument("--json-output", type=str, default="results/experiments.json", help="Simulation JSON path")
     parser.add_argument("--output-plot", type=str, default="results/convergence_comparison.png", help="Convergence plot PNG path")
     parser.add_argument("--tolerance", type=float, default=1e-3, help="Tolerance for hit rate vs reference best (default: 1e-3)")
+    parser.add_argument("--num-stops", type=int, default=NUM_STOPS, help="Number of delivery stops to sequence (default: 8)")
     parser.add_argument("--use-libsumo", action="store_true", help="Use libsumo if installed")
     args = parser.parse_args()
 
     network_graph = NetworkGraph(NET_FILE)
     stops = pick_mutually_reachable_stops(
         adjacency_from_network_graph(network_graph, edge_weights={}),
-        NUM_STOPS,
+        args.num_stops,
     )
 
     if args.mode in ("convergence", "both"):
@@ -714,7 +760,7 @@ def main():
 
     if args.mode in ("simulation", "both"):
         seeds = [args.start_seed + i for i in range(min(args.num_seeds, 10))]
-        algorithms = ["va_qpso", "fixed_beta_qpso", "standard_pso", "ga", "dijkstra_nn"]
+        algorithms = ["va_qpso", "fixed_beta_qpso", "standard_pso", "ga", "sa", "dijkstra_nn"]
         results: List[Dict[str, Any]] = []
 
         total_runs = len(args.tiers) * len(seeds) * len(algorithms)

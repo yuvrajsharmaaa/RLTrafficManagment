@@ -46,7 +46,7 @@ Equal population size and generation budget ensure identical function evaluation
 across all algorithms.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Union, overload
 import numpy as np
 
 from .fitness import CongestionLookup, score_route
@@ -183,6 +183,64 @@ def tournament_selection(
     return population[winner_idx]
 
 
+@overload
+def genetic_algorithm(
+    dim: int,
+    fitness_fn: FitnessFn,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def genetic_algorithm(
+    dim: int,
+    fitness_fn: FitnessFn,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def genetic_algorithm(
+    dim: int,
+    fitness_fn: FitnessFn,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def genetic_algorithm(
     dim: int,
     fitness_fn: FitnessFn,
@@ -299,6 +357,73 @@ def genetic_algorithm(
     return best_order, best_score
 
 
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    *,
+    return_history: Literal[True],
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: Literal[False] = ...,
+) -> Tuple[np.ndarray, float]:
+    ...
+
+
+@overload
+def replan(
+    stops: List[str],
+    distance_matrix: np.ndarray,
+    congestion_lookup: CongestionLookup,
+    volatility_index: float = ...,
+    weights: Tuple[float, float, float] = ...,
+    population_size: Optional[int] = ...,
+    max_generations: Optional[int] = ...,
+    tournament_size: int = ...,
+    crossover_rate: float = ...,
+    mutation_rate: float = ...,
+    elitism: int = ...,
+    seed: Optional[int] = ...,
+    patience: int = ...,
+    tol: float = ...,
+    max_restarts: Optional[int] = ...,
+    return_history: bool = ...,
+) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
+    ...
+
+
 def replan(
     stops: List[str],
     distance_matrix: np.ndarray,
@@ -316,6 +441,7 @@ def replan(
     tol: float = DEFAULT_TOL,
     max_restarts: Optional[int] = None,
     return_history: bool = False,
+    physical_distance_matrix: Optional[np.ndarray] = None,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Execute standard permutation GA to sequence stops on a frozen state snapshot.
@@ -340,6 +466,7 @@ def replan(
         patience: Stagnation generations before restart.
         tol: Relative tolerance for improvement.
         max_restarts: Max stagnation restarts.
+        physical_distance_matrix: Optional (n, n) matrix of physical distances (m).
 
     Returns:
         (best_order, best_score): Optimal stop visit order permutation and total fitness.
@@ -349,9 +476,36 @@ def replan(
         raise ValueError(
             f"distance_matrix shape {distance_matrix.shape} does not match len(stops)={n}."
         )
+    if physical_distance_matrix is not None and physical_distance_matrix.shape != (n, n):
+        raise ValueError(
+            f"physical_distance_matrix shape {physical_distance_matrix.shape} does not match len(stops)={n}."
+        )
 
     def fitness_fn(order: np.ndarray) -> float:
-        return score_route(order, distance_matrix, congestion_lookup, weights)
+        return score_route(
+            order,
+            distance_matrix,
+            physical_distance_matrix if physical_distance_matrix is not None else distance_matrix,
+            congestion_lookup,
+            weights,
+        )
+
+    if return_history:
+        return genetic_algorithm(
+            dim=n,
+            fitness_fn=fitness_fn,
+            population_size=population_size,
+            max_generations=max_generations,
+            tournament_size=tournament_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            elitism=elitism,
+            seed=seed,
+            patience=patience,
+            tol=tol,
+            max_restarts=max_restarts,
+            return_history=True,
+        )
 
     return genetic_algorithm(
         dim=n,
@@ -366,5 +520,5 @@ def replan(
         patience=patience,
         tol=tol,
         max_restarts=max_restarts,
-        return_history=return_history,
+        return_history=False,
     )

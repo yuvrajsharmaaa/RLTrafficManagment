@@ -19,7 +19,7 @@ Reference:
 """
 
 import heapq
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 
@@ -43,113 +43,137 @@ def decode_order(x: np.ndarray) -> np.ndarray:
 
 
 def _dijkstra_single_source(
-    adjacency: Dict[str, List[Tuple[str, float]]],
+    adjacency: Dict[str, List[Any]],
     source: str,
-) -> Dict[str, float]:
+    *,
+    return_physical_lengths: bool = False,
+) -> Union[Dict[str, float], Tuple[Dict[str, float], Dict[str, float]]]:
     """
     Single-source shortest path distances via Dijkstra's algorithm.
 
-    O(E + V log V) with a binary heap. Returns distances to every node
-    reachable from `source`; unreached nodes are simply absent (treated as
-    +inf by the caller).
+    Priority is strictly travel-time (time-optimal path). When
+    `return_physical_lengths=True`, also returns the sum of physical edge
+    lengths along the time-optimal path actually driven.
+
+    O(E + V log V) with a binary heap.
     """
-    distances: Dict[str, float] = {source: 0.0}
+    times: Dict[str, float] = {source: 0.0}
+    lengths: Dict[str, float] = {source: 0.0}
     visited = set()
-    pq: List[Tuple[float, str]] = [(0.0, source)]
+    pq: List[Tuple[float, float, str]] = [(0.0, 0.0, source)]  # (time, physical_length, node)
 
     while pq:
-        dist, node = heapq.heappop(pq)
+        time_cost, phys_cost, node = heapq.heappop(pq)
         if node in visited:
             continue
         visited.add(node)
 
-        for neighbor, edge_cost in adjacency.get(node, []):
+        for item in adjacency.get(node, []):
+            neighbor = item[0]
+            edge_time = item[1]
+            edge_len = item[2] if len(item) > 2 else edge_time
+
             if neighbor in visited:
                 continue
-            new_dist = dist + edge_cost
-            if new_dist < distances.get(neighbor, float("inf")):
-                distances[neighbor] = new_dist
-                heapq.heappush(pq, (new_dist, neighbor))
 
-    return distances
+            new_time = time_cost + edge_time
+            new_len = phys_cost + edge_len
+
+            cur_best_time = times.get(neighbor, float("inf"))
+            if new_time < cur_best_time - 1e-12 or (
+                abs(new_time - cur_best_time) <= 1e-12
+                and new_len < lengths.get(neighbor, float("inf"))
+            ):
+                times[neighbor] = new_time
+                lengths[neighbor] = new_len
+                heapq.heappush(pq, (new_time, new_len, neighbor))
+
+    if return_physical_lengths:
+        return times, lengths
+    return times
 
 
 def compute_distance_matrix(
-    adjacency: Dict[str, List[Tuple[str, float]]],
+    adjacency: Dict[str, List[Any]],
     stops: List[str],
-) -> np.ndarray:
+    *,
+    return_physical_distance: bool = False,
+    return_both: bool = False,
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
     """
-    Precompute the full stop-to-stop shortest-path distance matrix.
+    Precompute the full stop-to-stop shortest-path travel-time matrix and
+    optionally the physical-distance matrix along those time-optimal paths.
 
     Runs one Dijkstra per stop (O(n) runs, each O(E + V log V) on the live-
     weighted graph) and caches every pairwise result in an n x n matrix.
-    Call this ONCE per re-plan tick, on a frozen snapshot of edge weights —
-    never inside the QPSO fitness function. A single re-plan evaluates
-    hundreds of candidate orderings; if each fitness evaluation re-ran
-    Dijkstra instead of doing an O(n) matrix lookup, a re-plan tick that
-    should take milliseconds would instead scale with
-    (num_particles * num_iterations) full graph searches, which is
-    prohibitively slow.
-
-    Staleness trade-off: this matrix reflects edge weights at the moment it
-    was built (a frozen snapshot from state.py, e.g. subscription-derived
-    mean speeds), not the live network. It goes stale the instant traffic
-    conditions shift after that snapshot, and it is only ever as fresh as
-    the last re-plan tick. The re-plan cadence (how often a new snapshot is
-    taken and this matrix rebuilt) is therefore the knob that trades staleness
-    against recomputation cost — a tighter cadence keeps this matrix fresher
-    at the price of recomputing it more often.
 
     Args:
-        adjacency: Directed graph as node -> [(neighbor, edge_weight), ...],
-            e.g. built from NetworkGraph plus a live edge-weight snapshot.
-        stops: Node ids to compute pairwise distances between, in the order
-            they should map to matrix rows/columns.
+        adjacency: Directed graph as node -> [(neighbor, weight, length), ...]
+            or [(neighbor, weight), ...].
+        stops: Node ids to compute pairwise distances between.
+        return_physical_distance: If True, returns (time_matrix, distance_matrix).
+        return_both: Alias for return_physical_distance.
 
     Returns:
-        (n, n) float matrix where entry [i, j] is the shortest-path distance
-        from stops[i] to stops[j]. Unreachable pairs are np.inf.
+        (n, n) time_matrix, or (time_matrix, distance_matrix) if return_both is True.
     """
     n = len(stops)
-    matrix = np.full((n, n), np.inf, dtype=float)
+    time_matrix = np.full((n, n), np.inf, dtype=float)
+    dist_matrix = np.full((n, n), np.inf, dtype=float)
 
     for i, source in enumerate(stops):
-        distances = _dijkstra_single_source(adjacency, source)
+        times, phys_lengths = _dijkstra_single_source(
+            adjacency, source, return_physical_lengths=True
+        )
         for j, target in enumerate(stops):
-            if target in distances:
-                matrix[i, j] = distances[target]
+            if target in times:
+                time_matrix[i, j] = times[target]
+                dist_matrix[i, j] = phys_lengths[target]
 
-    return matrix
+    if return_physical_distance or return_both:
+        return time_matrix, dist_matrix
+    return time_matrix
+
+
+def compute_travel_and_distance_matrices(
+    adjacency: Dict[str, List[Any]],
+    stops: List[str],
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Precompute both the live-weighted travel-time matrix T (in seconds) and the
+    physical-distance matrix D (in meters) along the TIME-optimal path actually driven.
+
+    Returns:
+        (time_matrix, distance_matrix)
+    """
+    return compute_distance_matrix(adjacency, stops, return_both=True)
 
 
 def adjacency_from_network_graph(
     network_graph: NetworkGraph,
     edge_weights: Dict[str, float],
-) -> Dict[str, List[Tuple[str, float]]]:
+) -> Dict[str, List[Tuple[str, float, float]]]:
     """
-    Build a node -> [(neighbor, weight), ...] adjacency dict from a parsed
-    NetworkGraph, using a caller-supplied edge-weight snapshot (e.g. the
-    frozen travel times from state.py's get_state()) instead of static edge
-    length/speed.
-
-    Falls back to the edge's static free-flow travel time (length / speed)
-    for any edge missing from `edge_weights`, so a partial or stale snapshot
-    still yields a usable, fully-connected adjacency.
+    Build a node -> [(neighbor, weight, length), ...] adjacency dict from a parsed
+    NetworkGraph, using a caller-supplied edge-weight snapshot for live travel times
+    and the static edge length from .net.xml for physical distance.
     """
-    adjacency: Dict[str, List[Tuple[str, float]]] = {}
+    adjacency: Dict[str, List[Tuple[str, float, float]]] = {}
 
     for edge_id, edge in network_graph.edges.items():
         from_node, to_node = edge["from"], edge["to"]
+        length = float(edge.get("length", 0.0))
         weight = edge_weights.get(edge_id)
         if weight is None:
-            weight = edge["length"] / edge["speed"] if edge["speed"] > 0 else float("inf")
-        adjacency.setdefault(from_node, []).append((to_node, weight))
+            speed = float(edge.get("speed", 13.89))
+            weight = length / speed if speed > 0 else float("inf")
+        adjacency.setdefault(from_node, []).append((to_node, weight, length))
 
     return adjacency
 
 
 def _reachable_from(
-    adjacency: Dict[str, List[Tuple[str, float]]],
+    adjacency: Dict[str, List[Any]],
     source: str,
 ) -> set:
     """Nodes reachable from `source` by following adjacency edges forward."""
@@ -157,7 +181,8 @@ def _reachable_from(
     stack = [source]
     while stack:
         node = stack.pop()
-        for neighbor, _ in adjacency.get(node, []):
+        for item in adjacency.get(node, []):
+            neighbor = item[0]
             if neighbor not in seen:
                 seen.add(neighbor)
                 stack.append(neighbor)
@@ -165,12 +190,17 @@ def _reachable_from(
 
 
 def _reverse_adjacency(
-    adjacency: Dict[str, List[Tuple[str, float]]],
-) -> Dict[str, List[Tuple[str, float]]]:
-    reverse: Dict[str, List[Tuple[str, float]]] = {}
+    adjacency: Dict[str, List[Any]],
+) -> Dict[str, List[Tuple]]:
+    reverse: Dict[str, List[Tuple]] = {}
     for node, edges in adjacency.items():
-        for neighbor, weight in edges:
-            reverse.setdefault(neighbor, []).append((node, weight))
+        for item in edges:
+            neighbor = item[0]
+            weight = item[1]
+            if len(item) > 2:
+                reverse.setdefault(neighbor, []).append((node, weight, item[2]))
+            else:
+                reverse.setdefault(neighbor, []).append((node, weight))
     return reverse
 
 
