@@ -56,13 +56,13 @@ def _resolve_route_args(
     actual_time = time_matrix
     actual_dist = distance_matrix
     actual_cong = congestion_lookup
-    actual_weights = weights if weights is not None else (1.0, 1.0, 1.0)
+    actual_weights = weights
 
     if actual_dist is not None:
         # distance_matrix explicitly passed as keyword
         if len(args) >= 1 and actual_cong is None:
             actual_cong = args[0]
-        if len(args) >= 2 and weights is None:
+        if len(args) >= 2 and actual_weights is None:
             actual_weights = args[1]
     else:
         # distance_matrix was not passed as keyword
@@ -71,20 +71,22 @@ def _resolve_route_args(
             actual_dist = args[0]
             if len(args) >= 2 and actual_cong is None:
                 actual_cong = args[1]
-            if len(args) >= 3 and weights is None:
+            if len(args) >= 3 and actual_weights is None:
                 actual_weights = args[2]
         else:
             # Positional pattern: (order, distance_matrix, [congestion_lookup], [weights])
             actual_dist = actual_time
             if len(args) >= 1 and actual_cong is None:
                 actual_cong = args[0]
-            if len(args) >= 2 and weights is None:
+            if len(args) >= 2 and actual_weights is None:
                 actual_weights = args[1]
 
     if actual_dist is None:
         actual_dist = actual_time
     if actual_cong is None:
         actual_cong = {}
+    if actual_weights is None:
+        actual_weights = (1.0, 1.0, 1.0)
 
     return actual_time, actual_dist, actual_cong, actual_weights
 
@@ -140,7 +142,7 @@ def score_route(
     order: np.ndarray,
     time_matrix: np.ndarray,
     *args,
-    weights: Tuple[float, float, float] = (1.0, 1.0, 1.0),
+    weights: Optional[Tuple[float, float, float]] = None,
     distance_matrix: Optional[np.ndarray] = None,
     congestion_lookup: Optional[CongestionLookup] = None,
 ) -> float:
