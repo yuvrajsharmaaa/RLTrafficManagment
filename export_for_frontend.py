@@ -36,39 +36,16 @@ Usage Modes:
 from __future__ import annotations
 
 import argparse
-import heapq
 import json
 import math
 import os
 import sys
 from bisect import bisect_right
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(PROJECT_ROOT))
-
-# Optional simulation imports (only required for live simulation trials)
-try:
-    import numpy as np
-    from src.planner.fitness import CongestionLookup, route_components, score_route
-    from src.planner.qpso import replan as qpso_replan
-    from src.planner.qpso_encoding import (
-        adjacency_from_network_graph,
-        compute_distance_matrix,
-        pick_mutually_reachable_stops,
-        _reachable_from,
-        _reverse_adjacency,
-    )
-    from src.reactive.arbiter import ReplanArbiter
-    from src.reactive.reactive import evaluate_vehicle_reroute
-    from src.state_extraction.network_graph import NetworkGraph
-    from src.state_extraction.state import SubscriptionStateExtractor
-    from src.volatility import NetworkVolatilityIndex
-    from traci.exceptions import FatalTraCIError, TraCIException
-    HAS_SIMULATION = True
-except ImportError:
-    HAS_SIMULATION = False
 
 try:
     from src.planner.qpso import DEFAULT_BETA_MIN, va_beta_floor
@@ -94,17 +71,7 @@ DEFAULT_NET_FILE = str(PROJECT_ROOT / "networks" / "delhi" / "delhi_intersection
 DEFAULT_FRONTEND_DIR = str(PROJECT_ROOT / "frontend_data")
 ALGORITHMS = {"va_qpso", "fixed_beta_qpso"}
 
-NUM_STOPS = 8
-N_MAX = 120.0
-N_MIN = 20.0
-N_FIXED = 70.0
-OCCUPANCY_THRESHOLD = 0.8
-MIN_OCCUPANCY_IMPROVEMENT = 0.15
-MAX_EXTRA_DISTANCE_RATIO = 0.3
-ARBITER_WINDOW_SECONDS = 60.0
-ARBITER_REROUTE_THRESHOLD = 5
-VOLATILITY_WINDOW = 15
-REFERENCE_VARIANCE = 0.002
+NUM_STOPS = 8  # pickup + 6 planner waypoints + network exit
 
 SCENARIO_MAP = {
     "low": {
@@ -282,73 +249,6 @@ def load_hospitals(file_path: Optional[str] = None) -> List[Dict[str, Any]]:
     return []
 
 
-def build_ambulance_scenario(
-    net: Any,
-    network_graph: Any,
-    adj: Dict[str, List[Tuple[str, float]]],
-    num_corridor_stops: int = 8,
-    seed: int = 42,
-) -> Tuple[List[str], Dict[str, Any], List[Dict[str, Any]]]:
-    """
-    Generate an ambulance scenario:
-    - 1 incident location (patient pickup in Connaught Place)
-    - Candidate destination hospitals from hospitals.json
-    - Evaluates live travel time to each hospital
-    - Selects the best hospital by shortest travel time
-    - Returns (stops, best_hospital, hospital_candidates)
-    """
-    hospitals = load_hospitals()
-    rev = _reverse_adjacency(adj)
-
-    sccs = []
-    visited = set()
-    for node in adj:
-        if node not in visited:
-            scc = _reachable_from(adj, node) & _reachable_from(rev, node)
-            visited.update(scc)
-            if len(scc) > 1:
-                sccs.append(scc)
-    sccs.sort(key=len, reverse=True)
-    main_scc = sccs[0]
-
-    # Central incident node in Connaught Place (patient pickup location)
-    incident_candidates = ["10239800518", "10246421064", "10239800521"]
-    incident_node = next((n for n in incident_candidates if n in main_scc), sorted(main_scc)[0])
-
-    hospital_candidates = []
-    for h in hospitals:
-        best_nid = None
-        min_dist = float("inf")
-        for nid in main_scc:
-            node = net.getNode(nid)
-            lat, lon = lonlat(net, node.getCoord())
-            d = math.hypot(lat - h["lat"], lon - h["lon"])
-            if d < min_dist:
-                min_dist = d
-                best_nid = nid
-        # Compute shortest path travel time from incident to candidate gateway node
-        edges, cost = find_edge_path_dijkstra(network_graph, incident_node, best_nid)
-        cand = dict(h)
-        cand["gateway_node"] = best_nid
-        cand["live_travel_time_sec"] = round(cost, 1) if cost < float("inf") else 45.0
-        hospital_candidates.append(cand)
-
-    # Pick the best hospital by shortest live travel time
-    hospital_candidates.sort(key=lambda c: c["live_travel_time_sec"])
-    best_hospital = hospital_candidates[0]
-    for idx, c in enumerate(hospital_candidates):
-        c["status"] = "selected_best_destination" if idx == 0 else "candidate_destination"
-
-    destination_node = best_hospital["gateway_node"]
-
-    # Assemble mutually reachable corridor sequence
-    corridors = [n for n in sorted(main_scc) if n != incident_node and n != destination_node]
-    intermediate_stops = corridors[: max(0, num_corridor_stops - 2)]
-    stops = [incident_node] + intermediate_stops + [destination_node]
-
-    return stops, best_hospital, hospital_candidates
-
-
 def stop_records(
     net: Any,
     stops: list[str],
@@ -375,7 +275,7 @@ def stop_records(
             else:
                 label = "🏥 Destination: Dr. Ram Manohar Lohia Hospital (Trauma Center)"
         else:
-            label = f"🚑 Emergency Corridor Checkpoint {number - 1}"
+            label = f"Planner waypoint {number - 1} (auto-selected junction, not a real place)"
 
         records.append({
             "id": stop_id,
@@ -671,273 +571,107 @@ def export_from_log_file(log_path: str, output_path: str, net_file: str = DEFAUL
 # Live Simulation Exporter (when running SUMO)
 # ----------------------------------------------------------------------
 
-def replan_interval(volatility_index: float) -> float:
-    return N_MAX - (N_MAX - N_MIN) * volatility_index
+HERO_PICKUP_JUNCTION = "10239800518"  # recorded incident junction, Connaught Place
+HERO_SEED = 42
+PLAUSIBLE_KMH = (15.0, 30.0)  # dense urban traffic; outside this range is flagged, not hidden
 
-
-def find_edge_path_dijkstra(
-    network_graph: Any,
-    src_node: str,
-    dst_node: str,
-    edge_weights: Optional[Dict[str, float]] = None,
-) -> Tuple[List[str], float]:
-    if src_node == dst_node:
-        return [], 0.0
-
-    adj: Dict[str, List[Tuple[str, str, float]]] = {}
-    for eid, edata in network_graph.edges.items():
-        w = edata["length"] / edata["speed"] if edata["speed"] > 0 else 1.0
-        if edge_weights and eid in edge_weights:
-            w = edge_weights[eid]
-        adj.setdefault(edata["from"], []).append((edata["to"], eid, w))
-
-    pq: List[Tuple[float, str, List[str]]] = [(0.0, src_node, [])]
-    visited: Dict[str, float] = {}
-
-    while pq:
-        cost, curr, path = heapq.heappop(pq)
-        if curr in visited and visited[curr] <= cost:
-            continue
-        visited[curr] = cost
-
-        if curr == dst_node:
-            return path, cost
-
-        for nxt, eid, w in adj.get(curr, []):
-            new_cost = cost + w
-            if nxt not in visited or new_cost < visited[nxt]:
-                heapq.heappush(pq, (new_cost, nxt, path + [eid]))
-
-    return [], float("inf")
-
-
-def build_full_tour_edges(network_graph: Any, ordered_stops: List[str]) -> List[str]:
-    tour_edges: List[str] = []
-    for i in range(len(ordered_stops) - 1):
-        u = ordered_stops[i]
-        v = ordered_stops[i + 1]
-        edges, _ = find_edge_path_dijkstra(network_graph, u, v)
-        if edges:
-            tour_edges.extend(edges)
-    return tour_edges
-
-
-def generate_vehicle_trajectory(net: Any, tour_edges: List[str], total_time: float) -> List[Dict[str, float]]:
-    all_points: List[Tuple[float, float]] = []
-    for eid in tour_edges:
-        try:
-            edge = net.getEdge(eid)
-            for xy in edge.getShape():
-                lat, lon = lonlat(net, xy)
-                if not all_points or (lat, lon) != all_points[-1]:
-                    all_points.append((lat, lon))
-        except Exception:
-            continue
-
-    if len(all_points) < 2:
-        return [{"t": 0.0, "lat": 28.6325, "lon": 77.2215}]
-
-    return dense_path(all_points, total_time)
+# Arrival times the previous exporter wrote as constants. Kept only so the
+# regenerated files can be compared against them; they are not used.
+PREVIOUS_HARDCODED_COMPLETION_S = {
+    ("low", "va_qpso"): 93.55, ("low", "fixed_beta_qpso"): 93.71,
+    ("medium", "va_qpso"): 95.22, ("medium", "fixed_beta_qpso"): 98.62,
+    ("high", "va_qpso"): 125.70, ("high", "fixed_beta_qpso"): 109.37,
+}
 
 
 def run_and_export_trial(
     tier: str = "medium",
     algorithm: str = "va_qpso",
-    seed: int = 42,
-    duration: int = 200,
-    net_file: str = DEFAULT_NET_FILE,
+    seed: int = HERO_SEED,
+    num_stops: int = NUM_STOPS,
+    sirens: bool = False,
+    model: Any = None,
 ) -> Dict[str, Any]:
-    """Execute live simulation trial and format for Leaflet mission control."""
-    if not HAS_SIMULATION:
-        raise SystemExit(
-            "Live simulation requires project dependencies (SUMO / TraCI / src modules). "
-            "To export from pre-recorded logs without SUMO, use the 'export' command or --log."
-        )
+    """
+    Recorded run: an ambulance driven through SUMO from the pickup junction to
+    the default hospital's network exit, re-planning on the algorithm's
+    cadence. Every time in the result is SUMO's (see src/simulation/dispatch.py).
+    """
+    from src.simulation.dispatch import DispatchSession, RoadModel
+    from src.simulation.payload import build_payload
 
-    sumolib = require_sumolib()
-    import traci
-
-    scenario_info = SCENARIO_MAP[tier]
-    sumocfg = scenario_info["cfg"]
-    net = sumolib.net.readNet(net_file)
-    network_graph = NetworkGraph(net_file)
-    adj = adjacency_from_network_graph(network_graph, {})
-    stops, best_hospital, hospital_candidates = build_ambulance_scenario(
-        net=net,
-        network_graph=network_graph,
-        adj=adj,
-        num_corridor_stops=NUM_STOPS,
-        seed=seed,
-    )
-
-    cmd = [
-        sumolib.checkBinary("sumo"),
-        "-c", sumocfg,
-        "--seed", str(seed),
-        "--no-step-log", "true",
-        "--time-to-teleport", "-1",
-        "--waiting-time-memory", "1000",
-        "--ignore-route-errors", "true",
-    ]
-
-    traci.start(cmd)
-    try:
-        nvi = NetworkVolatilityIndex(window_size=VOLATILITY_WINDOW, reference_variance=REFERENCE_VARIANCE)
-        arbiter = ReplanArbiter(
-            window_seconds=ARBITER_WINDOW_SECONDS,
-            reroute_threshold=ARBITER_REROUTE_THRESHOLD,
-        )
-        edge_ids = list(traci.edge.getIDList())
-
-        dist_matrix = compute_distance_matrix(adj, stops)
-        replan_events: List[Dict[str, Any]] = []
-        metrics_over_time: List[Dict[str, Any]] = []
-        frontend_events_list: List[Dict[str, Any]] = []
-        recorded_path_edges: List[str] = []
-
-        # Initial Replan
-        sim_time = traci.simulation.getTime()
-        initial_order, _ = qpso_replan(
-            stops=stops,
-            distance_matrix=dist_matrix,
-            congestion_lookup={},
-            volatility_index=0.0,
-            num_particles=15,
+    model = model or RoadModel.load(Path(DEFAULT_NET_FILE))
+    hospitals = load_hospitals()
+    hospital = hospitals[0]
+    exit_junction = hospital["exit_junction"]
+    waypoints = model.default_waypoints(num_stops - 2, exclude=[HERO_PICKUP_JUNCTION, exit_junction])
+    stops = [("junction", HERO_PICKUP_JUNCTION)] + [("junction", w) for w in waypoints] + [("junction", exit_junction)]
+    with DispatchSession(tier, model, sirens=sirens) as session:
+        dispatch_sample = session.last
+        plan = session.plan(stops, algorithm, seed)
+        drive = session.drive(plan, algorithm, seed)
+        return build_payload(
+            model=model,
+            scenario=SCENARIO_MAP[tier]["key"],
+            tier=tier,
             algorithm=algorithm,
             seed=seed,
+            plan=plan,
+            dispatch_sample=dispatch_sample,
+            hospital=hospital,
+            hospitals=hospitals,
+            pickup_label=f"Patient pickup (junction {HERO_PICKUP_JUNCTION})",
+            pickup_snap_m=None,
+            drive=drive,
+            edge_time=session.edge_time,
+            sirens=sirens,
         )
-        ordered_stops = [stops[i] for i in initial_order]
-        current_tour_edges = build_full_tour_edges(network_graph, ordered_stops)
-        recorded_path_edges.extend(current_tour_edges)
-
-        replan_events.append({
-            "t": 0.0,
-            "type": "replan",
-            "detail": make_plain_replan_detail(0.0, "scheduled", 50.0, 0.0),
-        })
-        frontend_events_list.append(replan_events[-1])
-
-        next_replan_time = replan_interval(0.0) if algorithm == "va_qpso" else N_FIXED
-
-        for step in range(duration):
-            traci.simulationStep()
-            sim_time = traci.simulation.getTime()
-
-            edge_speeds = {e: traci.edge.getLastStepMeanSpeed(e) for e in edge_ids}
-            v_val = nvi.update(edge_speeds)
-            v_val = max(0.0, min(1.0, v_val))
-
-            beta_val = beta_floor_for(algorithm, v_val)
-            tier_label = tier_for(v_val)
-
-            metrics_over_time.append({
-                "t": int(sim_time),
-                "volatility_index": round(v_val, 4),
-                "beta": round(beta_val, 4),
-                "tier": tier_label,
-            })
-
-            # Check Replan Trigger
-            trigger_replan = False
-            trigger_type = "scheduled"
-
-            if arbiter.should_trigger_early_replan(sim_time):
-                trigger_replan = True
-                trigger_type = "arbiter"
-            elif sim_time >= next_replan_time:
-                trigger_replan = True
-                trigger_type = "scheduled"
-
-            if trigger_replan:
-                arbiter.notify_replanned(sim_time)
-                replan_order, _ = qpso_replan(
-                    stops=stops,
-                    distance_matrix=dist_matrix,
-                    congestion_lookup={},
-                    volatility_index=v_val if algorithm == "va_qpso" else 0.0,
-                    num_particles=15,
-                    algorithm=algorithm,
-                    seed=seed + int(sim_time),
-                )
-                ordered_stops = [stops[i] for i in replan_order]
-                new_edges = build_full_tour_edges(network_graph, ordered_stops)
-                if new_edges:
-                    current_tour_edges = new_edges
-
-                replan_events.append({
-                    "t": round(sim_time, 2),
-                    "type": "replan",
-                    "detail": make_plain_replan_detail(v_val, trigger_type, 65.0, sim_time),
-                })
-                frontend_events_list.append(replan_events[-1])
-                next_replan_time = sim_time + (replan_interval(v_val) if algorithm == "va_qpso" else N_FIXED)
-
-        completion_time = float(duration)
-        if algorithm == "va_qpso" and tier == "medium":
-            completion_time = 95.22
-        elif algorithm == "fixed_beta_qpso" and tier == "medium":
-            completion_time = 98.62
-        elif algorithm == "va_qpso" and tier == "low":
-            completion_time = 93.55
-        elif algorithm == "fixed_beta_qpso" and tier == "low":
-            completion_time = 93.71
-        elif algorithm == "va_qpso" and tier == "high":
-            completion_time = 125.70
-        elif algorithm == "fixed_beta_qpso" and tier == "high":
-            completion_time = 109.37
-
-        path_points = generate_vehicle_trajectory(net, current_tour_edges, completion_time)
-        formatted_stops = stop_records(net, stops, best_hospital=best_hospital)
-
-        return {
-            "scenario": scenario_info["key"],
-            "algorithm": algorithm,
-            "stops": formatted_stops,
-            "hospital_candidates": hospital_candidates,
-            "selected_hospital": best_hospital,
-            "path": path_points,
-            "metrics_over_time": metrics_over_time,
-            "events": frontend_events_list,
-            "completion_time": completion_time,
-        }
-    finally:
-        traci.close()
 
 
 def export_heroes(output_dir: str = DEFAULT_FRONTEND_DIR, net_file: str = DEFAULT_NET_FILE) -> None:
-    """Batch export all 3 paired Hero scenarios and manifest index.json."""
+    """Export the three matched hero pairs and index.json, all from SUMO drive-throughs."""
+    from src.simulation.dispatch import RoadModel
+
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
-    manifest = {"scenarios": []}
+    model = RoadModel.load(Path(net_file))
+    manifest: Dict[str, Any] = {"scenarios": []}
+    report = []
 
     for tier, sinfo in SCENARIO_MAP.items():
-        print(f"\nGenerating Hero Matched Pair for [{tier.upper()} VOLATILITY]...")
-        va_data = run_and_export_trial(tier=tier, algorithm="va_qpso", seed=42, net_file=net_file)
-        va_file = f"hero_{tier}_va_qpso.json"
-        write_json(out_path / va_file, va_data)
+        entry: Dict[str, Any] = {"id": sinfo["key"], "title": sinfo["title"], "description": sinfo["description"]}
+        for algorithm, suffix in (("va_qpso", "va"), ("fixed_beta_qpso", "fb")):
+            print(f"[{tier}] {algorithm}: driving ambulance through SUMO...", flush=True)
+            data = run_and_export_trial(tier=tier, algorithm=algorithm, model=model)
+            name = f"hero_{tier}_{algorithm}.json"
+            write_json(out_path / name, data)
+            timing = data["timing"]
+            entry[f"{algorithm}_file"] = name
+            entry[f"completion_time_{suffix}"] = data["completion_time"]
+            entry[f"status_{suffix}"] = timing["status"]
+            entry[f"events_count_{suffix}"] = len(data["events"])
+            report.append((tier, algorithm, timing, data["traffic_at_dispatch"]))
+        manifest["scenarios"].append(entry)
 
-        fb_data = run_and_export_trial(tier=tier, algorithm="fixed_beta_qpso", seed=42, net_file=net_file)
-        fb_file = f"hero_{tier}_fixed_beta_qpso.json"
-        write_json(out_path / fb_file, fb_data)
+    write_json(out_path / "index.json", manifest)
 
-        manifest["scenarios"].append({
-            "id": sinfo["key"],
-            "title": sinfo["title"],
-            "description": sinfo["description"],
-            "va_qpso_file": va_file,
-            "fixed_beta_qpso_file": fb_file,
-            "completion_time_va": va_data["completion_time"],
-            "completion_time_fb": fb_data["completion_time"],
-            "events_count_va": len(va_data["events"]),
-            "events_count_fb": len(fb_data["events"]),
-        })
-
-    manifest_path = out_path / "index.json"
-    write_json(manifest_path, manifest)
-    print("\n" + "=" * 80)
-    print(f"SUCCESS: All Hero scenarios exported to {out_path.resolve()}")
-    print(f"Manifest written to: {manifest_path.resolve()}")
-    print("=" * 80)
+    print("\nRecorded-run timing (old hard-coded value vs SUMO drive-through):")
+    print(f"{'tier':<7}{'algorithm':<17}{'old (s)':>9}{'measured (s)':>14}{'status':>24}{'driven (m)':>12}{'avg km/h':>10}  traffic at dispatch")
+    for tier, algorithm, timing, traffic in report:
+        old = PREVIOUS_HARDCODED_COMPLETION_S[(tier, algorithm)]
+        measured = timing["seconds_to_exit"]
+        kmh = timing["average_speed_kmh"]
+        flag = ""
+        if kmh is None:
+            flag = "  <-- no valid arrival"
+        elif not PLAUSIBLE_KMH[0] <= kmh <= PLAUSIBLE_KMH[1]:
+            flag = f"  <-- outside {PLAUSIBLE_KMH[0]:.0f}-{PLAUSIBLE_KMH[1]:.0f} km/h"
+        print(
+            f"{tier:<7}{algorithm:<17}{old:>9.2f}{(measured if measured is not None else float('nan')):>14.1f}"
+            f"{timing['status']:>24}{timing['driven_length_m']:>12.0f}{(kmh if kmh is not None else float('nan')):>10.1f}"
+            f"  {traffic['vehicles']} veh, {traffic['mean_vehicle_speed_kmh']} km/h, {traffic['stopped_vehicles']} stopped{flag}"
+        )
+    print(f"\nWrote hero files and index.json to {out_path.resolve()}")
 
 
 def start_server(port: int = 8000, data_dir: str = DEFAULT_FRONTEND_DIR) -> None:
@@ -1072,8 +806,6 @@ def main() -> None:
             tier=arguments.tier,
             algorithm=arguments.algorithm,
             seed=arguments.seed,
-            duration=arguments.duration,
-            net_file=arguments.net,
         )
         write_json(Path(out), data)
         print(f"Saved {out} (completion_time: {data['completion_time']}s, path points: {len(data['path'])})")

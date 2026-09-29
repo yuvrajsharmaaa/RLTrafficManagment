@@ -165,3 +165,30 @@ if __name__ == "__main__":
     test_va_qpso_rejects_out_of_range_volatility_index()
     test_replan_matches_va_qpso_via_score_route()
     print("OK: all qpso.py tests passed.")
+
+
+def test_fixed_endpoints_keeps_start_and_end_and_finds_optimum():
+    import itertools
+
+    from src.planner.fitness import score_route
+
+    rng = np.random.default_rng(3)
+    n = 7
+    dm = rng.uniform(10.0, 100.0, (n, n))
+    np.fill_diagonal(dm, 0.0)
+    stops = [f"s{i}" for i in range(n)]
+    best = min(
+        score_route(np.array((0, *mid, n - 1)), dm, dm, {}, (1.0, 1.0, 1.0))
+        for mid in itertools.permutations(range(1, n - 1))
+    )
+    for algorithm in ("va_qpso", "fixed_beta_qpso"):
+        order, score = replan(stops, dm, {}, 0.5, seed=0, algorithm=algorithm, fixed_endpoints=True)
+        assert order[0] == 0 and order[-1] == n - 1
+        assert sorted(order) == list(range(n))
+        assert np.isclose(score, best)
+
+
+def test_fixed_endpoints_two_stops_is_trivial():
+    dm = np.array([[0.0, 5.0], [7.0, 0.0]])
+    order, score, history = replan(["a", "b"], dm, {}, fixed_endpoints=True, return_history=True)
+    assert list(order) == [0, 1] and len(history) == 1
