@@ -1,0 +1,104 @@
+/* Phase 2 design tokens: the single source of truth for colour, type,
+   space, shape, elevation, layers and motion. Dark theme only. */
+:root {
+  color-scheme: dark;
+
+  /* Neutrals */
+  --color-bg: #0B0D10;
+  --color-panel: #12151A;
+  --color-raised: #1A1E24;
+  --color-border-subtle: #252A31;
+  --color-border: #343A43;
+  --color-border-strong: #4A515C;
+  --color-border-control: #6B7380;
+  --color-text-1: #E6E8EB;
+  --color-text-2: #AEB5BF;
+  --color-text-3: #8A929D;
+  --color-text-disabled: #5A616B;
+
+  /* Accent */
+  --color-accent: #6FA8DC;
+  --color-accent-weak: rgb(111 168 220 / 0.14);
+  --color-on-accent: #0B0D10;
+
+  /* Semantic */
+  --color-success: #3FAE7A;
+  --color-success-weak: rgb(63 174 122 / 0.14);
+  --color-warning: #D9A33A;
+  --color-warning-weak: rgb(217 163 58 / 0.14);
+  --color-danger: #E5534B;
+  --color-danger-weak: rgb(229 83 75 / 0.14);
+  --color-info: #6FA8DC;
+  --color-info-weak: rgb(111 168 220 / 0.14);
+
+  /* Domain: traffic */
+  --traffic-free: #4DAF7C;
+  --traffic-moderate: #E3C04F;
+  --traffic-heavy: #E0782F;
+  --traffic-blocked: #D13B3B;
+
+  /* Domain: vehicle */
+  --vehicle-standby: #8A929D;
+  --vehicle-en-route: #6FA8DC;
+  --vehicle-rerouting: #D9A33A;
+  --vehicle-arrived: #3FAE7A;
+  --vehicle-unavailable: #70777F;
+
+  /* Domain: hospital load (no backend data yet: render --hospital-unknown) */
+  --hospital-available: #3FAE7A;
+  --hospital-busy: #D9A33A;
+  --hospital-full: #E5534B;
+  --hospital-unknown: #8A929D;
+
+  /* Domain: routes */
+  --route-optimized: #6FA8DC;
+  --route-baseline: #C3C8D0;
+  --route-alternative: #7D8590;
+  --route-blocked: #D13B3B;
+
+  /* Heatmap, sequential single hue */
+  --heat-1: #2B2216;
+  --heat-2: #5A3D17;
+  --heat-3: #8C5A1C;
+  --heat-4: #C27D26;
+  --heat-5: #F0AE52;
+
+  /* Chart series (Benchmark) */
+  --series-va-qpso: #6FA8DC;
+  --series-fixed-qpso: #C3C8D0;
+  --series-pso: #E69F00;
+  --series-ga: #2E8B57;
+  --series-sa: #B5679A;
+  --series-dijkstra: #F0E442;
+
+  /* Type */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Elevation: border + black shadow only, never a glow */
+  --elev-1: 0 1px 2px rgb(0 0 0 / 0.40);
+  --elev-2: 0 4px 12px rgb(0 0 0 / 0.50);
+  --elev-3: 0 8px 24px rgb(0 0 0 / 0.60);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Shell (Phase 3) */
+  --shell-header-h: 48px;
+  --shell-statusbar-h: 32px;
+  --shell-nav-w: 80px;
+  --shell-dock-h: 56px;
+  --shell-panel-w: 320px;
+}
+
+@media (min-width: 1440px) {
+  :root { --shell-panel-w: 360px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
+}
