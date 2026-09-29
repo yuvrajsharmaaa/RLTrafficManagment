@@ -9,8 +9,8 @@ import {
 
 interface Row { method: string; best: number; mean: number }
 const rows: Row[] = [
-  { method: 'Adaptive routing', best: 71.076, mean: 76.968 },
-  { method: 'Shortest-path baseline', best: 103.541, mean: 110.061 },
+  { method: 'Adaptive routing', best: 361.158, mean: 366.966 },
+  { method: 'Shortest-path baseline', best: 686.082, mean: 744.049 },
 ];
 const columns: Column<Row>[] = [
   { key: 'method', header: 'Method', render: (r) => r.method, sortValue: (r) => r.method },

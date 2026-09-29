@@ -6,6 +6,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8731"],
       "port": 8731
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["server.py", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "web-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "web", "run", "dev"],
+      "port": 5173
     }
   ]
 }

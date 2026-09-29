@@ -402,22 +402,84 @@ class DispatchSession:
     ) -> Dict[str, Any]:
         """Order the middle stops; route; planner estimate from measured speeds."""
         from src.planner.qpso import replan
+        from src.planner.pso_baseline import standard_pso
+        from src.planner.ga_baseline import genetic_algorithm
+        from src.planner.sa_baseline import simulated_annealing
+        from src.planner.fitness import score_route
+        from src.planner.qpso_encoding import decode_order
 
         tm, dm = travel_matrices(self.model, stops, self.edge_time)
         v = self.last.volatility_index
-        order, score, history = replan(
-            stops=[s[1] for s in stops],
-            distance_matrix=tm,
-            congestion_lookup={},
-            volatility_index=v if algorithm == "va_qpso" else 0.0,
-            weights=(1.0, 0.0, 0.0),
-            num_particles=num_particles,
-            max_iterations=max_iterations,
-            algorithm=algorithm,
-            seed=seed,
-            return_history=True,
-            fixed_endpoints=True,
-        )
+        n = len(stops)
+
+        if algorithm in ("va_qpso", "fixed_beta_qpso", "standard_qpso"):
+            order, score, history = replan(
+                stops=[s[1] for s in stops],
+                distance_matrix=tm,
+                congestion_lookup={},
+                volatility_index=v if algorithm == "va_qpso" else 0.0,
+                weights=(1.0, 0.0, 0.0),
+                num_particles=num_particles,
+                max_iterations=max_iterations,
+                algorithm=algorithm,
+                seed=seed,
+                return_history=True,
+                fixed_endpoints=True,
+            )
+        elif algorithm in ("dijkstra", "dijkstra_nn"):
+            if n <= 2:
+                order = np.arange(n)
+            else:
+                visited = [0]
+                unvisited = set(range(1, n - 1))
+                curr = 0
+                while unvisited:
+                    nxt = min(unvisited, key=lambda c: (tm[curr, c], c))
+                    visited.append(nxt)
+                    unvisited.remove(nxt)
+                    curr = nxt
+                visited.append(n - 1)
+                order = np.array(visited, dtype=int)
+            score = score_route(order, tm, dm, {}, (1.0, 0.0, 0.0))
+            history = np.array([score])
+        else:
+            dim = n - 2
+            def decode(p: Any) -> np.ndarray:
+                return np.concatenate(([0], np.asarray(p) + 1, [n - 1])).astype(int)
+
+            if algorithm in ("pso", "standard_pso"):
+                def fitness_fn_pso(x: np.ndarray) -> float:
+                    ord_sub = decode(decode_order(x))
+                    return score_route(ord_sub, tm, dm, {}, (1.0, 0.0, 0.0))
+                best_pos, score, hist = standard_pso(
+                    dim, fitness_fn_pso, num_particles=num_particles,
+                    max_iterations=max_iterations, seed=seed, return_history=True
+                )
+                order = decode(decode_order(best_pos))
+                history = hist
+            elif algorithm in ("ga", "permutation_ga"):
+                def fitness_fn_ga(p: np.ndarray) -> float:
+                    ord_sub = decode(p)
+                    return score_route(ord_sub, tm, dm, {}, (1.0, 0.0, 0.0))
+                best_perm, score, hist = genetic_algorithm(
+                    dim, fitness_fn_ga, population_size=num_particles,
+                    max_generations=max_iterations, seed=seed, return_history=True
+                )
+                order = decode(best_perm)
+                history = hist
+            elif algorithm in ("sa", "simulated_annealing"):
+                def fitness_fn_sa(p: np.ndarray) -> float:
+                    ord_sub = decode(p)
+                    return score_route(ord_sub, tm, dm, {}, (1.0, 0.0, 0.0))
+                best_perm, score, hist = simulated_annealing(
+                    dim, fitness_fn_sa, steps_per_temp=num_particles,
+                    max_iterations=max_iterations, seed=seed, return_history=True
+                )
+                order = decode(best_perm)
+                history = hist
+            else:
+                raise ValueError(f"Unknown planning algorithm: {algorithm}")
+
         ordered = [stops[i] for i in order]
         route, est_t, length = build_route(self.model, ordered, self.edge_time)
         return {
