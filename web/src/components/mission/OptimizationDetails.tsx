@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Panel, Tooltip } from '../ui';
 import { SOURCE_WORD, formatDuration } from '../../lib/format';
 import { trafficAt } from '../../lib/timeline';
+import { tripOf } from '../../lib/trip';
 import type { RunData } from '../../lib/types';
 
 interface OptimizationDetailsProps {
@@ -32,6 +33,7 @@ function Row({ label, tip, children }: { label: string; tip?: string; children: 
 /** "How this route was found". Rows without data are left out, never shown blank. */
 export function OptimizationDetails({ run, kind, t, requestMs, onOpenOptimization }: OptimizationDetailsProps) {
   const m = trafficAt(run, t);
+  const trip = tripOf(run);
   return (
     <Panel raised title="How this route was found" collapsible defaultOpen={false}>
       <div className="flex flex-col gap-1.5 text-body-sm">
@@ -40,20 +42,20 @@ export function OptimizationDetails({ run, kind, t, requestMs, onOpenOptimizatio
         </Row>
         <Row label="Data">{kind === 'recorded' ? 'Recorded run' : (run.source && SOURCE_WORD[run.source]) ?? 'Live result'}</Row>
         {m && (
-          <Row label="Search-breadth floor now" tip={kind === 'recorded' ? 'Lowest β each search contracts to. Recorded files: 0.50 + 0.50 × traffic unpredictability' : 'Lowest β each search contracts to: 0.50 + 0.25 × traffic unpredictability'}>
+          <Row label="Search-breadth floor now" tip={run.algorithm === 'va_qpso' ? 'Lowest β each search contracts to: 0.50 + 0.25 × traffic unpredictability' : 'The fixed schedule always contracts to 0.50'}>
             <span className="num">{m.beta.toFixed(2)}</span>
           </Row>
         )}
         {run.seed !== undefined && (
-          <Row label="Run number" tip="Random seed; the same number reproduces the run">
+          <Row label="Run number" tip="Optimizer seed. With the same location and traffic level it reproduces the run exactly (SUMO traffic always uses seed 42).">
             <span className="num">{run.seed}</span>
           </Row>
         )}
         <Row label="Stops">
           <span className="num">{run.stops.length}</span>
         </Row>
-        <Row label="Total time to hospital">
-          <span className="num">{formatDuration(run.completion_time)}</span>
+        <Row label={`Time to network exit (${trip.timeSource.toLowerCase()})`}>
+          <span className="num">{trip.arrived || trip.state === 'estimate' ? formatDuration(run.completion_time) : 'No arrival'}</span>
         </Row>
         {kind === 'live' && requestMs !== null && (
           <Row label="Computed in">

@@ -11,6 +11,7 @@ import { cx } from '../lib/cx';
 import { buildTimeline, etaChangeWords } from '../lib/explain';
 import { SCENARIO_WORD, TIER_WORD, formatClock, formatDuration } from '../lib/format';
 import { replanEvents, trafficAt } from '../lib/timeline';
+import { tripOf } from '../lib/trip';
 import type { RunData, ScenarioTier } from '../lib/types';
 import { MissionMap } from '../map/MissionMap';
 
@@ -56,7 +57,8 @@ function SidePanel({ title, side, playback, style }: { title: string; side: Side
     );
   }
   const remaining = Math.max(0, run.completion_time - t);
-  const arrived = t >= run.completion_time;
+  const ended = t >= run.completion_time;
+  const trip = tripOf(run);
   const current = [...latest].reverse().find((e) => e.t <= t);
   const m = trafficAt(run, t);
   return (
@@ -69,7 +71,13 @@ function SidePanel({ title, side, playback, style }: { title: string; side: Side
           {title}
         </span>
         <span className="num text-metric-md text-text-1">
-          {arrived ? `Arrived ${formatClock(run.completion_time)}` : formatClock(remaining)}
+          {ended
+            ? trip.arrived
+              ? `At exit ${formatClock(run.completion_time)}`
+              : 'No arrival'
+            : trip.arrived
+              ? formatClock(remaining)
+              : `Simulated ${formatClock(t)}`}
         </span>
       </div>
       <div className="relative min-h-[240px] flex-1">
@@ -132,17 +140,28 @@ export const Analytics = memo(function Analytics() {
   }, [report, load.state, duration, metric, playback.t, playback.playing, playback.speed]);
 
   const paired = PAIRED.find((p) => p.tier === tier);
-  const diff = adaptive && fixed ? fixed.completion_time - adaptive.completion_time : null;
+  const aTrip = adaptive ? tripOf(adaptive) : null;
+  const fTrip = fixed ? tripOf(fixed) : null;
+  // A time difference exists only when both simulated ambulances reached the exit.
+  const diff = aTrip && fTrip && aTrip.arrived && fTrip.arrived ? fTrip.duration - aTrip.duration : null;
+  const capWords = formatDuration(aTrip?.capS ?? fTrip?.capS ?? duration);
   const headline =
-    diff === null
+    !aTrip || !fTrip
       ? 'Comparison incomplete: one run is missing'
-      : Math.abs(diff) < 0.05
-        ? 'Both methods arrived at the same time'
-        : diff > 0
-          ? `Adaptive routing arrived ${formatDuration(diff)} sooner`
-          : `Fixed schedule arrived ${formatDuration(-diff)} sooner`;
+      : diff !== null
+        ? Math.abs(diff) < 0.05
+          ? 'Both methods reached the network exit at the same time'
+          : diff > 0
+            ? `Adaptive routing reached the exit ${formatDuration(diff)} sooner`
+            : `Fixed schedule reached the exit ${formatDuration(-diff)} sooner`
+        : aTrip.arrived
+          ? `Only adaptive routing reached the exit within ${capWords}`
+          : fTrip.arrived
+            ? `Only the fixed schedule reached the exit within ${capWords}`
+            : `Neither method reached the network exit within ${capWords}`;
   const winnerArrived =
     diff !== null && adaptive && fixed && playback.t >= Math.min(adaptive.completion_time, fixed.completion_time);
+  const timeWords = (t: typeof aTrip) => (t && t.arrived ? formatDuration(t.duration) : `no arrival in ${capWords}`);
 
   const tierPicker = (
     <div className="flex overflow-hidden rounded border border-border-control" role="group" aria-label="Traffic level">
@@ -194,7 +213,7 @@ export const Analytics = memo(function Analytics() {
         </div>
         {adaptive && fixed && (
           <p className="text-body-sm text-text-2">
-            {formatDuration(adaptive.completion_time)} adaptive vs {formatDuration(fixed.completion_time)} fixed at {SCENARIO_WORD[tier]} traffic.
+            {timeWords(aTrip)} adaptive vs {timeWords(fTrip)} fixed at {SCENARIO_WORD[tier]} traffic (simulated drives to the network exit).
             {paired?.congestionNote && ` The adaptive route had ${paired.congestionNote} (${README_SOURCE}).`}
           </p>
         )}

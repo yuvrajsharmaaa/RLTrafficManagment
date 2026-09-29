@@ -14,6 +14,7 @@ import { doingNow } from '../lib/explain';
 import { SCENARIO_WORD, SOURCE_WORD, TIER_WORD, formatDuration, shortName } from '../lib/format';
 import { BETA_MAX, BETA_MIN, FIXED_EXPORT_BETA, LIVE_SEARCH_BUDGET, VA_FLOOR_SPAN, explorationKept } from '../lib/search';
 import { replanEvents, trafficAt } from '../lib/timeline';
+import { tripOf } from '../lib/trip';
 import type { ScenarioTier } from '../lib/types';
 
 type Choice = { kind: 'session' } | { kind: 'recorded'; tier: ScenarioTier };
@@ -173,7 +174,10 @@ export const Optimization = memo(function Optimization() {
   }
 
   const isAdaptive = run.algorithm === 'va_qpso';
-  const diff = data.baseline ? data.baseline.completion_time - run.completion_time : null;
+  const trip = tripOf(run);
+  const baseTrip = data.baseline ? tripOf(data.baseline) : null;
+  // A difference exists only when both runs reached the exit.
+  const diff = baseTrip && trip.arrived && baseTrip.arrived ? baseTrip.duration - trip.duration : null;
   const kept = metric && isAdaptive ? explorationKept(metric.beta) : null;
   const answer = !isAdaptive
     ? 'This is a fixed-schedule run: its search narrows on the same timetable whatever the traffic.'
@@ -203,12 +207,27 @@ export const Optimization = memo(function Optimization() {
           <section aria-label="Summary" className="col-span-8 grid grid-cols-2 gap-4 rounded border border-border bg-panel p-4 desktop:grid-cols-5 wide:col-span-12">
             <StatBlock label="Status" value={t >= duration ? 'Arrived' : playback.playing ? 'Replaying' : 'Paused'} size="md" delta="The search finished before playback" />
             <StatBlock label="Trip time" value={`T+${Math.floor(t)} / ${Math.round(duration)}`} unit="s" size="md" delta="Search iterations: not reported" />
-            <StatBlock label="Best route found" value={formatDuration(duration)} size="md" delta="Total time to hospital" />
+            <StatBlock
+              label={trip.state === 'estimate' ? 'Planner estimate' : 'Time to network exit'}
+              value={trip.arrived || trip.state === 'estimate' ? formatDuration(duration) : 'No arrival'}
+              size="md"
+              delta={
+                trip.arrived || trip.state === 'estimate'
+                  ? trip.timeSource
+                  : `Not at exit within ${formatDuration(trip.capS ?? duration)} simulated`
+              }
+            />
             <StatBlock
               label="Versus fixed schedule"
               value={diff === null ? null : `${Math.abs(diff).toFixed(1)} s`}
               size="md"
-              delta={diff === null ? (data.kind === 'live' ? 'No baseline for live runs' : 'Not loaded') : diff >= 0 ? 'sooner on the same traffic' : 'later on the same traffic'}
+              delta={
+                diff !== null
+                  ? diff >= 0 ? 'sooner on the same traffic' : 'later on the same traffic'
+                  : baseTrip
+                    ? 'No difference: a run did not reach the exit'
+                    : data.kind === 'live' ? 'No baseline for live runs' : 'Not loaded'
+              }
             />
             <StatBlock
               label="Search compute time"
@@ -367,7 +386,8 @@ export const Optimization = memo(function Optimization() {
                     xMax={run.best_score_history.length}
                     yMin={Math.floor(Math.min(...run.best_score_history) * 0.95)}
                     yMax={Math.ceil(Math.max(...run.best_score_history) * 1.02)}
-                    yTicks={[Math.min(...run.best_score_history), Math.max(...run.best_score_history)].map((v) => Math.round(v))}
+                    yTicks={[...new Set([Math.min(...run.best_score_history), Math.max(...run.best_score_history)].map((v) => Math.round(v)))]}
+                    xLabel="Iteration"
                     yLabel="s"
                     formatY={(v) => v.toFixed(0)}
                     height={160}
@@ -398,11 +418,11 @@ export const Optimization = memo(function Optimization() {
                     <span className="num text-text-1">{run.hospital_candidates.length}</span>
                   </li>
                   <li className={cx('flex justify-between gap-3 border-t border-border-subtle pt-2')}>
-                    <span className="text-text-1">Destination, by shortest road time</span>
+                    <span className="text-text-1">Destination, by shortest unsimulated distance</span>
                     <span className="text-right text-text-1">{run.selected_hospital ? shortName(run.selected_hospital.name) : 'No data'}</span>
                   </li>
                   <li className="flex justify-between gap-3 border-t border-border-subtle pt-2">
-                    <span className="text-text-1">Stops on the corridor</span>
+                    <span className="text-text-1">Stops: pickup, planner waypoints, network exit</span>
                     <span className="num text-text-1">{run.stops.length}</span>
                   </li>
                   <li className="flex justify-between gap-3 border-t border-border-subtle pt-2">
@@ -411,8 +431,9 @@ export const Optimization = memo(function Optimization() {
                   </li>
                 </ol>
                 <p className="text-caption text-text-3">
-                  The destination is picked by shortest-path road time before the route search runs. The candidate orders the
-                  search tried are not reported, so how they narrowed can't be shown.
+                  The destination is the hospital closest to the simulated map (straight-line from its network exit), picked
+                  before the route search runs. The search orders the auto-selected waypoints between the fixed pickup and
+                  network exit. The candidate orders it tried are not reported, so how they narrowed can't be shown.
                 </p>
               </div>
             </Panel>

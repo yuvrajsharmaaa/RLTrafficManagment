@@ -33,6 +33,8 @@ interface TimeSeriesChartProps {
   /** Playback cursor. */
   cursor?: number;
   height?: number;
+  /** X-axis caption; defaults to time. */
+  xLabel?: string;
   /** Small card version: no legend row, fewer ticks. */
   compact?: boolean;
 }
@@ -41,6 +43,7 @@ interface TimeSeriesChartProps {
 // 2 px first series, 1.5 px others, dashed references, amber event markers.
 export function TimeSeriesChart({
   title, series, xMax, yMin, yMax, yTicks, yLabel, formatY, markers = [], references = [], cursor, height = 180, compact = false,
+  xLabel = 'Time (s)',
 }: TimeSeriesChartProps) {
   const [ref, W] = useElementWidth<HTMLDivElement>();
   const H = height;
@@ -125,7 +128,7 @@ export function TimeSeriesChart({
           {geom.xTicks.map((t) => (
             <text key={t} x={x(t)} y={H - PAD.b + 16} textAnchor="middle" fontSize={12} className="num fill-text-3">{t}</text>
           ))}
-          {!compact && <text x={W - PAD.r} y={H - 2} textAnchor="end" fontSize={12} className="fill-text-3">Time (s)</text>}
+          {!compact && <text x={W - PAD.r} y={H - 2} textAnchor="end" fontSize={12} className="fill-text-3">{xLabel}</text>}
           {!compact && <text x={4} y={PAD.t - 2} fontSize={12} className="fill-text-3">{yLabel}</text>}
           {markers.map((m) => (
             <line key={m.t} x1={x(m.t)} x2={x(m.t)} y1={PAD.t} y2={H - PAD.b} stroke="var(--vehicle-rerouting)" strokeWidth="1.5">

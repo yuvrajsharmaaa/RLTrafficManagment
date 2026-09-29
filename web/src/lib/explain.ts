@@ -26,9 +26,9 @@ function endTitle(run: RunData): string {
   const trip = tripOf(run);
   switch (trip.state) {
     case 'arrived':
-      return `Reached the ${trip.destinationLabel.toLowerCase()}`;
+      return `Reached: ${trip.destinationLabel}`;
     case 'estimate':
-      return `Estimated arrival at the ${trip.destinationLabel.toLowerCase()} (planner estimate)`;
+      return `Estimated arrival (planner estimate): ${trip.destinationLabel}`;
     case 'not_arrived_within_cap':
       return 'Simulation limit reached: the ambulance was not at the network exit';
     case 'teleported':
@@ -52,7 +52,7 @@ export function buildTimeline(run: RunData): TimelineEntry[] {
         sawEnd = true;
         entries.push({ t: e.t, kind: 'arrival', title: endTitle(run), serverNote: e.detail });
       } else if (e.type === 'dispatch' || (e.t === 0 && e.type !== 'waypoint')) {
-        entries.push({ t: e.t, kind: 'dispatch', title: `Dispatched toward the ${destination.toLowerCase()}`, serverNote: e.detail });
+        entries.push({ t: e.t, kind: 'dispatch', title: `Dispatched. Destination: ${destination}`, serverNote: e.detail });
       } else if (e.type === 'replan') {
         const m = trafficAt(run, e.t);
         const traffic = m ? `Speeds ${TIER_WORD[m.tier].toLowerCase()}. ` : '';
