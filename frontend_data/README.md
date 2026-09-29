@@ -56,6 +56,16 @@ exactly as the hero export does. There is no synthetic fallback: without SUMO
 the endpoint returns 503. A request with the same body returns the same
 response.
 
+## Reproducing the numbers
+
+```sh
+python reproduce_demo.py --all
+```
+
+re-checks hospital coverage, measures traffic per tier, sends a live request
+twice, and re-drives every recorded run in SUMO, comparing each with the
+committed file. It exits non-zero if anything differs.
+
 ## History
 
 Files exported before 2026-09-29 used hard-coded arrival times (93.55 to
