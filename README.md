@@ -18,6 +18,8 @@
 | **Traffic** | 3 scenarios (Light / Moderate / Heavy), 8 vehicle types incl. two-wheelers, autos, e-rickshaws, buses |
 | **Simulator** | Eclipse SUMO 1.26.0 (pinned) |
 | **Tests** | 97 passing (`pytest`) |
+| **Live demo (static)** | [Vercel](https://vercel.com/yuvrajsharmaaas-projects/va-qpso-team-innovexa/Ehevzi3HJrRpjvvbauns1YZhC4Js): frontend only, replays recorded SUMO runs |
+| **Live demo (full)** | [Render](https://va-qpso-team-innovexa.onrender.com/?screen=mission): real SUMO + FastAPI backend (free tier, see [Live demos](#live-demos)) |
 | **Reproducibility** | `python reproduce_demo.py --all` re-derives every number in the demo |
 
 ![logo](logo.png)
@@ -29,6 +31,7 @@
 1. [Problem](#1-problem)
 2. [Solution](#2-solution)
 3. [Quick start](#3-quick-start)
+   - [Live demos](#live-demos)
 4. [How it works](#4-how-it-works)
 5. [Results](#5-results)
 6. [What is measured vs estimated](#6-what-is-measured-vs-estimated)
@@ -87,6 +90,27 @@ npm --prefix web run dev            # open http://localhost:5173
 2. Click the map (or *Recorded pickup junction*), pick a traffic level, *Find route*: live plan from the measured traffic (≈ 3 s).
 3. Tick *Simulate the drive in SUMO* for a measured drive-through (≈ 20–60 s).
 4. *Optimization* shows β, the Volatility Index and the convergence curve; *Analytics* compares adaptive vs fixed schedule on the same traffic.
+
+## Live demos
+
+There are two deployments. They show different things.
+
+| | Vercel (static) | Render (full) |
+| :--- | :--- | :--- |
+| **URL** | [Vercel Deployment](https://vercel.com/yuvrajsharmaaas-projects/va-qpso-team-innovexa/Ehevzi3HJrRpjvvbauns1YZhC4Js) | [va-qpso-team-innovexa.onrender.com](https://va-qpso-team-innovexa.onrender.com/?screen=mission) |
+| **What runs** | React dashboard only | Dashboard + FastAPI + SUMO 1.26 (Docker) |
+| **Recorded incidents** (Light / Moderate / Heavy) | Yes | Yes |
+| **Find route** (live VA-QPSO plan) | No | Yes |
+| **Simulate the drive in SUMO** | No | Yes |
+| **Availability** | Always on | Sleeps when idle, wakes on first visit |
+
+**Vercel is a static preview.** It has no backend, so it can only show the recorded runs from `frontend_data/`. It is meant to show the dashboard and what a result looks like, not the working system. Clicking the map or *Find route* will not compute anything there.
+
+**Render is the real system.** Every live plan and drive-through is computed by SUMO and the VA-QPSO planner on the server.
+
+> **Note: the Render instance runs on the free plan.** It spins down after about 15 minutes without traffic. The first request after that takes **around 1 minute** to wake it up (the page may look blank or show a loading error meanwhile). To wake it, open `https://va-qpso-team-innovexa.onrender.com/health` first and wait for the JSON response, then open the dashboard. Live planning takes about 3 s and a SUMO drive-through 20–60 s once it is awake.
+>
+> If the Render demo is unavailable, use the Vercel link for a preview, or run the project locally (see [Quick start](#3-quick-start)).
 
 ## 4. How it works
 
