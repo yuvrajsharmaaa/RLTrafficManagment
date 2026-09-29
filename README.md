@@ -330,9 +330,11 @@ Earlier versions of this project reported numbers that were not measured. They h
 
 | Role | Name |
 | :--- | :--- |
-| Team lead | [to be added] |
-| Simulation and network | [to be added] |
-| Optimisation and analysis | [to be added] |
-| Frontend and backend | [to be added] |
+| Team lead | Yuvraj Sharma |
+| Simulation and network | Anjali Kumari |
+| Optimisation and analysis | Vanshika Garg |
+| Frontend and backend | Shivam Shaubnik |
+| Traffic simulation and testing | Abhishek Gupta |
+| Data analysis and evaluation | Ayush Patel |
 
 MIT License.
