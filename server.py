@@ -340,7 +340,8 @@ def get_run(run_id: str) -> Any:
 @app.get("/", summary="Serve the Mission Control UI")
 @app.get("/index.html", summary="Serve the Mission Control UI")
 def serve_index() -> FileResponse:
-    index_path = PROJECT_ROOT / "index.html"
+    web_dist = PROJECT_ROOT / "web" / "dist" / "index.html"
+    index_path = web_dist if web_dist.is_file() else PROJECT_ROOT / "index.html"
     if not index_path.is_file():
         raise HTTPException(status_code=404, detail="index.html not found.")
     return FileResponse(index_path, media_type="text/html; charset=utf-8")
@@ -383,9 +384,11 @@ if DEFAULT_DATA_DIR.is_dir():
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    port_default = int(os.environ.get("PORT", "8000"))
+    host_default = os.environ.get("HOST", "0.0.0.0")
     parser = argparse.ArgumentParser(description="Serve the Adaptive Ambulance Route Control API & Web UI")
-    parser.add_argument("--host", default="127.0.0.1", help="Host to bind (default: 127.0.0.1)")
-    parser.add_argument("--port", default=8000, type=int, help="Port to bind (default: 8000)")
+    parser.add_argument("--host", default=host_default, help=f"Host to bind (default: {host_default})")
+    parser.add_argument("--port", default=port_default, type=int, help=f"Port to bind (default: {port_default})")
     parser.add_argument("--data-dir", default="frontend_data", help="Directory containing exported hero JSON")
     args = parser.parse_args()
 
