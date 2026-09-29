@@ -1,12 +1,12 @@
 import { memo, useEffect, useMemo, useState } from 'react';
-import { BookOpen, CircleCheck, Columns2, History } from 'lucide-react';
+import { CircleCheck, Columns2, History } from 'lucide-react';
 import { useReportStatus } from '../app/shellStatus';
 import { TimeSeriesChart } from '../components/charts/TimeSeriesChart';
 import { PlaybackDock } from '../components/mission/PlaybackDock';
 import { Button, EmptyState, ErrorState, Panel, Skeleton, StatusChip, Table, type Column } from '../components/ui';
 import { usePlayback, type Playback } from '../hooks/usePlayback';
 import { fetchRunData, recordedRunId, type LoadedRun } from '../lib/api';
-import { PAIRED, PAIRED_SEEDS_IDENTICAL, README_SOURCE, type PairedRow } from '../lib/benchmark';
+import { REAL_BENCHMARK, README_SOURCE, type RealBenchmarkRow } from '../lib/benchmark';
 import { cx } from '../lib/cx';
 import { buildTimeline, etaChangeWords } from '../lib/explain';
 import { SCENARIO_WORD, TIER_WORD, formatClock, formatDuration } from '../lib/format';
@@ -26,14 +26,11 @@ function initialTier(): ScenarioTier {
 type Side = { state: 'ok'; run: RunData } | { state: 'missing' };
 type Load = { state: 'loading' } | { state: 'error'; message: string } | { state: 'ready'; adaptive: Side; fixed: Side };
 
-const pairedColumns: Column<PairedRow>[] = [
-  { key: 'tier', header: 'Traffic', render: (r) => SCENARIO_WORD[r.tier] },
-  { key: 'a', header: 'Adaptive mean (s)', numeric: true, render: (r) => r.adaptiveMean.toFixed(2) },
-  { key: 'f', header: 'Fixed mean (s)', numeric: true, render: (r) => r.fixedMean.toFixed(2) },
-  { key: 'd', header: 'Difference', numeric: true, render: (r) => `${Math.abs(r.diff).toFixed(2)} s ${r.diff <= 0 ? 'sooner' : 'later'}` },
-  { key: 'p', header: 'Chance it is luck (p)', numeric: true, render: (r) => r.pValue.toFixed(4) },
-  { key: 'a12', header: 'Adaptive wins (A12)', numeric: true, render: (r) => `${Math.round(r.a12 * 100)}%` },
-  { key: 'c', header: 'Congestion score, adaptive − fixed', numeric: true, render: (r) => `${r.congestionDiff > 0 ? '+' : ''}${r.congestionDiff.toFixed(4)}` },
+const realColumns: Column<RealBenchmarkRow>[] = [
+  { key: 'm', header: 'Method', render: (r) => r.algorithm },
+  { key: 'c', header: 'Reached exit', numeric: true, render: (r) => `${r.completed} of ${r.total}` },
+  { key: 'a', header: 'Mean arrival', numeric: true, render: (r) => (r.meanArrivalS === null ? 'No arrival' : formatDuration(r.meanArrivalS)) },
+  { key: 'd', header: 'Mean distance driven', numeric: true, render: (r) => `${Math.round(r.meanDrivenM).toLocaleString('en-IN')} m` },
 ];
 
 function SidePanel({ title, side, playback, style }: { title: string; side: Side; playback: Playback; style: 'optimized' | 'baseline' }) {
@@ -139,7 +136,7 @@ export const Analytics = memo(function Analytics() {
     });
   }, [report, load.state, duration, metric, playback.t, playback.playing, playback.speed]);
 
-  const paired = PAIRED.find((p) => p.tier === tier);
+  const realRows = REAL_BENCHMARK.filter((r) => r.tier === tier);
   const aTrip = adaptive ? tripOf(adaptive) : null;
   const fTrip = fixed ? tripOf(fixed) : null;
   // A time difference exists only when both simulated ambulances reached the exit.
@@ -214,21 +211,16 @@ export const Analytics = memo(function Analytics() {
         {adaptive && fixed && (
           <p className="text-body-sm text-text-2">
             {timeWords(aTrip)} adaptive vs {timeWords(fTrip)} fixed at {SCENARIO_WORD[tier]} traffic (simulated drives to the network exit).
-            {paired?.congestionNote && ` The adaptive route had ${paired.congestionNote} (${README_SOURCE}).`}
           </p>
         )}
         <Panel title="Across repeated trials" collapsible defaultOpen={false} className="mt-1">
           <div className="flex flex-col gap-2">
-            <Table caption="Paired comparison of adaptive routing and the fixed schedule" columns={pairedColumns} rows={PAIRED}
-              rowKey={(r) => r.tier} selectedKey={tier} dense source={`Source: ${README_SOURCE}, table 4 (10 seeds per traffic level). Differences are adaptive minus fixed.`} />
-            {PAIRED_SEEDS_IDENTICAL && (
-              <p className="flex gap-2 text-caption text-warning">
-                <BookOpen size={14} strokeWidth={1.75} aria-hidden className="mt-0.5 shrink-0" />
-                In results/experiments.csv every one of the 10 seeds in a traffic level gave exactly the same time and congestion
-                score. The 10 trials are one outcome repeated, so the p-value reflects ten identical differences, not variation
-                across conditions.
-              </p>
-            )}
+            <Table caption={`Ambulance drive-throughs in SUMO, ${SCENARIO_WORD[tier]} traffic`} columns={realColumns} rows={realRows}
+              rowKey={(r) => r.technical} dense
+              source={`Source: ${README_SOURCE}.5 (run_real_benchmark.py). 5 optimiser seeds per method on the same SUMO traffic; 900 s limit.`} />
+            <p className="text-caption text-text-3">
+              Distance driven before the limit includes waypoint loops, so it does not measure progress toward the hospital.
+            </p>
           </div>
         </Panel>
       </div>

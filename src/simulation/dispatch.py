@@ -576,3 +576,24 @@ class DispatchSession:
             events=events,
             waypoint_times=waypoint_times,
         )
+
+
+def prewarm_all(sirens: bool = False) -> List[Path]:
+    """Build (or find) the saved warm-up state of every tier."""
+    return [warmup_state(tier, sirens) for tier in TIERS]
+
+
+if __name__ == "__main__":
+    import argparse
+    import time
+
+    parser = argparse.ArgumentParser(description="Dispatch pipeline utilities")
+    parser.add_argument("--prewarm", action="store_true", help="build the saved SUMO warm-up state of every tier")
+    args = parser.parse_args()
+    if args.prewarm:
+        for tier in TIERS:
+            t0 = time.time()
+            path = warmup_state(tier)
+            print(f"{tier:<7} {path.name}  ({time.time() - t0:.1f} s)", flush=True)
+    else:
+        parser.print_help()

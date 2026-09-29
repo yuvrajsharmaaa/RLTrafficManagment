@@ -12,8 +12,10 @@ export function formatClock(seconds: number): string {
 export function formatDuration(seconds: number): string {
   const s = Math.abs(seconds);
   if (s < 60) return `${s.toFixed(1)} s`;
-  const m = Math.floor(s / 60);
-  const r = Math.round(s % 60);
+  // Round once, then split, so 479.6 s reads "8 min 00 s", not "7 min 60 s".
+  const total = Math.round(s);
+  const m = Math.floor(total / 60);
+  const r = total % 60;
   return `${m} min ${r.toString().padStart(2, '0')} s`;
 }
 

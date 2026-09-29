@@ -88,6 +88,18 @@ def initialize_network_cache() -> None:
 initialize_network_cache()
 
 
+def _prewarm_states() -> None:
+    """Build any missing SUMO warm-up state so no request waits for one."""
+    try:
+        from src.simulation.dispatch import prewarm_all
+
+        t0 = time.time()
+        paths = prewarm_all()
+        logger.info("SUMO warm-up states ready (%d tiers) in %.1fs.", len(paths), time.time() - t0)
+    except Exception as exc:  # a request will build its state on demand instead
+        logger.warning("Could not pre-build SUMO warm-up states: %s", exc)
+
+
 # ---------------------------------------------------------------------------
 # FastAPI Application & Request / Response Models
 # ---------------------------------------------------------------------------
@@ -97,6 +109,12 @@ app = FastAPI(
     description="Adaptive Emergency Ambulance Routing powered by Volatility-Adaptive QPSO (VA-QPSO).",
     version="1.0.0",
 )
+
+@app.on_event("startup")
+def _start_prewarm() -> None:
+    if HAS_SIMULATION and _road_model is not None:
+        threading.Thread(target=_prewarm_states, name="sumo-prewarm", daemon=True).start()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -337,14 +355,20 @@ def get_run(run_id: str) -> Any:
 # Static Web Assets (Frontend, PWA Manifest, Service Worker)
 # ---------------------------------------------------------------------------
 
+# The React app (web/) builds to one self-contained file. The root
+# index.html is the previous app, served only when no build exists.
+WEB_BUILD_INDEX = PROJECT_ROOT / "web" / "dist" / "index.html"
+LEGACY_INDEX = PROJECT_ROOT / "index.html"
+
+
 @app.get("/", summary="Serve the Mission Control UI")
 @app.get("/index.html", summary="Serve the Mission Control UI")
 def serve_index() -> FileResponse:
-    web_dist = PROJECT_ROOT / "web" / "dist" / "index.html"
-    index_path = web_dist if web_dist.is_file() else PROJECT_ROOT / "index.html"
+    index_path = WEB_BUILD_INDEX if WEB_BUILD_INDEX.is_file() else LEGACY_INDEX
     if not index_path.is_file():
         raise HTTPException(status_code=404, detail="index.html not found.")
-    return FileResponse(index_path, media_type="text/html; charset=utf-8")
+    # no-cache: browsers revalidate, so a redeploy is picked up immediately.
+    return FileResponse(index_path, media_type="text/html; charset=utf-8", headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/manifest.json")
@@ -355,8 +379,9 @@ def serve_manifest() -> FileResponse:
 
 @app.get("/sw.js")
 def serve_service_worker() -> FileResponse:
+    # sw.js retires the old app's caching worker; never let it be cached itself.
     path = PROJECT_ROOT / "sw.js"
-    return FileResponse(path, media_type="application/javascript")
+    return FileResponse(path, media_type="application/javascript", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/icon-192.png")
