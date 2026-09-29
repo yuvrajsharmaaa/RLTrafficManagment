@@ -1,5 +1,7 @@
-# Volatility-Adaptive Ambulance Routing (VA-QPSO)
+# Quantum-Inspired Intelligent Traffic Route Optimization in Transportation
+### Volatility-Adaptive Ambulance Routing (VA-QPSO)
 
+> **SIH 2026 — Problem Statement SIH26137**  
 > Traffic-aware ambulance routing for congested Indian cities. A quantum-inspired
 > swarm optimiser (VA-QPSO) re-plans the route as traffic changes, and adapts how
 > often and how widely it searches to how **unpredictable** traffic is right now.
@@ -7,6 +9,10 @@
 
 | | |
 | :--- | :--- |
+| **Organization** | Egreen Quanta |
+| **Problem Statement** | SIH26137 |
+| **Category** | Software |
+| **Theme** | Transportation & Logistics |
 | **Status** | Working prototype: SUMO simulation + FastAPI backend + React dashboard |
 | **Road network** | OpenStreetMap, Connaught Place, New Delhi: 772 road segments, 543 junctions, Delhi Traffic Police speed limits |
 | **Traffic** | 3 scenarios (Light / Moderate / Heavy), 8 vehicle types incl. two-wheelers, autos, e-rickshaws, buses |
@@ -14,7 +20,7 @@
 | **Tests** | 97 passing (`pytest`) |
 | **Reproducibility** | `python reproduce_demo.py --all` re-derives every number in the demo |
 
-![SUMO micro-simulation: cars, buses and two-wheelers queued at a Connaught Place signal](1.png)
+![logo](logo.png)
 
 ---
 
