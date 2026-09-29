@@ -1,45 +1,13 @@
 import type { ScenarioTier } from './types';
 
-// Figures copied from README.md, section 12 ("Results & Experimental
-// Validation"). The server does not serve results/, so these are a labelled
-// snapshot, not live data (Phase 1 question 1 is still open).
+// Figures copied from README.md, section 5 ("Results"). The server does not
+// serve results/, so these are a labelled snapshot, not live data. The earlier
+// paired table (93.55 / 95.22 / 125.70 s, p = 0.002) is withdrawn; see README
+// section 12.
 
-export const README_SOURCE = 'README section 12';
+export const README_SOURCE = 'README section 5';
 
-/** Table 4: paired comparison, 10 seeds per traffic level. Differences are adaptive minus fixed. */
-export interface PairedRow {
-  tier: ScenarioTier;
-  adaptiveMean: number;
-  fixedMean: number;
-  /** Adaptive minus fixed, seconds; negative = adaptive sooner. */
-  diff: number;
-  pValue: number;
-  /** Vargha-Delaney A12: probability a random adaptive trial beats a random fixed trial. */
-  a12: number;
-  /** Congestion score difference, adaptive minus fixed; negative = adaptive less congestion. */
-  congestionDiff: number;
-  /** Stated in the README only for Heavy traffic. */
-  congestionNote?: string;
-}
-
-export const PAIRED: PairedRow[] = [
-  { tier: 'low', adaptiveMean: 93.55, fixedMean: 93.71, diff: -0.16, pValue: 0.002, a12: 1.0, congestionDiff: 0.0013 },
-  { tier: 'medium', adaptiveMean: 95.22, fixedMean: 98.62, diff: -3.4, pValue: 0.002, a12: 1.0, congestionDiff: 0.0047 },
-  {
-    tier: 'high', adaptiveMean: 125.7, fixedMean: 109.37, diff: 16.33, pValue: 0.002, a12: 0.0, congestionDiff: -0.084,
-    congestionNote: '25.62% less congestion exposure',
-  },
-];
-
-/**
- * results/experiments.csv (the source of table 4) shows every one of the 10
- * seeds in a traffic level produced exactly the same time and congestion score.
- * The "10 trials" are therefore one outcome repeated; the p-value reflects ten
- * identical differences, not variation across conditions.
- */
-export const PAIRED_SEEDS_IDENTICAL = true;
-
-/** Table 5: 30 seeded trials, 8 stops, Moderate traffic, 600 iterations or generations. */
+/** README 5.2: 30 seeded trials, 8 stops, Moderate traffic, 600 iterations or generations. */
 export interface MethodRow {
   key: string;
   method: string;
@@ -66,7 +34,7 @@ export const METHODS: MethodRow[] = [
 
 export const METHODS_SETUP = '30 seeded trials, 8 stops, Moderate traffic, synthetic congestion model (not measured SUMO travel time)';
 
-/** Table 6: Real-world performance measured in Eclipse SUMO across 5 random seeds per traffic tier. */
+/** README 5.5: SUMO drive-throughs, 5 optimiser seeds per traffic level (same SUMO traffic in every run). */
 export interface RealBenchmarkRow {
   tier: ScenarioTier;
   algorithm: string;

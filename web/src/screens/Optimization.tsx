@@ -396,13 +396,13 @@ export const Optimization = memo(function Optimization() {
                     Score = planned travel time to the network exit in seconds, from the edge speeds SUMO measured at dispatch. X axis: search iteration.
                   </p>
                   <p className="text-caption text-text-3">Algorithm comparison — synthetic congestion model, not measured travel time.</p>
-                  <Table caption="Search speed across 30 trials (synthetic congestion model)" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}, table 5 (${METHODS_SETUP})`} dense />
+                  <Table caption="Search speed across 30 trials (synthetic congestion model)" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}.2 (${METHODS_SETUP})`} dense />
                 </div>
               </Panel>
             ) : (
               <Unavailable title="Convergence by iteration">
                 <p>This run file has no per-iteration scores, so no convergence curve is drawn. The summary below is from repeated trials on a synthetic congestion model (not measured SUMO travel time).</p>
-                <Table caption="Search speed across 30 trials (synthetic congestion model)" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}, table 5 (${METHODS_SETUP})`} dense />
+                <Table caption="Search speed across 30 trials (synthetic congestion model)" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}.2 (${METHODS_SETUP})`} dense />
               </Unavailable>
             )}
 

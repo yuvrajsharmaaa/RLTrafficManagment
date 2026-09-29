@@ -116,7 +116,7 @@ export const Benchmark = memo(function Benchmark() {
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone="warning" icon={ShieldAlert} label="Algorithm comparison — synthetic congestion model, not measured travel time" />
             <StatusChip tone="neutral" icon={BookOpen} label="README snapshot" />
-            <span className="text-caption text-text-3">Source: {README_SOURCE}, table 5 · {METHODS_SETUP}</span>
+            <span className="text-caption text-text-3">Source: {README_SOURCE}.2 · {METHODS_SETUP}</span>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export const Benchmark = memo(function Benchmark() {
 
         <Panel title="Full results (synthetic congestion model)" className="col-span-8 wide:col-span-12">
           <Table caption="Benchmark results for six route-search methods on synthetic congestion model" columns={columns} rows={METHODS} rowKey={(r) => r.key}
-            source={`Source: ${README_SOURCE}, table 5. ${METHODS_SETUP}.`} />
+            source={`Source: ${README_SOURCE}.2. ${METHODS_SETUP}.`} />
         </Panel>
 
         <div className="col-span-8 flex flex-col gap-4 wide:col-span-12">
