@@ -25,18 +25,24 @@ export function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
             </Dialog.Close>
           </div>
           <Dialog.Description className="text-body text-text-2">
-            This console routes an emergency ambulance through simulated Delhi traffic (Connaught Place) to the
-            nearest trauma centre.
+            This console routes an emergency ambulance through simulated Delhi traffic (Connaught Place). The
+            simulated roads cover central Connaught Place only and no hospital lies on them, so each trip is simulated
+            to the network exit closest to the hospital; the rest is shown as a straight-line distance estimate.
           </Dialog.Description>
           <dl className="flex flex-col gap-3 text-body">
             <div>
-              <dt className="font-semibold text-text-1">Arrival time</dt>
-              <dd className="text-text-2">Remaining drive time to the hospital. It changes when the route is re-planned.</dd>
+              <dt className="font-semibold text-text-1">Time to network exit</dt>
+              <dd className="text-text-2">
+                Either the time an ambulance actually took in SUMO (simulated drive), or the planner estimate from the
+                speeds measured at dispatch. The card always says which. A simulated drive that is still in traffic at
+                the 15-minute limit has no arrival time and is shown as such.
+              </dd>
             </div>
             <div>
               <dt className="font-semibold text-text-1">Traffic unpredictability</dt>
               <dd className="text-text-2">
-                How much road speeds are changing across the network, from 0 (steady) to 1 (unstable). When it rises,
+                How much road speeds are changing across the network, from 0 (steady) to 1 (unstable). It is not a
+                congestion level, which is shown separately as vehicles, mean speed and stopped vehicles. When it rises,
                 the route search looks wider and re-plans sooner.
               </dd>
             </div>

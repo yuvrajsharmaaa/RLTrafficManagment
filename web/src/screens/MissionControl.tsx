@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Database, PanelLeft, Radio, RotateCcw, TriangleAlert } from 'lucide-react';
+import { Database, PanelLeft, Radio, RotateCcw } from 'lucide-react';
 import { useConnectionState } from '../app/connection';
 import { useNotifications } from '../app/notifications';
 import { useSession } from '../app/sessionRun';
@@ -17,6 +17,7 @@ import { fetchRunData, planRoute, randomSeed, recordedRunId } from '../lib/api';
 import { cx } from '../lib/cx';
 import { SCENARIO_WORD, SOURCE_WORD, TIER_WORD, formatClock, formatCoord } from '../lib/format';
 import { replanEvents, trafficAt } from '../lib/timeline';
+import { endWord, tripOf } from '../lib/trip';
 import type { RunData, ScenarioTier } from '../lib/types';
 import { MissionMap } from '../map/MissionMap';
 
@@ -59,6 +60,7 @@ export const MissionControl = memo(function MissionControl() {
       : null,
   );
   const [computing, setComputing] = useState(false);
+  const [driveThrough, setDriveThrough] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(true);
@@ -117,13 +119,14 @@ export const MissionControl = memo(function MissionControl() {
         seed: randomSeed(),
         use_live_sumo: true,
         num_stops: 8,
+        drive_through: driveThrough,
       });
       const source = (data.source && SOURCE_WORD[data.source]) ?? 'Live result';
       const requestMs = performance.now() - started;
       setMission({ key: `live-${Date.now()}`, run: data, baseline: null, kind: 'live', source, incident, tier, note: null, requestMs });
       session.setCurrent({ run: data, baseline: null, kind: 'live', tier, requestMs });
-      if (data.source === 'live_calibrated_scenario') {
-        push('warning', 'Traffic simulation was unavailable, so this route uses estimated traffic. Treat times as approximate.');
+      if (data.timing?.status === 'not_arrived_within_cap' || data.timing?.status === 'teleported') {
+        push('warning', 'The simulated ambulance did not reach the network exit, so this run has no arrival time.');
       }
       pendingPlay.current = true;
     } catch (err) {
@@ -191,12 +194,8 @@ export const MissionControl = memo(function MissionControl() {
       .filter((e) => prev < e.t && e.t <= playback.t)
       .forEach((e) => {
         const word = run ? trafficAt(run, e.t) : null;
-        const traffic = word ? ` Traffic ${TIER_WORD[word.tier].toLowerCase()}.` : '';
-        const saved =
-          typeof e.eta_before === 'number' && typeof e.eta_after === 'number' && e.eta_before > e.eta_after
-            ? ` Arrival ${Math.round(e.eta_before - e.eta_after)} s sooner.`
-            : '';
-        push('info', `T+${Math.round(e.t)} s: route re-planned.${traffic}${saved}`);
+        const traffic = word ? ` Speeds ${TIER_WORD[word.tier].toLowerCase()}.` : '';
+        push('info', `T+${Math.round(e.t)} s: route re-planned.${traffic}`);
       });
   }, [playback.t, playback.playing, replans, push, run]);
 
@@ -214,8 +213,6 @@ export const MissionControl = memo(function MissionControl() {
   const sourceChip = mission ? (
     mission.kind === 'recorded' ? (
       <StatusChip tone="neutral" icon={Database} label="Recorded run" />
-    ) : mission.run.source === 'live_calibrated_scenario' ? (
-      <StatusChip tone="warning" icon={TriangleAlert} label="Estimated traffic" />
     ) : (
       <StatusChip tone="info" icon={Radio} label={mission.source} />
     )
@@ -248,6 +245,13 @@ export const MissionControl = memo(function MissionControl() {
                   <StatusChip tone="neutral" label={`${SCENARIO_WORD[mission.tier]} traffic`} />
                 </div>
                 {mission.note && <p className="text-caption text-warning">{mission.note}</p>}
+                {mission.run.timing && (
+                  <p className="num text-caption text-text-3">
+                    Reproduce: {mission.kind === 'live' ? `optimizer seed ${mission.run.seed ?? 'n/a'} · ` : ''}SUMO seed{' '}
+                    {mission.run.timing.sumo_seed} · dispatch at t = {mission.run.timing.dispatch_sim_time_s} s
+                    {mission.run.pickup_snap_m != null ? ` · pickup snapped ${Math.round(mission.run.pickup_snap_m)} m` : ''}
+                  </p>
+                )}
                 <p className="num text-text-2">
                   {mission.incident
                     ? formatCoord(mission.incident.lat, mission.incident.lon)
@@ -280,6 +284,8 @@ export const MissionControl = memo(function MissionControl() {
             tier={tier}
             onTierChange={setTier}
             onFindRoute={() => void findRoute()}
+            driveThrough={driveThrough}
+            onDriveThroughChange={setDriveThrough}
             onOpenRecorded={() => void openRecorded()}
             computing={computing}
             elapsedMs={elapsedMs}
@@ -305,7 +311,7 @@ export const MissionControl = memo(function MissionControl() {
           </Button>
           {run && !panelOpen && (
             <span className="num rounded border border-border bg-panel px-2 py-1 text-body-sm text-text-1 shadow-1">
-              {playback.t >= run.completion_time ? 'Arrived' : `Arrival in ${formatClock(run.completion_time - playback.t)}`}
+              {playback.t >= run.completion_time ? endWord(tripOf(run)) : `Time to exit ${formatClock(run.completion_time - playback.t)}`}
             </span>
           )}
         </div>

@@ -18,8 +18,8 @@ function normalizeRunData(data: RunData): RunData {
     path: (data.path || []).sort((a, b) => a.t - b.t),
     metrics_over_time: (data.metrics_over_time || []).sort((a, b) => a.t - b.t),
     events: (data.events || []).sort((a, b) => a.t - b.t),
-    completion_time:
-      data.completion_time || (data.path && data.path.length ? (data.path.at(-1)?.t ?? 100) : 100),
+    // No invented default: a file without completion_time plays to its last path sample.
+    completion_time: data.completion_time ?? data.path?.at(-1)?.t ?? 0,
   };
 }
 
@@ -69,11 +69,19 @@ export async function planRoute(req: PlanRouteRequest): Promise<RunData> {
       seed: req.seed,
       use_live_sumo: req.use_live_sumo,
       num_stops: req.num_stops,
+      drive_through: req.drive_through ?? false,
     }),
   });
 
   if (!res.ok) {
-    throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+    let detail = res.statusText;
+    try {
+      const body = (await res.json()) as { detail?: string };
+      if (body.detail) detail = body.detail;
+    } catch {
+      // keep statusText
+    }
+    throw new Error(`Server returned ${res.status}: ${detail}`);
   }
   return normalizeRunData((await res.json()) as RunData);
 }

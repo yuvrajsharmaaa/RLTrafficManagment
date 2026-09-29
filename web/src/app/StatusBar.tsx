@@ -16,7 +16,7 @@ export interface PlaybackClock {
 interface StatusBarProps {
   connection: Connection;
   systemState: SystemState;
-  /** "Recorded run", "Live simulation snapshot" or "Estimated traffic". Hidden when absent. */
+  /** "Recorded run", "SUMO traffic, planner estimate" or "SUMO simulated drive". Hidden when absent. */
   dataSource?: string;
   traffic?: { word: string; v: number };
   clock?: PlaybackClock;
@@ -64,7 +64,7 @@ export function StatusBar({ connection, systemState, dataSource, traffic, clock 
       )}
       {traffic && (
         <Item>
-          <span className="text-text-3">Traffic</span>
+          <span className="text-text-3">Unpredictability</span>
           <span className="text-text-1">{traffic.word}</span>
           <span className="num">{traffic.v.toFixed(2)}</span>
         </Item>

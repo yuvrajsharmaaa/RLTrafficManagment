@@ -5,6 +5,7 @@ import './map.css';
 import type { Playback } from '../hooks/usePlayback';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { formatClock } from '../lib/format';
+import { endWord, tripOf } from '../lib/trip';
 import type { RunData } from '../lib/types';
 import { DetailCard } from './DetailCard';
 import { MapEngine, type LayerKey, type RouteStyle, type Selection } from './engine';
@@ -87,13 +88,24 @@ export const MissionMap = memo(function MissionMap({
   const { subscribe } = playback;
   useEffect(() => subscribe((t) => engine.current?.update(t)), [subscribe]);
 
-  // Arrival label on the destination, at display rate.
+  // Label on the network exit, at display rate. Wording comes from the run's timing status.
   const remaining = run ? Math.max(0, run.completion_time - playback.t) : 0;
-  const arrived = run !== null && playback.t >= run.completion_time;
+  const ended = run !== null && playback.t >= run.completion_time;
+  const trip = run ? tripOf(run) : null;
+  const arrived = ended && trip?.arrived === true;
   useEffect(() => {
-    if (!run) return;
-    engine.current?.setEtaLabel(arrived ? `Arrived ${formatClock(run.completion_time)}` : `Arrival in ${formatClock(remaining)}`);
-  }, [run, remaining, arrived]);
+    if (!run || !trip) return;
+    const stuck = trip.state === 'not_arrived_within_cap' || trip.state === 'teleported';
+    engine.current?.setEtaLabel(
+      ended
+        ? stuck
+          ? endWord(trip)
+          : `${endWord(trip)} ${formatClock(run.completion_time)}`
+        : stuck
+          ? `Simulated ${formatClock(playback.t)}`
+          : `${trip.state === 'estimate' ? 'Est. exit in' : 'Exit in'} ${formatClock(remaining)}`,
+    );
+  }, [run, trip, remaining, ended, playback.t]);
 
   const toggleLayer = useCallback((key: LayerKey, on: boolean) => {
     setLayers((prev) => ({ ...prev, [key]: on }));
@@ -130,7 +142,7 @@ export const MissionMap = memo(function MissionMap({
           <DetailCard
             selection={selection}
             onClose={closeDetail}
-            ambulance={{ remaining, progressPct: run ? (Math.min(playback.t, run.completion_time) / run.completion_time) * 100 : 0, arrived }}
+            ambulance={{ remaining, progressPct: run ? (Math.min(playback.t, run.completion_time) / run.completion_time) * 100 : 0, arrived, ended, state: trip?.state ?? 'unlabelled' }}
           />
         </div>
       )}

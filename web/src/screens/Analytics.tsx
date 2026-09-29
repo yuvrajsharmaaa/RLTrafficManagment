@@ -80,7 +80,7 @@ function SidePanel({ title, side, playback, style }: { title: string; side: Side
         <p className="text-body-sm text-text-1">
           {current ? `T+${Math.round(current.t)} s: ${current.title}${current.eta ? `, ${etaChangeWords(current.eta)}` : ''}` : 'Waiting to dispatch'}
         </p>
-        {m && <p className="text-caption text-text-3">Traffic {TIER_WORD[m.tier].toLowerCase()} {m.volatility_index.toFixed(2)}</p>}
+        {m && <p className="text-caption text-text-3">Speeds {TIER_WORD[m.tier].toLowerCase()} {m.volatility_index.toFixed(2)}</p>}
         <TimeSeriesChart compact title={`${title}: traffic unpredictability`} series={series} xMax={run.completion_time}
           yMin={0} yMax={1} yTicks={[0, 1]} yLabel="V" formatY={(v) => v.toFixed(0)}
           markers={replanEvents(run.events).map((e) => ({ t: e.t, label: `Re-plan at T+${Math.round(e.t)} s` }))} cursor={t} height={64} />

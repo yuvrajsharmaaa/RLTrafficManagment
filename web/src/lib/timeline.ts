@@ -48,25 +48,17 @@ export function metricAt(metrics: MetricPoint[], t: number): MetricPoint | null 
   return metrics[Math.max(0, i)] ?? null;
 }
 
-/** Live responses carry `source` and a single measured volatility_index. */
+/** Live responses carry `source`; recorded files do not. */
 export function isLiveRun(run: RunData): boolean {
-  return run.source !== undefined && run.volatility_index !== undefined;
+  return run.source !== undefined;
 }
 
 /**
- * Traffic reading to display at time t.
- *
- * Recorded runs: the per-second sample (logged during the SUMO run).
- * Live runs: server.py measures V once, then fills metrics_over_time with a
- * generated drift (V + 0.03 * sin(t / 10)) that is not a measurement. The UI
- * therefore uses the t = 0 sample, which equals the measured value, for the
- * whole trip.
+ * Traffic reading in effect at time t. Every metrics_over_time entry is a
+ * SUMO measurement: one per simulated second for a simulated drive, a single
+ * dispatch reading for a planner estimate (which then applies to the whole trip).
  */
 export function trafficAt(run: RunData, t: number): MetricPoint | null {
-  if (isLiveRun(run)) {
-    const first = run.metrics_over_time[0];
-    return first ? { ...first, t } : null;
-  }
   return metricAt(run.metrics_over_time, t);
 }
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Panel, Tooltip } from '../ui';
 import { TimeSeriesChart } from '../charts/TimeSeriesChart';
-import { isLiveRun, replanEvents, trafficAt } from '../../lib/timeline';
+import { replanEvents, trafficAt } from '../../lib/timeline';
 import type { RunData } from '../../lib/types';
 import { TierLabel } from './TierLabel';
 
@@ -17,14 +17,11 @@ interface TrafficCardProps {
 export function TrafficCard({ run, t }: TrafficCardProps) {
   const duration = run.completion_time;
   const metric = trafficAt(run, t);
-  const live = isLiveRun(run);
+  const single = run.metrics_over_time.length <= 1;
 
   const { series, markers } = useMemo(() => {
-    // Live runs: one measured value, drawn flat (the per-second series is generated drift).
-    const first = run.metrics_over_time[0];
-    const pts = isLiveRun(run)
-      ? first ? [{ t: 0, v: first.volatility_index }, { t: duration, v: first.volatility_index }] : []
-      : run.metrics_over_time.filter((m) => m.t <= duration).map((m) => ({ t: m.t, v: m.volatility_index }));
+    // Every sample is a measurement. A planner estimate has one (at dispatch), drawn as a single point.
+    const pts = run.metrics_over_time.filter((m) => m.t <= duration).map((m) => ({ t: m.t, v: m.volatility_index }));
     return {
       series: [{ key: 'v', label: 'Traffic unpredictability (V)', color: 'var(--color-text-2)', points: pts }],
       markers: replanEvents(run.events).map((e) => ({ t: e.t, label: `Re-plan at T+${Math.round(e.t)} s` })),
@@ -42,9 +39,26 @@ export function TrafficCard({ run, t }: TrafficCardProps) {
   return (
     <Panel raised title="Traffic now">
       <div className="flex flex-col gap-2">
+        {metric.vehicles !== undefined && (
+          <dl className="grid grid-cols-3 gap-2 text-body-sm" aria-label="Congestion now">
+            <div>
+              <dt className="text-caption text-text-3">Vehicles</dt>
+              <dd className="num text-text-1">{metric.vehicles}</dd>
+            </div>
+            <div>
+              <dt className="text-caption text-text-3">Mean speed</dt>
+              <dd className="num text-text-1">{metric.mean_vehicle_speed_kmh != null ? `${metric.mean_vehicle_speed_kmh.toFixed(1)} km/h` : 'No data'}</dd>
+            </div>
+            <div>
+              <dt className="text-caption text-text-3">Stopped</dt>
+              <dd className="num text-text-1">{metric.stopped_vehicles ?? 'No data'}</dd>
+            </div>
+          </dl>
+        )}
         <p className="flex items-baseline gap-2 text-body">
+          <span className="text-body-sm text-text-2">Unpredictability</span>
           <TierLabel tier={metric.tier} />
-          <Tooltip content="Traffic unpredictability (volatility index V): rolling speed variance across the network, 0 to 1">
+          <Tooltip content="How much network speeds are changing (volatility index V, rolling speed variance, 0 to 1). It is not a congestion level: a fully jammed network whose speeds stay low reads as steady.">
             <span tabIndex={0} className="num text-text-2 underline decoration-dotted underline-offset-2">
               {metric.volatility_index.toFixed(2)}
             </span>
@@ -53,7 +67,7 @@ export function TrafficCard({ run, t }: TrafficCardProps) {
 
         <TimeSeriesChart
           compact
-          title="Traffic unpredictability over the trip"
+          title="Unpredictability over the trip"
           series={series}
           xMax={duration}
           yMin={0}
@@ -67,9 +81,9 @@ export function TrafficCard({ run, t }: TrafficCardProps) {
           height={104}
         />
         <p className="text-caption text-text-3">
-          {live
-            ? 'Measured once when the route was requested; the server does not measure it again during the trip. Network-wide, not a single road.'
-            : 'Amber lines mark route re-plans. Network-wide, not a single road.'}
+          {single
+            ? 'Measured once in SUMO at dispatch; no vehicle was driven, so there is no reading during the trip. Network-wide, not a single road.'
+            : 'Measured in SUMO every simulated second. Amber lines mark route re-plans. Network-wide, not a single road.'}
         </p>
 
         <Panel title="Details" collapsible defaultOpen={false} className="-mx-4 -mb-4 border-x-0 border-b-0 bg-transparent">

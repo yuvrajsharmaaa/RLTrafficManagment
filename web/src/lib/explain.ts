@@ -1,6 +1,7 @@
 import { SOURCE_WORD, TIER_WORD, formatDuration, shortName } from './format';
 import { explorationKept } from './search';
 import { trafficAt } from './timeline';
+import { formatDistance, tripOf } from './trip';
 import type { DecisionEvent, RunData } from './types';
 
 // Plain-language text built from fixed templates and real fields only. A
@@ -21,24 +22,40 @@ function hasEta(e: DecisionEvent): e is DecisionEvent & { eta_before: number; et
   return typeof e.eta_before === 'number' && typeof e.eta_after === 'number';
 }
 
+function endTitle(run: RunData): string {
+  const trip = tripOf(run);
+  switch (trip.state) {
+    case 'arrived':
+      return `Reached the ${trip.destinationLabel.toLowerCase()}`;
+    case 'estimate':
+      return `Estimated arrival at the ${trip.destinationLabel.toLowerCase()} (planner estimate)`;
+    case 'not_arrived_within_cap':
+      return 'Simulation limit reached: the ambulance was not at the network exit';
+    case 'teleported':
+      return 'No valid arrival: SUMO teleported the ambulance out of a jam';
+    default:
+      return 'End of recording';
+  }
+}
+
 export function buildTimeline(run: RunData): TimelineEntry[] {
   const end = run.completion_time;
-  const hospital = run.selected_hospital ? shortName(run.selected_hospital.name) : 'the hospital';
+  const destination = tripOf(run).destinationLabel;
   const entries: TimelineEntry[] = [];
-  let sawArrival = false;
+  let sawEnd = false;
 
   // Recorded fixed-schedule files contain events after arrival (e.g. T+140 s); they are not part of this trip.
   run.events
     .filter((e) => e.t <= end)
     .forEach((e) => {
-      if (e.type === 'arrival') {
-        sawArrival = true;
-        entries.push({ t: e.t, kind: 'arrival', title: `Arrived at ${hospital}`, serverNote: e.detail });
-      } else if (e.type === 'dispatch' || e.t === 0) {
-        entries.push({ t: e.t, kind: 'dispatch', title: `Dispatched to ${hospital}`, serverNote: e.detail });
-      } else {
+      if (e.type === 'arrival' || e.type === 'not_arrived' || e.type === 'teleported') {
+        sawEnd = true;
+        entries.push({ t: e.t, kind: 'arrival', title: endTitle(run), serverNote: e.detail });
+      } else if (e.type === 'dispatch' || (e.t === 0 && e.type !== 'waypoint')) {
+        entries.push({ t: e.t, kind: 'dispatch', title: `Dispatched toward the ${destination.toLowerCase()}`, serverNote: e.detail });
+      } else if (e.type === 'replan') {
         const m = trafficAt(run, e.t);
-        const traffic = m ? `Traffic ${TIER_WORD[m.tier].toLowerCase()}. ` : '';
+        const traffic = m ? `Speeds ${TIER_WORD[m.tier].toLowerCase()}. ` : '';
         entries.push({
           t: e.t,
           kind: 'replan',
@@ -49,7 +66,7 @@ export function buildTimeline(run: RunData): TimelineEntry[] {
       }
     });
 
-  if (!sawArrival) entries.push({ t: end, kind: 'arrival', title: `Arrived at ${hospital}` });
+  if (!sawEnd) entries.push({ t: end, kind: 'arrival', title: endTitle(run) });
   return entries.sort((a, b) => a.t - b.t);
 }
 
@@ -66,28 +83,36 @@ export interface Sentence {
 }
 
 const SOURCE_SENTENCE: Record<string, string> = {
-  live_bounded_sumo: 'Based on a live simulation snapshot.',
-  live_calibrated_scenario: 'Based on estimated traffic, because the simulation was unavailable; treat times as approximate.',
+  live_sumo_snapshot:
+    'Traffic measured in SUMO at dispatch; the time is the planner estimate from those speeds, not a simulated drive.',
+  live_sumo_drive: 'An ambulance was driven through SUMO from the measured traffic; the time is the simulated one.',
 };
 
 export function whyThisRoute(run: RunData, kind: 'live' | 'recorded', baseline: RunData | null): Sentence[] {
   const out: Sentence[] = [];
   const dest = run.selected_hospital;
-  const destTime = run.hospital_candidates.find((h) => h.name === dest?.name)?.live_travel_time_sec;
-  if (dest && destTime !== undefined) {
-    const faster = run.hospital_candidates.filter((h) => h.live_travel_time_sec !== undefined);
-    const tied = faster.filter((h) => h.name !== dest.name && h.live_travel_time_sec === destTime).map((h) => shortName(h.name));
+  const destM = dest?.straight_line_from_exit_m;
+  if (dest && destM !== undefined) {
+    const known = run.hospital_candidates.filter((h) => h.straight_line_from_exit_m !== undefined);
     out.push({
-      text: `${shortName(dest.name)} has the shortest road time of ${faster.length} hospitals (${destTime.toFixed(1)} s)${tied.length ? `, tied with ${tied.join(', ')}` : ''}.`,
-      fields: ['selected_hospital.name', `hospital_candidates[].live_travel_time_sec = ${faster.map((h) => h.live_travel_time_sec).join(', ')}`],
+      text: `${shortName(dest.name)} is the closest of ${known.length} hospitals to the simulated map: ${formatDistance(destM)} straight-line beyond its network exit. That distance is an estimate and is not part of the time.`,
+      fields: ['selected_hospital.name', `hospital_candidates[].straight_line_from_exit_m = ${known.map((h) => h.straight_line_from_exit_m).join(', ')}`],
     });
   }
 
   const first = trafficAt(run, 0);
   if (first) {
+    const congestion =
+      first.vehicles !== undefined && first.mean_vehicle_speed_kmh != null
+        ? `${first.vehicles} vehicles averaging ${first.mean_vehicle_speed_kmh.toFixed(1)} km/h (${first.stopped_vehicles ?? 0} stopped); `
+        : '';
     out.push({
-      text: `Traffic was ${TIER_WORD[first.tier].toLowerCase()} at dispatch.`,
-      fields: [`metrics_over_time[0].tier = ${first.tier}`, `volatility_index = ${first.volatility_index}`],
+      text: `At dispatch: ${congestion}speeds were ${TIER_WORD[first.tier].toLowerCase()} (unpredictability ${first.volatility_index.toFixed(2)}).`,
+      fields: [
+        `metrics_over_time[0].tier = ${first.tier}`,
+        `volatility_index = ${first.volatility_index}`,
+        ...(first.vehicles !== undefined ? [`vehicles = ${first.vehicles}`, `mean_vehicle_speed_kmh = ${first.mean_vehicle_speed_kmh}`, `stopped_vehicles = ${first.stopped_vehicles}`] : []),
+      ],
     });
   }
 
@@ -96,7 +121,7 @@ export function whyThisRoute(run: RunData, kind: 'live' | 'recorded', baseline: 
     .forEach((e) => {
       const m = trafficAt(run, e.t);
       out.push({
-        text: `At T+${Math.round(e.t)} s traffic was ${m ? TIER_WORD[m.tier].toLowerCase() : 'changing'}; the route was re-planned${e.eta ? `, ${etaChangeWords(e.eta)}` : ''}.`,
+        text: `At T+${Math.round(e.t)} s speeds were ${m ? TIER_WORD[m.tier].toLowerCase() : 'changing'}${m && m.mean_vehicle_speed_kmh != null ? ` (network mean ${m.mean_vehicle_speed_kmh.toFixed(1)} km/h)` : ''}; the route was re-planned${e.eta ? `, ${etaChangeWords(e.eta)}` : ''}.`,
         fields: [`events[].t = ${e.t}`, ...(e.eta ? [`eta_before = ${e.eta.before}`, `eta_after = ${e.eta.after}`] : []), ...(m ? [`tier = ${m.tier}`] : [])],
       });
     });
@@ -108,11 +133,27 @@ export function whyThisRoute(run: RunData, kind: 'live' | 'recorded', baseline: 
   }
 
   if (baseline) {
-    const d = baseline.completion_time - run.completion_time;
-    out.push({
-      text: `On the same recorded traffic, the fixed schedule took ${formatDuration(baseline.completion_time)} (adaptive ${formatDuration(Math.abs(d))} ${d >= 0 ? 'sooner' : 'later'}).`,
-      fields: [`completion_time = ${run.completion_time}`, `fixed completion_time = ${baseline.completion_time}`],
-    });
+    const a = tripOf(run);
+    const b = tripOf(baseline);
+    const fields = [
+      `timing.status = ${run.timing?.status}`,
+      `fixed timing.status = ${baseline.timing?.status}`,
+      `completion_time = ${run.completion_time}`,
+      `fixed completion_time = ${baseline.completion_time}`,
+    ];
+    if (a.arrived && b.arrived) {
+      const d = baseline.completion_time - run.completion_time;
+      out.push({
+        text: `On the same recorded traffic, the fixed schedule took ${formatDuration(baseline.completion_time)} to the network exit (adaptive ${formatDuration(Math.abs(d))} ${d >= 0 ? 'sooner' : 'later'}).`,
+        fields,
+      });
+    } else {
+      const word = (arrived: boolean, duration: number) => (arrived ? `reached the exit in ${formatDuration(duration)}` : 'did not reach the exit');
+      out.push({
+        text: `On the same recorded traffic the adaptive run ${word(a.arrived, a.duration)} and the fixed schedule ${word(b.arrived, b.duration)} within the ${formatDuration(a.capS ?? run.completion_time)} simulation limit, so no time difference can be given.`,
+        fields,
+      });
+    }
   }
   return out;
 }
@@ -122,10 +163,17 @@ export function doingNow(run: RunData, t: number): string[] {
   const out: string[] = [];
   const m = trafficAt(run, t);
   if (t >= run.completion_time) {
-    out.push(`The ambulance arrived at T+${Math.round(run.completion_time)} s. No further searches run for this trip.`);
+    const trip = tripOf(run);
+    out.push(
+      trip.arrived
+        ? `The ambulance reached the network exit at T+${Math.round(run.completion_time)} s. No further searches run for this trip.`
+        : trip.state === 'estimate'
+          ? `End of the planner estimate (T+${Math.round(run.completion_time)} s). No vehicle was driven for this trip.`
+          : `The simulation stopped at T+${Math.round(run.completion_time)} s with the ambulance not at the network exit.`,
+    );
   }
   if (m) {
-    out.push(`Traffic is ${TIER_WORD[m.tier].toLowerCase()} (unpredictability ${m.volatility_index.toFixed(2)}).`);
+    out.push(`Speeds are ${TIER_WORD[m.tier].toLowerCase()} (unpredictability ${m.volatility_index.toFixed(2)})${m.mean_vehicle_speed_kmh != null ? `; network mean speed ${m.mean_vehicle_speed_kmh.toFixed(1)} km/h, ${m.stopped_vehicles ?? 0} vehicles stopped` : ''}.`);
     if (run.algorithm === 'va_qpso') {
       const kept = Math.round(explorationKept(m.beta) * 100);
       const floor = m.beta.toFixed(2);

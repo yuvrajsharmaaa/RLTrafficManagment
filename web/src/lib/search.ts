@@ -5,15 +5,11 @@ export const BETA_MIN = 0.5; // DEFAULT_BETA_MIN: the fixed schedule ends here
 export const VA_FLOOR_SPAN = 0.25; // va_qpso's floor rises by up to this much at V = 1
 
 /**
- * Floor formula per data source. The recorded files were exported with an
- * older formula, 0.50 + 0.50 * V (every sample fits it exactly); the current
- * code, and so every live run, uses 0.50 + 0.25 * V.
+ * Exported "beta" is the floor each search's anneal ends at, for both
+ * variants: 0.50 + 0.25 * V for adaptive runs (recorded and live), and
+ * BETA_MIN for the fixed schedule, which ignores traffic.
  */
-export const FLOOR_SPAN_RECORDED = 0.5;
-export const FLOOR_SPAN_LIVE = VA_FLOOR_SPAN;
-
-/** Value the fixed-schedule export writes for beta at every second (export_for_frontend.py). */
-export const FIXED_EXPORT_BETA = 0.75;
+export const FIXED_EXPORT_BETA = BETA_MIN;
 
 /** Live searches are configured in server.py; the payload does not report them. */
 export const LIVE_SEARCH_BUDGET = { particles: 15, iterations: 30 };

@@ -44,6 +44,6 @@ export function formatCoord(lat: number, lon: number): string {
 }
 
 export const SOURCE_WORD: Record<string, string> = {
-  live_bounded_sumo: 'Live simulation snapshot',
-  live_calibrated_scenario: 'Estimated traffic',
+  live_sumo_snapshot: 'SUMO traffic, planner estimate',
+  live_sumo_drive: 'SUMO simulated drive',
 };

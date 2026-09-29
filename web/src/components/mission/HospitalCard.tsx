@@ -1,23 +1,27 @@
-import { Hospital as HospitalIcon } from 'lucide-react';
+import { Hospital as HospitalIcon, Info } from 'lucide-react';
 import { Panel, Tooltip } from '../ui';
 import { shortName } from '../../lib/format';
+import { ABOUT_THIS_MAP, formatDistance } from '../../lib/trip';
 import type { Hospital, RunData } from '../../lib/types';
 import { cx } from '../../lib/cx';
 
-// The backend substitutes 45.0 s when a hospital can't be reached on the
-// graph; a real 45.0 s can't be told apart, so it is flagged, not hidden.
-const UNREACHABLE_PLACEHOLDER_S = 45;
-
 export function HospitalCard({ run }: { run: RunData }) {
   const destName = run.selected_hospital?.name;
-  const destTime = run.hospital_candidates.find((h) => h.name === destName)?.live_travel_time_sec;
   const rows = [...run.hospital_candidates].sort(
-    (a, b) => (a.live_travel_time_sec ?? Infinity) - (b.live_travel_time_sec ?? Infinity),
+    (a, b) => (a.straight_line_from_exit_m ?? Infinity) - (b.straight_line_from_exit_m ?? Infinity),
+  );
+  const about = (
+    <Tooltip content={ABOUT_THIS_MAP}>
+      <span tabIndex={0} aria-label="About this map" className="flex items-center gap-1 text-caption text-text-3">
+        <Info size={14} strokeWidth={1.75} aria-hidden />
+        About this map
+      </span>
+    </Tooltip>
   );
 
   if (rows.length === 0) {
     return (
-      <Panel raised title="Hospitals by road time">
+      <Panel raised title="Hospitals" actions={about}>
         <p className="text-body-sm text-text-3">No hospital candidates in this run.</p>
       </Panel>
     );
@@ -25,8 +29,7 @@ export function HospitalCard({ run }: { run: RunData }) {
 
   const row = (h: Hospital) => {
     const isDest = h.name === destName;
-    const time = h.live_travel_time_sec;
-    const tied = !isDest && time !== undefined && time === destTime;
+    const d = h.straight_line_from_exit_m;
     return (
       <li
         key={h.name}
@@ -42,30 +45,36 @@ export function HospitalCard({ run }: { run: RunData }) {
           className={cx('mt-0.5 shrink-0', isDest ? 'text-route-optimized' : 'text-hospital-unknown')}
         />
         <div className="flex min-w-0 flex-1 flex-col">
-          <Tooltip content={`${h.name} (${h.level})`}>
+          <Tooltip content={`${h.name} (${h.level})${h.coord_source ? `. Location: ${h.coord_source}` : ''}`}>
             <span tabIndex={0} className="truncate text-body-sm text-text-1">{shortName(h.name)}</span>
           </Tooltip>
           <span className="text-caption text-text-3">
-            {isDest ? 'Destination' : tied ? 'Tied with destination' : h.level}
+            {isDest ? 'Destination' : h.level}
+            {h.in_network === false && ' · outside the simulated map'}
+            {h.coord_source?.startsWith('unverified') && <span className="text-warning"> · location unverified</span>}
           </span>
         </div>
         <span className="flex shrink-0 flex-col items-end">
-          {time === undefined ? (
+          {d === undefined ? (
             <span className="text-caption text-text-3">No data</span>
           ) : (
-            <span className="num text-body-sm text-text-1">{time.toFixed(1)} s</span>
+            <span className="num text-body-sm text-text-1">{formatDistance(d)}</span>
           )}
-          {time === UNREACHABLE_PLACEHOLDER_S && <span className="text-caption text-warning">may be unreachable</span>}
+          <span className="text-caption text-text-3">estimate</span>
         </span>
       </li>
     );
   };
 
   return (
-    <Panel raised title="Hospitals by road time">
-      <ul aria-label="Hospitals ranked by road time">{rows.map(row)}</ul>
+    <Panel raised title="Hospitals" actions={about}>
+      <ul aria-label="Hospitals by distance beyond the simulated map">{rows.map(row)}</ul>
       <div className="mt-2 flex flex-col gap-1 border-t border-border-subtle pt-2 text-caption text-text-3">
-        <span>Shortest-path road time from the incident to each hospital's entry, not the full trip.</span>
+        <span>
+          Straight-line distance from each hospital's network exit to the hospital: the part of the trip that is not
+          simulated. An estimate, never added to the simulated time. The destination is the hospital with the shortest
+          unsimulated distance unless one was requested.
+        </span>
         <span>Load: no data from the system.</span>
       </div>
     </Panel>

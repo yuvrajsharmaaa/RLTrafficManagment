@@ -26,7 +26,7 @@ export type Selection =
   | { kind: 'checkpoint'; stop: Stop; index: number }
   | { kind: 'replan'; event: DecisionEvent }
   | { kind: 'segment'; t0: number; t1: number; tier: TierKey; v: number }
-  | { kind: 'baseline'; completion: number };
+  | { kind: 'baseline'; completion: number; arrived: boolean };
 
 export type RouteStyle = 'optimized' | 'baseline';
 
@@ -234,7 +234,7 @@ export class MapEngine {
         },
       );
       this.hoverable(line, 3);
-      line.on('click', () => this.select({ kind: 'baseline', completion: baseline.completion_time }, null));
+      line.on('click', () => this.select({ kind: 'baseline', completion: baseline.completion_time, arrived: baseline.timing ? baseline.timing.status === 'arrived' : true }, null));
       line.addTo(this.groups.baseline);
     }
 
@@ -274,7 +274,7 @@ export class MapEngine {
     }
 
     run.stops.slice(1, -1).forEach((stop, i) => {
-      this.marker('checkpoint', [stop.lat, stop.lon], `Corridor checkpoint ${i + 1}`, { kind: 'checkpoint', stop, index: i + 1 }, 400, String(i + 1)).addTo(
+      this.marker('checkpoint', [stop.lat, stop.lon], `Planner waypoint ${i + 1}`, { kind: 'checkpoint', stop, index: i + 1 }, 400, String(i + 1)).addTo(
         this.groups.checkpoints,
       );
     });
@@ -286,8 +286,8 @@ export class MapEngine {
         kind: 'destination', hospital, candidates: run.hospital_candidates,
       }, 950).addTo(this.always);
     }
-    // The hospital itself can lie outside the simulated network (AIIMS does), so
-    // the arrival label sits on the route's last point: the hospital's entry junction.
+    // No hospital lies on the simulated network, so the label sits on the route's
+    // last point: the network exit toward the hospital.
     const end = latlngs.at(-1);
     if (end) {
       this.routeEnd = L.marker(end, { icon: markerIcon('routeEnd'), interactive: false, keyboard: false, zIndexOffset: 800 }).addTo(this.always);

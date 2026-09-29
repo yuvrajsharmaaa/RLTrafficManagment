@@ -12,8 +12,8 @@ import { METHODS, METHODS_SETUP, README_SOURCE, type MethodRow } from '../lib/be
 import { cx } from '../lib/cx';
 import { doingNow } from '../lib/explain';
 import { SCENARIO_WORD, SOURCE_WORD, TIER_WORD, formatDuration, shortName } from '../lib/format';
-import { BETA_MAX, BETA_MIN, FIXED_EXPORT_BETA, FLOOR_SPAN_LIVE, FLOOR_SPAN_RECORDED, LIVE_SEARCH_BUDGET, explorationKept } from '../lib/search';
-import { isLiveRun, replanEvents, trafficAt } from '../lib/timeline';
+import { BETA_MAX, BETA_MIN, FIXED_EXPORT_BETA, LIVE_SEARCH_BUDGET, VA_FLOOR_SPAN, explorationKept } from '../lib/search';
+import { replanEvents, trafficAt } from '../lib/timeline';
 import type { ScenarioTier } from '../lib/types';
 
 type Choice = { kind: 'session' } | { kind: 'recorded'; tier: ScenarioTier };
@@ -111,11 +111,8 @@ export const Optimization = memo(function Optimization() {
   const note = load.state === 'ready' ? load.note : null;
   const derived = useMemo(() => {
     if (!run) return null;
-    // Live runs: server.py measures V once and fills the rest with generated drift, so use one flat reading.
-    const first = run.metrics_over_time[0];
-    const inTrip = isLiveRun(run)
-      ? first ? [{ ...first, t: 0 }, { ...first, t: run.completion_time }] : []
-      : run.metrics_over_time.filter((m) => m.t <= run.completion_time);
+    // Every sample is a SUMO measurement: per second for simulated drives, one dispatch reading for estimates.
+    const inTrip = run.metrics_over_time.filter((m) => m.t <= run.completion_time);
     const peak = inTrip.reduce((a, m) => (m.beta > a.beta ? m : a), inTrip[0] ?? { t: 0, beta: BETA_MIN, volatility_index: 0, tier: 'calm' as const });
     return {
       replans: replanEvents(run.events),
@@ -125,7 +122,7 @@ export const Optimization = memo(function Optimization() {
           ? [{ key: 'floor', label: 'Adaptive: search-breadth floor', color: 'var(--route-optimized)', points: inTrip.map((m) => ({ t: m.t, v: m.beta })) }]
           : []),
         ...(baseline
-          ? [{ key: 'fixed', label: 'Fixed schedule: exported constant, not measured', color: 'var(--route-baseline)', dash: '6 4',
+          ? [{ key: 'fixed', label: `Fixed schedule: floor ${FIXED_EXPORT_BETA.toFixed(2)}, ignores traffic`, color: 'var(--route-baseline)', dash: '6 4',
               points: baseline.metrics_over_time.filter((m) => m.t <= run.completion_time).map((m) => ({ t: m.t, v: m.beta })) }]
           : []),
       ],
@@ -180,9 +177,9 @@ export const Optimization = memo(function Optimization() {
   const kept = metric && isAdaptive ? explorationKept(metric.beta) : null;
   const answer = !isAdaptive
     ? 'This is a fixed-schedule run: its search narrows on the same timetable whatever the traffic.'
-    : isLiveRun(run)
-      ? `Traffic was ${TIER_WORD[derived.peak.tier].toLowerCase()} when this route was requested, so each search narrowed to a floor of ${derived.peak.beta.toFixed(2)}. The fixed schedule does not react to traffic.`
-      : `Search-breadth floor rose to ${derived.peak.beta.toFixed(2)} at T+${Math.round(derived.peak.t)} s, when traffic was ${TIER_WORD[derived.peak.tier].toLowerCase()}. The fixed schedule does not react to traffic.`;
+    : run.metrics_over_time.length <= 1
+      ? `Speeds were ${TIER_WORD[derived.peak.tier].toLowerCase()} when this route was requested, so each search narrowed to a floor of ${derived.peak.beta.toFixed(2)}. The fixed schedule does not react to traffic.`
+      : `Search-breadth floor rose to ${derived.peak.beta.toFixed(2)} at T+${Math.round(derived.peak.t)} s, when speeds were ${TIER_WORD[derived.peak.tier].toLowerCase()}. The fixed schedule does not react to traffic.`;
 
   return (
     <div className="grid h-full min-h-0 grid-rows-[1fr_var(--shell-dock-h)] [grid-template-areas:'body'_'dock']">
@@ -271,13 +268,13 @@ export const Optimization = memo(function Optimization() {
                     height={160}
                   />
                   <p className="text-caption text-text-3">
-                    {data.kind === 'recorded'
-                      ? `The recorded files were exported with floor = ${BETA_MIN.toFixed(2)} + ${FLOOR_SPAN_RECORDED.toFixed(2)} × V. The current code, used by live runs, has ${BETA_MIN.toFixed(2)} + ${FLOOR_SPAN_LIVE.toFixed(2)} × V, so live floors rise half as far.`
-                      : `Live runs use floor = ${BETA_MIN.toFixed(2)} + ${FLOOR_SPAN_LIVE.toFixed(2)} × V, from the one traffic reading taken when the route was requested.`}
+                    {run.metrics_over_time.length <= 1
+                      ? `Floor = ${BETA_MIN.toFixed(2)} + ${VA_FLOOR_SPAN.toFixed(2)} × V, from the one traffic reading taken in SUMO at dispatch.`
+                      : `Floor = ${BETA_MIN.toFixed(2)} + ${VA_FLOOR_SPAN.toFixed(2)} × V, with V measured in SUMO every simulated second.`}
                   </p>
                   {data.baseline && (
                     <p className="text-caption text-text-3">
-                      The fixed-schedule file stores β = {FIXED_EXPORT_BETA.toFixed(2)} at every second. That value is written by the exporter; the fixed schedule actually narrows from {BETA_MAX.toFixed(1)} to {BETA_MIN.toFixed(1)} inside every search, whatever the traffic.
+                      The fixed schedule narrows from {BETA_MAX.toFixed(1)} to {BETA_MIN.toFixed(2)} inside every search, whatever the traffic, so its floor is {FIXED_EXPORT_BETA.toFixed(2)} at every second.
                     </p>
                   )}
                 </div>
@@ -303,7 +300,7 @@ export const Optimization = memo(function Optimization() {
                       <span>100%: never narrows (exploration)</span>
                     </div>
                     <p className="text-caption text-text-3">
-                      Defined as (floor − {BETA_MIN.toFixed(2)}) ÷ ({BETA_MAX.toFixed(2)} − {BETA_MIN.toFixed(2)}), from the exported floor and the constants in qpso.py. At V = 1 it reaches {Math.round(FLOOR_SPAN_RECORDED * 200)}% for recorded runs and {Math.round(FLOOR_SPAN_LIVE * 200)}% for live runs. The fixed schedule is always 0%.
+                      Defined as (floor − {BETA_MIN.toFixed(2)}) ÷ ({BETA_MAX.toFixed(2)} − {BETA_MIN.toFixed(2)}), from the exported floor and the constants in qpso.py. At V = 1 it reaches {Math.round((VA_FLOOR_SPAN / (BETA_MAX - BETA_MIN)) * 100)}%. The fixed schedule is always 0%.
                     </p>
                   </div>
                 )}
@@ -340,9 +337,9 @@ export const Optimization = memo(function Optimization() {
                 <div>
                   <p className="pb-1 text-label text-text-2">Available</p>
                   <ul className="list-disc pl-4 text-text-1">
-                    <li>Traffic unpredictability for each second of the trip (recorded runs); one measured reading (live runs)</li>
+                    <li>Traffic unpredictability and congestion for each simulated second (simulated drives); one reading at dispatch (planner estimates)</li>
                     <li>Search-breadth floor for each second (adaptive runs)</li>
-                    <li>Re-plan times, and arrival estimates before and after (recorded adaptive runs)</li>
+                    <li>Re-plan times, whether the waypoint order changed, and the planner's remaining-time estimate at each re-plan (simulated drives)</li>
                     <li>The final route, its total time, the hospitals considered</li>
                     <li>Run number and data source (live runs)</li>
                   </ul>
@@ -350,23 +347,43 @@ export const Optimization = memo(function Optimization() {
                 <div>
                   <p className="pb-1 text-label text-text-2">Not available from the server</p>
                   <ul className="list-disc pl-4 text-text-1">
-                    <li>Best score per iteration (convergence)</li>
                     <li>Particle positions and the global best per iteration</li>
                     <li>β per iteration, and how many iterations ran</li>
-                    <li>Traffic during a live trip: the server's per-second live series is generated drift around one reading, so it is not shown</li>
                   </ul>
                   <p className="pt-2 text-caption text-text-3">
-                    qpso.py can record the best-score history (return_history), but server.py does not request or send it.
                     Live searches are configured in server.py for {LIVE_SEARCH_BUDGET.particles} particles and {LIVE_SEARCH_BUDGET.iterations} iterations; the response does not confirm this.
                   </p>
                 </div>
               </div>
             </Panel>
 
-            <Unavailable title="Convergence by iteration">
-              <p>The server does not send the best score per iteration, so no convergence curve is drawn. The summary below is from repeated trials, not from this run.</p>
-              <Table caption="Search speed across 30 trials" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}, table 5 (${METHODS_SETUP})`} dense />
-            </Unavailable>
+            {run.best_score_history && run.best_score_history.length > 1 ? (
+              <Panel raised title="Convergence by iteration">
+                <div className="flex flex-col gap-2 text-body-sm text-text-2">
+                  <TimeSeriesChart
+                    title="Best route score after each search iteration (dispatch plan)"
+                    series={[{ key: 'best', label: 'Best score (s)', color: 'var(--route-optimized)',
+                      points: run.best_score_history.map((v, i) => ({ t: i + 1, v })) }]}
+                    xMax={run.best_score_history.length}
+                    yMin={Math.floor(Math.min(...run.best_score_history) * 0.95)}
+                    yMax={Math.ceil(Math.max(...run.best_score_history) * 1.02)}
+                    yTicks={[Math.min(...run.best_score_history), Math.max(...run.best_score_history)].map((v) => Math.round(v))}
+                    yLabel="s"
+                    formatY={(v) => v.toFixed(0)}
+                    height={160}
+                  />
+                  <p className="text-caption text-text-3">
+                    Score = planned travel time to the network exit in seconds, from the edge speeds SUMO measured at dispatch. X axis: search iteration.
+                  </p>
+                  <Table caption="Search speed across 30 trials" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}, table 5 (${METHODS_SETUP})`} dense />
+                </div>
+              </Panel>
+            ) : (
+              <Unavailable title="Convergence by iteration">
+                <p>This run file has no per-iteration scores, so no convergence curve is drawn. The summary below is from repeated trials, not from this run.</p>
+                <Table caption="Search speed across 30 trials" columns={speedColumns} rows={METHODS} rowKey={(r) => r.key} source={`Source: ${README_SOURCE}, table 5 (${METHODS_SETUP})`} dense />
+              </Unavailable>
+            )}
 
             <Unavailable title="Swarm view">
               <p>Particle positions are not sent by the server, so the swarm can't be drawn or replayed. No projection is shown rather than an invented one.</p>

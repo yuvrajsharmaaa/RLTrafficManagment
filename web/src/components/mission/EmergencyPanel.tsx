@@ -30,6 +30,9 @@ interface EmergencyPanelProps {
   tier: ScenarioTier;
   onTierChange: (t: ScenarioTier) => void;
   onFindRoute: () => void;
+  /** Drive an ambulance through SUMO (exact, slower) instead of returning the planner estimate. */
+  driveThrough: boolean;
+  onDriveThroughChange: (on: boolean) => void;
   onOpenRecorded: () => void;
   computing: boolean;
   elapsedMs: number;
@@ -39,7 +42,8 @@ interface EmergencyPanelProps {
 }
 
 export function EmergencyPanel({
-  incident, onIncidentChange, tier, onTierChange, onFindRoute, onOpenRecorded, computing, elapsedMs, error, blockedReason,
+  incident, onIncidentChange, tier, onTierChange, onFindRoute, driveThrough, onDriveThroughChange, onOpenRecorded, computing,
+  elapsedMs, error, blockedReason,
 }: EmergencyPanelProps) {
   const inputId = useId();
   const helpId = useId();
@@ -127,12 +131,29 @@ export function EmergencyPanel({
         </div>
       </fieldset>
 
+      <label className="flex items-start gap-2 text-body-sm text-text-1">
+        <input
+          type="checkbox"
+          className="mt-0.5"
+          checked={driveThrough}
+          disabled={computing}
+          onChange={(e) => onDriveThroughChange(e.target.checked)}
+        />
+        <span className="flex flex-col">
+          Simulate the drive in SUMO
+          <span className="text-caption text-text-3">
+            Exact simulated time, up to a 15-minute limit; takes seconds to a minute. Off: planner estimate from the
+            traffic measured at dispatch.
+          </span>
+        </span>
+      </label>
+
       <Button
         variant="primary"
         size="large"
         icon={Navigation}
         loading={computing}
-        loadingLabel={`Finding route · ${(elapsedMs / 1000).toFixed(1)} s`}
+        loadingLabel={`${driveThrough ? 'Simulating drive' : 'Finding route'} · ${(elapsedMs / 1000).toFixed(1)} s`}
         disabled={!canFind && !computing}
         onClick={onFindRoute}
       >
