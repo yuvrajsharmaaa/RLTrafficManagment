@@ -48,7 +48,11 @@ COPY --from=web /web/dist/index.html web/dist/index.html
 
 # Pre-build the SUMO warm-up state of every traffic tier (outputs/sumo_states/),
 # so the first live request of each tier does not wait for one.
-RUN python -m src.simulation.dispatch --prewarm
+RUN python -m src.simulation.dispatch --prewarm && chmod -R a+rwX /app/outputs
+
+# Hosts such as Hugging Face Spaces run the container as a non-root user.
+RUN useradd --create-home --uid 1000 app && chown -R app /app/outputs
+USER app
 
 EXPOSE 8000
 
