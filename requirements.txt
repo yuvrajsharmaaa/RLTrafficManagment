@@ -12,8 +12,8 @@ matplotlib>=3.7.0
 pandas>=2.0.0
 
 # SUMO Simulation & TraCI Integration
-traci>=1.20.0
-sumolib>=1.20.0
+traci==1.26.0  # match SUMO 1.26.0 (see Dockerfile)
+sumolib==1.26.0
 
 # Testing & Client Tools
 pytest>=7.0.0

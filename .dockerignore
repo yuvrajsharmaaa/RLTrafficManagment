@@ -1,5 +1,13 @@
+# VCS, editors, OS
 .git
 .gitignore
+.claude
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Python
 .venv
 venv
 env
@@ -10,10 +18,17 @@ __pycache__
 .pytest_cache
 .coverage
 htmlcov
-.DS_Store
-Thumbs.db
-.claude
-.idea
-.vscode
+
+# Frontend: dependencies and build output are produced inside the image
+web/node_modules
+web/dist
+
+# Generated or not needed at runtime
+outputs
+results
+logs
+archive
 scratch
+experiments
 *.log
+1.png

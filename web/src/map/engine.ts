@@ -1,4 +1,4 @@
-import L from 'leaflet';
+import L from './leaflet';
 import 'leaflet.markercluster';
 import type { DecisionEvent, Hospital, MetricPoint, RunData, Stop, TierKey } from '../lib/types';
 import { bearing, positionAt, replanEvents, segmentIndexAt, trafficAt } from '../lib/timeline';
