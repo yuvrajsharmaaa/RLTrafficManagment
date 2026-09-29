@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
     <input>
-        <net-file value="C:\Users\Asus\Desktop\dl\RL projects\trafficmgmt\RLTrafficManagment\networks\delhi\delhi_intersection.net.xml" />
-        <route-files value="C:\Users\Asus\Desktop\dl\RL projects\trafficmgmt\RLTrafficManagment\networks\delhi\scenarios\low\routes.rou.xml" />
-        <additional-files value="C:\Users\Asus\Desktop\dl\RL projects\trafficmgmt\RLTrafficManagment\networks\delhi\scenarios\low\incidents.add.xml" />
+        <net-file value="../../delhi_intersection.net.xml" />
+        <route-files value="routes.rou.xml" />
+        <additional-files value="incidents.add.xml" />
     </input>
     <time>
         <begin value="0" />

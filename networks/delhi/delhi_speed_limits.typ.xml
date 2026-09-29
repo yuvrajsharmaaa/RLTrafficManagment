@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Delhi speed limits for the OSM road classes in this network. Loaded after
+  SUMO's osmNetconvert.typ.xml, so these entries replace its generic defaults
+  (secondary 100 km/h, tertiary 80 km/h, residential/unclassified 50 km/h).
+  None of the OSM ways in delhi_intersection.osm carries a maxspeed tag.
+
+  Source: Delhi Traffic Police notification of 8 June 2021 (DCP Traffic,
+  Modernization), maximum limits for M1 cars/taxis:
+    - 50 km/h on arterial roads not listed at 60/70 km/h (the 60/70 km/h list
+      is Ring Road, Outer Ring Road, national highways and similar; no
+      Connaught Place road is on it)
+    - 30 km/h on minor roads in residential, commercial and market areas and
+      on service lanes
+  Mapping: secondary (the CP circles), secondary_link, tertiary (radial
+  arterials) and tertiary_link -> 50 km/h (13.89 m/s); residential and
+  unclassified -> 30 km/h (8.33 m/s). highway.service keeps SUMO's 20 km/h and
+  its car ban, which are already within the notified limit.
+  Every attribute other than speed is copied from osmNetconvert.typ.xml (SUMO 1.26.0).
+-->
+<types>
+    <type id="highway.secondary"      numLanes="1" speed="13.89" priority="11" oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.secondary_link" numLanes="1" speed="13.89" priority="6"  oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.tertiary"       numLanes="1" speed="13.89" priority="10" oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.tertiary_link"  numLanes="1" speed="13.89" priority="5"  oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.unclassified"   numLanes="1" speed="8.33"  priority="4"  oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.residential"    numLanes="1" speed="8.33"  priority="3"  oneway="false" disallow="rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+</types>

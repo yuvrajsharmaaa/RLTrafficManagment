@@ -397,12 +397,13 @@ def build_scenario_tier(
     # already embeds the vType definitions directly inside routes.rou.xml.
     add_paths = []
     if os.path.exists(incidents_file) and os.path.getsize(incidents_file) > 100:
-        add_paths.append(os.path.abspath(incidents_file))
+        add_paths.append(os.path.relpath(incidents_file, tier_dir))
 
     write_sumocfg(
         cfg_path=sumocfg_path,
-        net_path=os.path.abspath(net_file),
-        routes_path=os.path.abspath(routes_output),
+        # Relative to the .sumocfg, so the scenario works from any checkout.
+        net_path=os.path.relpath(net_file, tier_dir),
+        routes_path=os.path.relpath(routes_output, tier_dir),
         additional_paths=add_paths,
         duration=duration
     )
