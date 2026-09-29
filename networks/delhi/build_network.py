@@ -56,6 +56,12 @@ def build_network():
     cmd = [
         netconvert_bin,
         "--osm-files", osm_file,
+        # Delhi speed limits override netconvert's generic OSM defaults
+        # (see delhi_speed_limits.typ.xml for the source).
+        "--type-files", ",".join([
+            os.path.join(os.environ.get("SUMO_HOME", ""), "data", "typemap", "osmNetconvert.typ.xml"),
+            os.path.join(script_dir, "delhi_speed_limits.typ.xml"),
+        ]),
         "--output-file", net_file,
         "--output.street-names", "true",
         "--proj.utm", "true",

@@ -1,32 +1,72 @@
 [
   {
-    "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
-    "lat": 28.5672,
-    "lon": 77.21,
-    "level": "trauma center"
-  },
-  {
-    "name": "VMMC & Safdarjung Hospital",
-    "lat": 28.5673,
-    "lon": 77.205,
-    "level": "trauma center"
-  },
-  {
-    "name": "Max Smart Super Speciality Hospital, Saket",
-    "lat": 28.5273,
-    "lon": 77.2117,
-    "level": "general"
+    "name": "Dr. Ram Manohar Lohia Hospital",
+    "lat": 28.6259241,
+    "lon": 77.2008646,
+    "level": "trauma center",
+    "coord_source": "OpenStreetMap way 34404757",
+    "in_network": false,
+    "exit_junction": "cluster_267198388_3947529835_4083436490",
+    "exit_lat": 28.630363,
+    "exit_lon": 77.21792,
+    "straight_line_from_exit_m": 1736.3,
+    "nearest_edge_m": 1584.0,
+    "outside_boundary_box_m": 1454.0
   },
   {
     "name": "Moolchand Hospital, Lajpat Nagar",
     "lat": 28.5731,
     "lon": 77.2369,
-    "level": "general"
+    "level": "general",
+    "coord_source": "unverified: no hospital feature in OpenStreetMap; nearest named feature is the 'Moolchand Hospital' bus stop (node 5120631354, 28.5655248, 77.2358028)",
+    "in_network": false,
+    "exit_junction": "3228472668",
+    "exit_lat": 28.629121,
+    "exit_lon": 77.221188,
+    "straight_line_from_exit_m": 6415.4,
+    "nearest_edge_m": 5814.5,
+    "outside_boundary_box_m": 5814.5
   },
   {
-    "name": "Dr. Ram Manohar Lohia Hospital",
-    "lat": 28.6249,
-    "lon": 77.2001,
-    "level": "trauma center"
+    "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
+    "lat": 28.567441,
+    "lon": 77.2096335,
+    "level": "trauma center",
+    "coord_source": "OpenStreetMap node 7130306819 (AIIMS Emergency)",
+    "in_network": false,
+    "exit_junction": "5681450601",
+    "exit_lat": 28.628985,
+    "exit_lon": 77.219526,
+    "straight_line_from_exit_m": 6911.2,
+    "nearest_edge_m": 6623.6,
+    "outside_boundary_box_m": 6505.9
+  },
+  {
+    "name": "VMMC & Safdarjung Hospital",
+    "lat": 28.5673381,
+    "lon": 77.2049728,
+    "level": "trauma center",
+    "coord_source": "OpenStreetMap way 454523330",
+    "in_network": false,
+    "exit_junction": "5681450601",
+    "exit_lat": 28.628985,
+    "exit_lon": 77.219526,
+    "straight_line_from_exit_m": 7000.5,
+    "nearest_edge_m": 6714.8,
+    "outside_boundary_box_m": 6574.7
+  },
+  {
+    "name": "Max Smart Super Speciality Hospital, Saket",
+    "lat": 28.527633,
+    "lon": 77.2116434,
+    "level": "general",
+    "coord_source": "OpenStreetMap way 150520027",
+    "in_network": false,
+    "exit_junction": "5681450601",
+    "exit_lat": 28.628985,
+    "exit_lon": 77.219526,
+    "straight_line_from_exit_m": 11296.1,
+    "nearest_edge_m": 10994.1,
+    "outside_boundary_box_m": 10898.5
   }
 ]

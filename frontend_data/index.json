@@ -5,33 +5,39 @@
       "title": "Low Volatility (Off-Peak Emergency Transfer)",
       "description": "Smooth off-peak traffic across Connaught Place corridor for rapid hospital dispatch.",
       "va_qpso_file": "hero_low_va_qpso.json",
+      "completion_time_va": 900.0,
+      "status_va": "not_arrived_within_cap",
+      "events_count_va": 15,
       "fixed_beta_qpso_file": "hero_low_fixed_beta_qpso.json",
-      "completion_time_va": 93.55,
-      "completion_time_fb": 93.71,
-      "events_count_va": 2,
-      "events_count_fb": 3
+      "completion_time_fb": 852.0,
+      "status_fb": "arrived",
+      "events_count_fb": 19
     },
     {
       "id": "medium_volatility",
       "title": "Medium Volatility (Corridor Obstruction @ 120s)",
-      "description": "Moderate traffic with unexpected road obstruction at t=120s on hospital route. VA-QPSO dynamically reroutes to save critical minutes.",
+      "description": "Moderate traffic with unexpected road obstruction at t=120s. Adaptive routing redirects ambulance around obstruction.",
       "va_qpso_file": "hero_medium_va_qpso.json",
+      "completion_time_va": 900.0,
+      "status_va": "not_arrived_within_cap",
+      "events_count_va": 12,
       "fixed_beta_qpso_file": "hero_medium_fixed_beta_qpso.json",
-      "completion_time_va": 95.22,
-      "completion_time_fb": 98.62,
-      "events_count_va": 2,
-      "events_count_fb": 3
+      "completion_time_fb": 900.0,
+      "status_fb": "not_arrived_within_cap",
+      "events_count_fb": 17
     },
     {
       "id": "high_volatility",
       "title": "High Volatility (Rush Hour Emergency Surge)",
-      "description": "Severe peak congestion with dual closures along radial corridors. VA-QPSO discovers open perimeter bypass to trauma center.",
+      "description": "Severe peak congestion with dual road closures. Adaptive routing finds open perimeter corridor to trauma center.",
       "va_qpso_file": "hero_high_va_qpso.json",
+      "completion_time_va": 900.0,
+      "status_va": "not_arrived_within_cap",
+      "events_count_va": 10,
       "fixed_beta_qpso_file": "hero_high_fixed_beta_qpso.json",
-      "completion_time_va": 125.7,
-      "completion_time_fb": 109.37,
-      "events_count_va": 2,
-      "events_count_fb": 3
+      "completion_time_fb": 900.0,
+      "status_fb": "not_arrived_within_cap",
+      "events_count_fb": 13
     }
   ]
 }

@@ -511,6 +511,7 @@ def replan(
     physical_distance_matrix: Optional[np.ndarray] = ...,
     *,
     return_history: Literal[True],
+    fixed_endpoints: bool = ...,
 ) -> Tuple[np.ndarray, float, np.ndarray]:
     ...
 
@@ -533,6 +534,8 @@ def replan(
     algorithm: str = ...,
     return_history: Literal[False] = ...,
     physical_distance_matrix: Optional[np.ndarray] = ...,
+    *,
+    fixed_endpoints: bool = ...,
 ) -> Tuple[np.ndarray, float]:
     ...
 
@@ -555,6 +558,8 @@ def replan(
     algorithm: str = ...,
     return_history: bool = ...,
     physical_distance_matrix: Optional[np.ndarray] = ...,
+    *,
+    fixed_endpoints: bool = ...,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     ...
 
@@ -576,6 +581,8 @@ def replan(
     algorithm: str = "va_qpso",
     return_history: bool = False,
     physical_distance_matrix: Optional[np.ndarray] = None,
+    *,
+    fixed_endpoints: bool = False,
 ) -> Union[Tuple[np.ndarray, float], Tuple[np.ndarray, float, np.ndarray]]:
     """
     Run QPSO to convergence (see module docstring for the stopping
@@ -595,6 +602,10 @@ def replan(
         algorithm: "va_qpso" (volatility-adaptive) or "fixed_beta_qpso" (linear anneal).
         physical_distance_matrix: Optional (n, n) matrix of edge lengths (m) along the
             time-optimal path. If passed, both matrices are passed to score_route.
+        fixed_endpoints: If True, stops[0] is always visited first and
+            stops[-1] last (e.g. patient pickup -> hospital); only the order
+            of the stops in between is searched. Default False keeps the
+            original free-permutation problem used by the benchmarks.
 
     Returns:
         (best_order, best_score): best_order is the decoded visit-order
@@ -611,8 +622,19 @@ def replan(
             f"physical_distance_matrix shape {physical_distance_matrix.shape} does not match len(stops)={n}."
         )
 
+    if fixed_endpoints:
+        if n < 2:
+            raise ValueError("fixed_endpoints needs at least a start and an end stop.")
+        dim = n - 2
+
+        def decode(x: np.ndarray) -> np.ndarray:
+            return np.concatenate(([0], decode_order(x) + 1, [n - 1])).astype(int)
+    else:
+        dim = n
+        decode = decode_order
+
     def fitness_fn(x: np.ndarray) -> float:
-        order = decode_order(x)
+        order = decode(x)
         return score_route(
             order,
             distance_matrix,
@@ -621,10 +643,17 @@ def replan(
             weights,
         )
 
+    if dim == 0:  # start and end only: nothing to order
+        order = np.arange(n)
+        score = fitness_fn(np.zeros(0))
+        if return_history:
+            return order, score, np.array([score], dtype=float)
+        return order, score
+
     if algorithm == "va_qpso":
         if return_history:
             best_pos_v, best_score_v, history_v = va_qpso(
-                dim=n,
+                dim=dim,
                 fitness_fn=fitness_fn,
                 volatility_index=volatility_index,
                 num_particles=num_particles,
@@ -637,10 +666,10 @@ def replan(
                 max_restarts=max_restarts,
                 return_history=True,
             )
-            return decode_order(best_pos_v), best_score_v, history_v
+            return decode(best_pos_v), best_score_v, history_v
 
         best_pos_v, best_score_v = va_qpso(
-            dim=n,
+            dim=dim,
             fitness_fn=fitness_fn,
             volatility_index=volatility_index,
             num_particles=num_particles,
@@ -653,12 +682,12 @@ def replan(
             max_restarts=max_restarts,
             return_history=False,
         )
-        return decode_order(best_pos_v), best_score_v
+        return decode(best_pos_v), best_score_v
 
     elif algorithm == "fixed_beta_qpso":
         if return_history:
             best_pos_f, best_score_f, history_f = fixed_beta_qpso(
-                dim=n,
+                dim=dim,
                 fitness_fn=fitness_fn,
                 num_particles=num_particles,
                 max_iterations=max_iterations,
@@ -670,10 +699,10 @@ def replan(
                 max_restarts=max_restarts,
                 return_history=True,
             )
-            return decode_order(best_pos_f), best_score_f, history_f
+            return decode(best_pos_f), best_score_f, history_f
 
         best_pos_f, best_score_f = fixed_beta_qpso(
-            dim=n,
+            dim=dim,
             fitness_fn=fitness_fn,
             num_particles=num_particles,
             max_iterations=max_iterations,
@@ -685,7 +714,7 @@ def replan(
             max_restarts=max_restarts,
             return_history=False,
         )
-        return decode_order(best_pos_f), best_score_f
+        return decode(best_pos_f), best_score_f
 
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}. Must be 'va_qpso' or 'fixed_beta_qpso'.")

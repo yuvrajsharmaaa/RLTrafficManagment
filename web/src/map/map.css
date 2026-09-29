@@ -1,0 +1,181 @@
+/* Leaflet presentation, all values from the Phase 2 tokens. */
+
+.leaflet-container {
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+/* Base map: the same OSM tiles as today, dimmed to a low-contrast dark so
+   the data layers carry the colour. "Light" removes the filter. */
+.ems-tiles-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.55) contrast(0.8) saturate(0.25);
+}
+
+.leaflet-control-attribution {
+  background: rgb(18 21 26 / 0.85) !important;
+  color: var(--color-text-3) !important;
+  font-size: 11px;
+}
+.leaflet-control-attribution a { color: var(--color-text-2) !important; }
+
+.leaflet-control-scale-line {
+  background: rgb(18 21 26 / 0.85);
+  border: 1px solid var(--color-border-strong);
+  border-top: none;
+  color: var(--color-text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ---- Markers ---------------------------------------------------------- */
+.ems-mk-wrap { background: none; border: none; }
+
+.ems-mk {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  box-sizing: border-box;
+  color: var(--color-text-1);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+
+.leaflet-marker-icon:hover .ems-mk,
+.leaflet-marker-icon.ems-hover .ems-mk { transform: scale(1.12); }
+
+.leaflet-marker-icon:focus { outline: none; }
+.leaflet-marker-icon:focus-visible .ems-mk,
+.leaflet-marker-icon.ems-selected .ems-mk {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Ambulance: rounded square, vehicle-state border, heading notch. */
+.ems-mk-ambulance {
+  border-radius: 4px;
+  border: 2px solid var(--vehicle-en-route);
+  background: var(--color-panel);
+  color: var(--vehicle-en-route);
+}
+.ems-mk-ambulance[data-state='rerouting'] { border-color: var(--vehicle-rerouting); color: var(--vehicle-rerouting); }
+.ems-mk-ambulance[data-state='arrived'] { border-color: var(--vehicle-arrived); color: var(--vehicle-arrived); }
+.ems-heading {
+  position: absolute;
+  inset: -9px;
+  pointer-events: none;
+}
+.ems-heading::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 6px solid currentColor;
+}
+.ems-mk-ambulance[data-state='arrived'] .ems-heading { display: none; }
+
+/* Incident: diamond, warning colour, optional pulse ring. */
+.ems-diamond {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  transform: rotate(45deg);
+  border: 2px solid var(--color-warning);
+  background: var(--color-panel);
+  color: var(--color-warning);
+}
+.ems-diamond svg { transform: rotate(-45deg); }
+.ems-pulse {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--color-warning);
+  border-radius: 50%;
+  opacity: 0;
+}
+.ems-pulse-on .ems-pulse { animation: ems-pulse 2.4s var(--ease-standard) infinite; }
+@keyframes ems-pulse {
+  0% { transform: scale(0.7); opacity: 0.55; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ems-pulse-on .ems-pulse { animation: none; opacity: 0.45; transform: scale(1.35); }
+}
+
+/* Hospitals: circles. The destination has a double ring in the accent. */
+.ems-mk-destination {
+  border-radius: 50%;
+  border: 2px solid var(--route-optimized);
+  background: var(--color-panel);
+  box-shadow: 0 0 0 2px var(--color-panel), 0 0 0 3px var(--route-optimized);
+  color: var(--route-optimized);
+}
+.ems-mk-hospital {
+  border-radius: 50%;
+  border: 1.5px solid var(--hospital-unknown);
+  background: var(--color-panel);
+  color: var(--hospital-unknown);
+}
+
+/* Corridor checkpoints: small numbered squares. */
+.ems-mk-checkpoint {
+  border-radius: 2px;
+  border: 1px solid var(--color-border-control);
+  background: var(--color-panel);
+  color: var(--color-text-2);
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Route end (hospital entry junction): small accent square. */
+.ems-mk-route-end {
+  border-radius: 2px;
+  border: 2px solid var(--route-optimized);
+  background: var(--color-bg);
+}
+
+/* Re-plan point: ring. */
+.ems-mk-replan {
+  border-radius: 50%;
+  border: 2px solid var(--vehicle-rerouting);
+  background: var(--color-panel);
+  color: var(--vehicle-rerouting);
+}
+
+/* Signal: triangle (reserved; the server sends no signal data). */
+.ems-mk-signal {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: var(--color-text-3);
+  color: var(--color-panel);
+  padding-top: 6px;
+}
+
+.ems-mk-cluster {
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-raised);
+  color: var(--color-text-1);
+  font-size: 12px;
+}
+
+/* Direction chevrons along the route. */
+.ems-chevron-wrap { background: none; border: none; pointer-events: none; }
+.ems-chevron { color: var(--route-optimized); opacity: 0.9; display: block; }
+.ems-chevron-passed .ems-chevron { color: var(--color-text-3); opacity: 0.5; }
+
+/* Arrival label on the destination. */
+.leaflet-tooltip.ems-eta {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  box-shadow: var(--elev-1);
+  color: var(--color-text-1);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 6px;
+}
+.leaflet-tooltip.ems-eta::before { display: none; }
