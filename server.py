@@ -189,6 +189,9 @@ class PlanRouteResponse(BaseModel):
     selected_hospital: Dict[str, Any]
     hospital_candidates: List[Dict[str, Any]]
     path: List[Dict[str, Any]]
+    # One entry per real measurement. The live pipeline measures V once per
+    # request (bounded SUMO snapshot or calibrated fallback), so this holds a
+    # single sample at t = 0; it is not a per-second series along the trip.
     metrics_over_time: List[Dict[str, Any]]
     events: List[Dict[str, Any]]
     completion_time: float
@@ -196,6 +199,10 @@ class PlanRouteResponse(BaseModel):
     beta: float
     eta_seconds: float
     source: str
+    # Best fitness score after each VA-QPSO iteration (qpso.replan
+    # return_history=True), for a convergence chart. Optional so older
+    # clients and recorded runs are unaffected.
+    best_score_history: Optional[List[float]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -437,7 +444,7 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
 
     dist_matrix = compute_distance_matrix(adj_live, stops)
 
-    best_order, best_score = qpso_replan(
+    best_order, best_score, score_history = qpso_replan(
         stops=stops,
         distance_matrix=dist_matrix,
         congestion_lookup={},
@@ -446,6 +453,7 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
         max_iterations=30,
         algorithm="va_qpso",
         seed=seed,
+        return_history=True,
     )
 
     ordered_stops = [stops[i] for i in best_order]
@@ -499,20 +507,14 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
         },
     ]
 
-    # 10. Sample Rolling Telemetry Metrics
-    metrics_over_time: List[Dict[str, Any]] = []
-    num_metric_samples = max(2, int(eta_seconds) + 1)
-    for s_idx in range(num_metric_samples):
-        t_sec = float(s_idx)
-        # Small realistic temporal drift around measured volatility
-        v_drift = float(np.clip(v_val + 0.03 * math.sin(t_sec / 10.0), 0.0, 1.0))
-        b_drift = va_beta_floor(v_drift)
-        metrics_over_time.append({
-            "t": t_sec,
-            "volatility_index": round(v_drift, 4),
-            "beta": round(b_drift, 4),
-            "tier": eff.tier_for(v_drift),
-        })
+    # 10. Telemetry: the single measured sample. V is measured once per
+    # request, so no per-second series is synthesized along the trip.
+    metrics_over_time: List[Dict[str, Any]] = [{
+        "t": 0.0,
+        "volatility_index": round(v_val, 4),
+        "beta": round(beta_val, 4),
+        "tier": tier_label,
+    }]
 
     elapsed_ms = (time.time() - t_start) * 1000.0
     logger.info(
@@ -541,6 +543,7 @@ def plan_route(payload: PlanRouteRequest) -> PlanRouteResponse:
         beta=round(beta_val, 4),
         eta_seconds=eta_seconds,
         source=source_label,
+        best_score_history=[round(float(x), 6) for x in score_history],
     )
 
 

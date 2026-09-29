@@ -113,3 +113,33 @@ def test_plan_route_scenario_fallback():
     assert data["eta_seconds"] > 0
     print(f"\n[Test] Fallback scenario planning completed in {elapsed:.3f}s")
     assert elapsed < 1.0, f"Fallback planning should be sub-second ({elapsed:.2f}s)"
+
+
+def test_exported_beta_is_anneal_floor():
+    import export_for_frontend as eff
+
+    assert eff.beta_floor_for("va_qpso", 0.0) == 0.5
+    assert eff.beta_floor_for("va_qpso", 1.0) == 0.75
+    assert eff.beta_floor_for("fixed_beta_qpso", 0.9) == 0.5
+
+
+def test_plan_route_metrics_are_measured_not_synthesized():
+    payload = {
+        "incident_lat": 28.6300,
+        "incident_lon": 77.2200,
+        "scenario_tier": "high",
+        "seed": 7,
+        "use_live_sumo": False,
+    }
+    data = client.post("/api/plan-route", json=payload).json()
+
+    # V is measured once per request: exactly one sample, equal to the headline value.
+    (sample,) = data["metrics_over_time"]
+    assert sample["t"] == 0.0
+    assert sample["volatility_index"] == data["volatility_index"]
+    assert sample["beta"] == data["beta"]
+    assert abs(data["beta"] - (0.5 + 0.25 * data["volatility_index"])) < 1e-3
+
+    history = data["best_score_history"]
+    assert len(history) == 30
+    assert all(b <= a for a, b in zip(history, history[1:]))  # elite score never worsens

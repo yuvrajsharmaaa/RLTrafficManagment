@@ -668,1201 +668,1201 @@
     {
       "t": 1,
       "volatility_index": 0.0,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 2,
       "volatility_index": 0.0034,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 3,
       "volatility_index": 0.0232,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 4,
       "volatility_index": 0.0361,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 5,
       "volatility_index": 0.0291,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 6,
       "volatility_index": 0.0262,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 7,
       "volatility_index": 0.0307,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 8,
       "volatility_index": 0.0269,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 9,
       "volatility_index": 0.0491,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 10,
       "volatility_index": 0.0896,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 11,
       "volatility_index": 0.1056,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 12,
       "volatility_index": 0.1098,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 13,
       "volatility_index": 0.1341,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 14,
       "volatility_index": 0.148,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 15,
       "volatility_index": 0.1562,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 16,
       "volatility_index": 0.1843,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 17,
       "volatility_index": 0.1731,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 18,
       "volatility_index": 0.1728,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 19,
       "volatility_index": 0.1764,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 20,
       "volatility_index": 0.1489,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 21,
       "volatility_index": 0.1339,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 22,
       "volatility_index": 0.1354,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 23,
       "volatility_index": 0.0921,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 24,
       "volatility_index": 0.0975,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 25,
       "volatility_index": 0.1122,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 26,
       "volatility_index": 0.1077,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 27,
       "volatility_index": 0.1158,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 28,
       "volatility_index": 0.1344,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 29,
       "volatility_index": 0.161,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 30,
       "volatility_index": 0.1883,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 31,
       "volatility_index": 0.2206,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 32,
       "volatility_index": 0.2416,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 33,
       "volatility_index": 0.2618,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 34,
       "volatility_index": 0.3033,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 35,
       "volatility_index": 0.3056,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 36,
       "volatility_index": 0.3128,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 37,
       "volatility_index": 0.3558,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 38,
       "volatility_index": 0.3593,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 39,
       "volatility_index": 0.3801,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 40,
       "volatility_index": 0.385,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 41,
       "volatility_index": 0.3564,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 42,
       "volatility_index": 0.353,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 43,
       "volatility_index": 0.3526,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 44,
       "volatility_index": 0.3425,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 45,
       "volatility_index": 0.3432,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 46,
       "volatility_index": 0.2974,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 47,
       "volatility_index": 0.2573,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 48,
       "volatility_index": 0.2482,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 49,
       "volatility_index": 0.2657,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 50,
       "volatility_index": 0.2613,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 51,
       "volatility_index": 0.2487,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 52,
       "volatility_index": 0.3325,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 53,
       "volatility_index": 0.397,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 54,
       "volatility_index": 0.409,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 55,
       "volatility_index": 0.4095,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 56,
       "volatility_index": 0.4106,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 57,
       "volatility_index": 0.4528,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 58,
       "volatility_index": 0.4868,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 59,
       "volatility_index": 0.4881,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 60,
       "volatility_index": 0.4798,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 61,
       "volatility_index": 0.4391,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 62,
       "volatility_index": 0.3946,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 63,
       "volatility_index": 0.3737,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 64,
       "volatility_index": 0.3797,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 65,
       "volatility_index": 0.3537,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 66,
       "volatility_index": 0.2824,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 67,
       "volatility_index": 0.2606,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 68,
       "volatility_index": 0.2493,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 69,
       "volatility_index": 0.2055,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 70,
       "volatility_index": 0.1552,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 71,
       "volatility_index": 0.1281,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 72,
       "volatility_index": 0.1399,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 73,
       "volatility_index": 0.2348,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 74,
       "volatility_index": 0.2921,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 75,
       "volatility_index": 0.3286,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 76,
       "volatility_index": 0.3462,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 77,
       "volatility_index": 0.3609,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 78,
       "volatility_index": 0.3843,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 79,
       "volatility_index": 0.4382,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 80,
       "volatility_index": 0.4947,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 81,
       "volatility_index": 0.5552,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 82,
       "volatility_index": 0.5594,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 83,
       "volatility_index": 0.5741,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 84,
       "volatility_index": 0.5552,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 85,
       "volatility_index": 0.5084,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 86,
       "volatility_index": 0.4267,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 87,
       "volatility_index": 0.2699,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 88,
       "volatility_index": 0.2712,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 89,
       "volatility_index": 0.2771,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 90,
       "volatility_index": 0.2793,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 91,
       "volatility_index": 0.2579,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 92,
       "volatility_index": 0.2465,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 93,
       "volatility_index": 0.2044,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 94,
       "volatility_index": 0.1964,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 95,
       "volatility_index": 0.194,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 96,
       "volatility_index": 0.201,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 97,
       "volatility_index": 0.1797,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 98,
       "volatility_index": 0.2053,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 99,
       "volatility_index": 0.2092,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 100,
       "volatility_index": 0.2071,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 101,
       "volatility_index": 0.1383,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 102,
       "volatility_index": 0.1068,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 103,
       "volatility_index": 0.1137,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 104,
       "volatility_index": 0.2026,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 105,
       "volatility_index": 0.3497,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 106,
       "volatility_index": 0.4338,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 107,
       "volatility_index": 0.4945,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 108,
       "volatility_index": 0.5599,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 109,
       "volatility_index": 0.5729,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 110,
       "volatility_index": 0.5502,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 111,
       "volatility_index": 0.5324,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 112,
       "volatility_index": 0.5048,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 113,
       "volatility_index": 0.4868,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 114,
       "volatility_index": 0.4369,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 115,
       "volatility_index": 0.3747,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 116,
       "volatility_index": 0.3177,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 117,
       "volatility_index": 0.2191,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 118,
       "volatility_index": 0.1525,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 119,
       "volatility_index": 0.1935,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 120,
       "volatility_index": 0.2142,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 121,
       "volatility_index": 0.3236,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 122,
       "volatility_index": 0.4332,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 123,
       "volatility_index": 0.5271,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 124,
       "volatility_index": 0.5903,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 125,
       "volatility_index": 0.6014,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 126,
       "volatility_index": 0.6242,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 127,
       "volatility_index": 0.6238,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 128,
       "volatility_index": 0.6171,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 129,
       "volatility_index": 0.5981,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 130,
       "volatility_index": 0.5498,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 131,
       "volatility_index": 0.5067,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 132,
       "volatility_index": 0.391,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 133,
       "volatility_index": 0.2902,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 134,
       "volatility_index": 0.2385,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 135,
       "volatility_index": 0.1684,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 136,
       "volatility_index": 0.1977,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 137,
       "volatility_index": 0.2164,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 138,
       "volatility_index": 0.2174,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 139,
       "volatility_index": 0.2225,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 140,
       "volatility_index": 0.2275,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 141,
       "volatility_index": 0.2993,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 142,
       "volatility_index": 0.3706,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 143,
       "volatility_index": 0.418,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 144,
       "volatility_index": 0.4743,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 145,
       "volatility_index": 0.4973,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 146,
       "volatility_index": 0.4915,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 147,
       "volatility_index": 0.4835,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 148,
       "volatility_index": 0.4784,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 149,
       "volatility_index": 0.3982,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 150,
       "volatility_index": 0.4124,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 151,
       "volatility_index": 0.4131,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 152,
       "volatility_index": 0.3981,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 153,
       "volatility_index": 0.3161,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 154,
       "volatility_index": 0.247,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 155,
       "volatility_index": 0.1415,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 156,
       "volatility_index": 0.128,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 157,
       "volatility_index": 0.1325,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 158,
       "volatility_index": 0.143,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 159,
       "volatility_index": 0.1947,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 160,
       "volatility_index": 0.3051,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 161,
       "volatility_index": 0.3672,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 162,
       "volatility_index": 0.4987,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 163,
       "volatility_index": 0.6175,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 164,
       "volatility_index": 0.6247,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 165,
       "volatility_index": 0.6448,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 166,
       "volatility_index": 0.66,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 167,
       "volatility_index": 0.656,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 168,
       "volatility_index": 0.6446,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 169,
       "volatility_index": 0.6436,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 170,
       "volatility_index": 0.6043,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 171,
       "volatility_index": 0.5356,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "turbulent"
     },
     {
       "t": 172,
       "volatility_index": 0.4679,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 173,
       "volatility_index": 0.3514,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 174,
       "volatility_index": 0.266,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 175,
       "volatility_index": 0.2299,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 176,
       "volatility_index": 0.1659,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 177,
       "volatility_index": 0.1662,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 178,
       "volatility_index": 0.1262,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 179,
       "volatility_index": 0.1207,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 180,
       "volatility_index": 0.1236,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 181,
       "volatility_index": 0.1624,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 182,
       "volatility_index": 0.1835,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 183,
       "volatility_index": 0.2278,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 184,
       "volatility_index": 0.2617,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 185,
       "volatility_index": 0.2814,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 186,
       "volatility_index": 0.3532,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 187,
       "volatility_index": 0.3668,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 188,
       "volatility_index": 0.4281,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 189,
       "volatility_index": 0.4037,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 190,
       "volatility_index": 0.4219,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 191,
       "volatility_index": 0.426,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 192,
       "volatility_index": 0.4092,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 193,
       "volatility_index": 0.3556,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 194,
       "volatility_index": 0.2808,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "moderate"
     },
     {
       "t": 195,
       "volatility_index": 0.2053,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 196,
       "volatility_index": 0.1946,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 197,
       "volatility_index": 0.176,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 198,
       "volatility_index": 0.1528,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 199,
       "volatility_index": 0.1484,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     },
     {
       "t": 200,
       "volatility_index": 0.1357,
-      "beta": 0.75,
+      "beta": 0.5,
       "tier": "calm"
     }
   ],
@@ -1875,12 +1875,12 @@
     {
       "t": 70.0,
       "type": "replan",
-      "detail": "Traffic conditions steady. Maintained standard corridor for hospital transit."
+      "detail": "Traffic conditions steady. Maintained corridor for fastest transit time to hospital."
     },
     {
       "t": 140.0,
       "type": "replan",
-      "detail": "Traffic conditions steady. Maintained standard corridor for hospital transit."
+      "detail": "Traffic conditions steady. Maintained corridor for fastest transit time to hospital."
     }
   ],
   "completion_time": 109.37

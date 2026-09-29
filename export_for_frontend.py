@@ -10,7 +10,8 @@ Produces frontend-friendly JSON payloads containing:
 - "algorithm": Algorithm name ("va_qpso" or "fixed_beta_qpso")
 - "stops": Delivery destinations with latitude, longitude, label, and junction ID
 - "path": Densely sampled vehicle GPS coordinates over time
-- "metrics_over_time": Rolling volatility index, beta coefficient, and tier
+- "metrics_over_time": Rolling volatility index, beta anneal floor (va_qpso: 0.5 + 0.25 * V;
+  fixed_beta_qpso: 0.5), and tier
 - "events": Plain-language event stream for judges (re-plans, tactical detours)
 - "completion_time": Total route completion time in simulated seconds
 
@@ -70,10 +71,23 @@ except ImportError:
     HAS_SIMULATION = False
 
 try:
-    from src.planner.qpso import va_beta_floor
+    from src.planner.qpso import DEFAULT_BETA_MIN, va_beta_floor
 except ImportError:  # planner deps unavailable; same formula as src/planner/qpso.py
-    def va_beta_floor(volatility_index: float, beta_min: float = 0.5) -> float:
+    DEFAULT_BETA_MIN = 0.5
+
+    def va_beta_floor(volatility_index: float, beta_min: float = DEFAULT_BETA_MIN) -> float:
         return beta_min + 0.25 * volatility_index
+
+
+def beta_floor_for(algorithm: str, volatility_index: float) -> float:
+    """
+    Exported "beta": the floor each re-plan's anneal ends at (both variants
+    start at beta_max = 1.0). va_qpso ends at beta_min + 0.25 * V;
+    fixed_beta_qpso always ends at beta_min, independent of V.
+    """
+    if algorithm == "va_qpso":
+        return va_beta_floor(volatility_index)
+    return DEFAULT_BETA_MIN
 
 # Constants
 DEFAULT_NET_FILE = str(PROJECT_ROOT / "networks" / "delhi" / "delhi_intersection.net.xml")
@@ -493,7 +507,7 @@ def metrics(events: list[dict[str, Any]], completion_time: float, algorithm: str
     result = []
     for event in updates:
         volatility = max(0.0, min(1.0, float(event["volatility_index"])))
-        beta = va_beta_floor(volatility) if algorithm == "va_qpso" else 0.75
+        beta = beta_floor_for(algorithm, volatility)
         result.append({
             "t": round(min(float(event.get("sim_time", 0.0)), completion_time), 2),
             "volatility_index": round(volatility, 4),
@@ -813,7 +827,7 @@ def run_and_export_trial(
             v_val = nvi.update(edge_speeds)
             v_val = max(0.0, min(1.0, v_val))
 
-            beta_val = va_beta_floor(v_val) if algorithm == "va_qpso" else 0.75
+            beta_val = beta_floor_for(algorithm, v_val)
             tier_label = tier_for(v_val)
 
             metrics_over_time.append({
